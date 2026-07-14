@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cogito RFP Intelligence Framework™</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Mammoth.js for Word Document Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.2/mammoth.browser.min.js"></script>
+    
+    <!-- PDF.js for PDF Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    </script>
+    
+    <!-- SheetJS for Excel & CSV Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Marked.js for Robust Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+        
+        /* Advanced Markdown Styles */
+        .markdown-body { font-size: 0.95rem; line-height: 1.7; color: #334155; }
+        .markdown-body h1 { font-size: 1.75em; font-weight: 800; margin-top: 1.5em; margin-bottom: 0.75em; color: #0f172a; line-height: 1.2; }
+        .markdown-body h2 { font-size: 1.4em; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.75em; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; }
+        .markdown-body h3 { font-size: 1.15em; font-weight: 700; margin-top: 1.2em; margin-bottom: 0.5em; color: #334155; }
+        .markdown-body p { margin-bottom: 1.2em; }
+        .markdown-body ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1.2em; }
+        .markdown-body ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1.2em; }
+        .markdown-body li { margin-bottom: 0.3em; }
+        .markdown-body strong { color: #0f172a; font-weight: 700; }
+        
+        /* Premium Table Design */
+        .markdown-body table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 1.5em; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
+        .markdown-body th, .markdown-body td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 0.75rem 1rem; text-align: left; }
+        .markdown-body th:last-child, .markdown-body td:last-child { border-right: none; }
+        .markdown-body tbody tr:last-child td { border-bottom: none; }
+        .markdown-body th { background-color: #f8fafc; font-weight: 600; color: #334155; border-bottom: 2px solid #cbd5e1; }
+        .markdown-body tbody tr { background-color: #ffffff; transition: background-color 0.2s; }
+        .markdown-body tbody tr:hover { background-color: #f1f5f9; }
+        
+        .markdown-body blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; margin-bottom: 1.2em; color: #475569; background: #eff6ff; padding: 0.5rem 1rem; border-radius: 0 0.5rem 0.5rem 0; font-style: italic; }
+        
+        /* Loading Animation */
+        .loading-dots::after {
+            content: '.';
+            animation: dots 1.5s steps(5, end) infinite;
+        }
+        @keyframes dots { 
+            0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 
+            40% { color: inherit; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 
+            60% { text-shadow: .25em 0 0 inherit, .5em 0 0 rgba(0,0,0,0);} 
+            80%, 100% { text-shadow: .25em 0 0 inherit, .5em 0 0 inherit;}
+        }
+        
+        /* Chatbot Resizable Container */
+        #chatbot-container {
+            resize: both;
+            overflow: hidden;
+            min-width: 300px;
+            min-height: 50px; 
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+        .chat-message { max-width: 85%; word-wrap: break-word; }
+        
+        /* Custom scrollbar for tags container */
+        .tags-scroll { overflow-x: auto; scrollbar-width: none; }
+        .tags-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
+
+    <!-- Top Navigation -->
+    <header class="bg-slate-900 text-white shadow-md border-b border-slate-800 relative z-50 w-full">
+        <div class="container mx-auto px-4 py-3 flex items-center gap-3">
+            <img src="https://i.postimg.cc/fT2sQW09/1.png" alt="Logo" class="h-8 object-contain bg-white rounded p-1">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-white">Cogito RFP Intelligence Framework™</h1>
+                <div class="text-xs text-slate-400 font-medium">企業提案拆解與回應決策系統</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+        
+        <!-- Left Column: Input & Controls & Profile -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- API Key Setup -->
+            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200 bg-slate-900 text-white relative z-20">
+                <h2 class="text-sm font-semibold mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-key text-yellow-400"></i> 1. 系統啟動金鑰
+                </h2>
+                <div class="flex flex-col gap-3">
+                    <input type="password" id="apiKeyInput" placeholder="點擊此處貼上您的 Gemini API Key..." 
+                           class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 placeholder-slate-400 cursor-text">
+                    <button id="saveKeyBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                        <i class="fa-solid fa-lock"></i> 儲存金鑰並解鎖系統
+                    </button>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-3 text-center">金鑰僅加密暫存於您的瀏覽器中，關閉網頁即自動清除，保證安全。</p>
+            </div>
+            
+            <!-- Context Input -->
+            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-lg font-semibold mb-3 flex items-center justify-between">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-file-lines text-blue-600"></i> 2. 提案上下文</span>
+                    <div class="flex gap-2 text-xs">
+                        <button id="saveLocalBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition border border-slate-300" title="儲存進度至本機"><i class="fa-solid fa-hard-drive"></i></button>
+                        <button id="loadLocalBtn" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-1 rounded transition border border-slate-300" title="從本機載入"><i class="fa-solid fa-rotate-left"></i></button>
+                        <button id="exportBackupBtn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded transition border border-blue-200" title="下載備份"><i class="fa-solid fa-cloud-arrow-down"></i></button>
+                        <label class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-2 py-1 rounded transition border border-blue-200 cursor-pointer" title="上傳還原">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <input type="file" id="importBackupFile" class="hidden" accept=".json">
+                        </label>
+                    </div>
+                </h2>
+                
+                <div class="mb-3 flex flex-col gap-2">
+                    <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-slate-900 shadow-sm w-full">
+                        <i class="fa-solid fa-cloud-arrow-up text-base"></i> 上傳資料 (PDF/Word/Excel/CSV/TXT/圖片)
+                        <input type="file" id="fileUpload" class="hidden" multiple accept=".pdf,.docx,.xlsx,.xls,.csv,.txt,.png,.jpg,.jpeg">
+                    </label>
+                </div>
+
+                <!-- RFP 網址匯入 -->
+                <div class="flex flex-col gap-2 mb-3">
+                    <div class="flex gap-2">
+                        <input type="text" id="rfpUrlInput" placeholder="貼上參考網頁或競爭對手連結..." class="flex-grow bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+                        <button id="addRfpUrlBtn" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs transition whitespace-nowrap shrink-0">新增連結</button>
+                    </div>
+                    <!-- RFP 網址標籤容器 -->
+                    <div id="rfpUrlTagsContainer" class="flex flex-wrap gap-2 empty:hidden"></div>
+                </div>
+
+                <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mb-2 empty:hidden"></div>
+                <!-- RFP 檔案標籤容器 -->
+                <div id="rfpFileTagsContainer" class="flex flex-wrap gap-2 mb-2 empty:hidden"></div>
+                
+                <textarea id="rfpContext" rows="8" placeholder="在此直接貼上 RFP 文件內容..." 
+                          class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y text-sm"></textarea>
+            </div>
+
+            <!-- Workflow Steps -->
+            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-wand-magic-sparkles text-blue-600"></i> 3. 選擇戰略分析模組
+                </h2>
+                
+                <!-- 戰略分析模組使用說明 -->
+                <details class="mb-4 group bg-blue-50 hover:bg-blue-100 transition-colors border border-blue-200 rounded-lg text-sm text-slate-700 open:bg-white open:hover:bg-white open:shadow-sm">
+                    <summary class="cursor-pointer font-medium text-blue-800 px-4 py-3 flex items-center justify-between select-none list-none [&::-webkit-details-marker]:hidden">
+                        <span class="flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> 模組使用說明與建議流程</span>
+                        <i class="fa-solid fa-chevron-down text-xs text-blue-500 transition-transform duration-300 group-open:rotate-180"></i>
+                    </summary>
+                    <div class="px-4 pb-4 border-t border-blue-100 pt-3 space-y-3 text-xs leading-relaxed text-slate-600">
+                        <p class="font-medium text-slate-700">💡 建議依序進行深度拆解，或根據當下需求獨立呼叫：</p>
+                        <div class="space-y-2">
+                            <p><strong class="text-blue-700">Phase 1 拆解與洞察：</strong> 先用 <span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">模組 1-3</span> 將數十頁 RFP 濃縮為戰情摘要，破解客戶計分卡並找出我方致命缺口。</p>
+                            <p><strong class="text-blue-700">Phase 2 戰略與定位：</strong> 透過 <span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">模組 4</span> 發展核心勝選主軸 (Win Theme)。</p>
+                            <p><strong class="text-blue-700">Phase 3 提案建構：</strong> 利用 <span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">模組 5-6</span> 將戰略轉化為實際的簡報大綱，並建立防漏分的合規回應矩陣。</p>
+                            <p><strong class="text-blue-700">Phase 4 執行與收尾：</strong> 最後用 <span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">模組 7-9</span> 把關報價邏輯與檢查清單。</p>
+                        </div>
+                    </div>
+                </details>
+
+                <div class="grid grid-cols-1 gap-2 max-h-[400px] overflow-y-auto pr-2" id="workflowButtons">
+                    <!-- Buttons generated by JS -->
+                </div>
+            </div>
+
+            <!-- 4. 歷史提案勝敗覆盤分析 -->
+            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200">
+                <h2 class="text-lg font-semibold mb-3 flex items-center justify-between">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-file-signature text-blue-600"></i> 4. 提案評估與歷史覆盤</span>
+                </h2>
+                
+                <!-- 檔案上傳 -->
+                <div class="mb-3 flex flex-col gap-2">
+                    <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-2 rounded flex items-center justify-center gap-2 transition-colors border border-slate-300 shadow-sm w-full">
+                        <i class="fa-solid fa-file-arrow-up text-base"></i> 上傳我方提案 (PDF/Word/Excel/CSV/TXT)
+                        <input type="file" id="proposalFileUpload" class="hidden" multiple accept=".pdf,.docx,.xlsx,.xls,.csv,.txt">
+                    </label>
+                </div>
+                
+                <!-- 提案網址匯入 -->
+                <div class="flex flex-col gap-2 mb-3">
+                    <div class="flex gap-2">
+                        <input type="text" id="proposalUrlInput" placeholder="貼上 YouTube 影片或多個網頁連結..." class="flex-grow bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500">
+                        <button id="addProposalUrlBtn" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs transition whitespace-nowrap shrink-0">新增連結</button>
+                    </div>
+                    <!-- 提案網址標籤容器 -->
+                    <div id="proposalUrlTagsContainer" class="flex flex-wrap gap-2 empty:hidden"></div>
+                </div>
+
+                <!-- 提案檔案標籤容器 -->
+                <div id="proposalFileTagsContainer" class="flex flex-wrap gap-2 mb-2 empty:hidden"></div>
+                
+                <textarea id="proposalContext" rows="4" placeholder="在此貼上我方提案內容。若是提交前，可請求 AI 評估優化；若是已結束專案，可進行勝敗覆盤..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y text-sm mb-3"></textarea>
+                
+                <div class="flex flex-col gap-2">
+                    <button id="optimizeDraftBtn" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2.5 rounded-lg text-sm font-bold transition flex items-center justify-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 提交前：提案草案紅隊評估與優化
+                    </button>
+                    <div class="grid grid-cols-2 gap-2 mt-1">
+                        <button id="winAnalysisBtn" class="bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-trophy"></i> 事後：勝選關鍵
+                        </button>
+                        <button id="lossAnalysisBtn" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-2 rounded-lg text-sm font-medium transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-heart-crack"></i> 事後：敗選剖析
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TONY 顧問名片 -->
+            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200 bg-white">
+                <div class="flex items-start gap-4 mb-4">
+                    <img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" alt="TONY 老師" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 shadow-sm">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg leading-tight">TONY 楊文澤 老師</h3>
+                        <p class="text-xs text-blue-600 font-medium mt-1">資深數位行銷科技顧問 / 創業導師</p>
+                    </div>
+                </div>
+                <div class="text-xs text-slate-600 space-y-2">
+                    <p><strong><i class="fa-solid fa-briefcase text-slate-400 w-4"></i> 現職:</strong> 龍華科大 數位行銷講師 / 智策慧 品牌行銷科技顧問</p>
+                    <p><strong><i class="fa-solid fa-star text-slate-400 w-4"></i> 經歷:</strong> 脈動心聯 創辦人暨執行長 / 宏碁集團建碁 AOPEN 整合營銷處處長</p>
+                    <p><strong><i class="fa-solid fa-graduation-cap text-slate-400 w-4"></i> 學歷:</strong> 台大 EMBA 商學組 / 美國 Arizona State University 互動多媒體設計</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Results & Workspace -->
+        <div class="lg:col-span-8 flex flex-col h-[800px]">
+            <div class="glass-panel rounded-xl shadow-sm flex flex-col h-full overflow-hidden border border-slate-200 bg-white">
+                
+                <!-- Output Header -->
+                <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center">
+                    <h2 class="font-semibold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-robot text-blue-600"></i> AI 戰略分析結果
+                    </h2>
+                    <div class="flex gap-2 items-center">
+                        <span id="statusBadge" class="px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded-full font-medium">等待指令</span>
+                        <button id="exportWordBtn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1 rounded text-xs transition border border-blue-200 hidden" title="匯出成 Word 檔案">
+                            <i class="fa-solid fa-file-word mr-1"></i> 匯出 Word
+                        </button>
+                        <button id="copyBtn" class="text-slate-500 hover:text-blue-600 transition-colors hidden px-2" title="複製內容">
+                            <i class="fa-regular fa-copy text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Output Body -->
+                <div class="p-6 overflow-y-auto flex-grow relative bg-white">
+                    <!-- Empty State -->
+                    <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
+                        <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fa-solid fa-layer-group text-3xl text-slate-300"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-slate-600 mb-2">等待開始分析</h3>
+                        <p class="text-sm max-w-md">請在左側輸入 RFP 內容或上傳檔案，並選擇一個戰略分析模組。AI 將在此為您生成結構化報告。</p>
+                    </div>
+                    <!-- Loading State -->
+                    <div id="loadingState" class="absolute inset-0 flex flex-col items-center justify-center text-blue-500 p-8 text-center hidden bg-white z-10">
+                        <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i>
+                        <h3 class="text-lg font-medium text-slate-700 mb-1">AI 正在深度拆解中</h3>
+                        <p class="text-sm text-slate-500">正在分析文本與連結資料並建立關聯，請稍候...</p>
+                    </div>
+                    <!-- Result Content -->
+                    <div id="resultContent" class="markdown-body hidden"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm border-t border-slate-800 mt-auto z-10 relative">
+        <div class="container mx-auto px-4">
+            <p>&copy; 2026 TONY STUDIO. 本教材由 TONY STUDIO 楊文澤顧問設計. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- TONY 顧問 AI 助理 Chatbot -->
+    <div id="chatbot-container" class="fixed bottom-6 right-6 bg-white rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.15)] border border-slate-200 flex flex-col" style="display: flex; height: 50px; z-index: 9999;">
+        <!-- Header -->
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-t-xl flex justify-between items-center cursor-pointer" id="chatToggleHeader">
+            <div class="flex items-center gap-3 pointer-events-none">
+                <div class="relative">
+                    <img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-9 h-9 rounded-full border-2 border-slate-600 object-cover" alt="TONY">
+                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></span>
+                </div>
+                <div>
+                    <div class="font-bold text-sm leading-tight">TONY 顧問</div>
+                    <div class="text-[10px] text-slate-300">首席提案策略 AI 助理</div>
+                </div>
+            </div>
+            <div class="flex gap-3 items-center">
+                <button id="chatExportBtn" class="text-slate-300 hover:text-white transition-colors p-1" title="對話存成 Word"><i class="fa-solid fa-file-word text-lg"></i></button>
+                <button id="chatCopyBtn" class="text-slate-300 hover:text-white transition-colors p-1" title="複製對話內容"><i class="fa-regular fa-copy text-lg"></i></button>
+                <button id="chatToggleBtn" class="text-slate-300 hover:text-white transition-colors p-1 pointer-events-none" title="最小化/展開"><i class="fa-solid fa-chevron-up text-lg"></i></button>
+            </div>
+        </div>
+        <!-- Chat Area -->
+        <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-slate-50 flex flex-col gap-4 text-sm relative" style="display: none;">
+            <!-- Messages rendered by JS -->
+        </div>
+        <!-- Input Area -->
+        <div class="p-3 bg-white border-t border-slate-200 flex gap-2" style="display: none;" id="chatInputArea">
+            <textarea id="chatInput" rows="2" class="flex-grow border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 resize-none" placeholder="問問 TONY 顧問任何問題..."></textarea>
+            <button id="chatSendBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg transition-colors flex items-center justify-center"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT -->
+    <script>
+        // System Prompt defined by Tony
+        const SYSTEM_PROMPT = `你現在是 Cogito 企業的首席提案策略師（Chief Proposal Strategist）與 B2B 採購分析專家。你擅長解讀大型企業的 RFP，能看透表層需求，挖掘隱性與決策需求。你的目標是協助團隊制定勝率最高的提案架構、規避合約與執行風險，並規劃出最合理的成本與專案管理模型。請以專業、結構化、具備商業洞察的繁體中文回答。
+
+【排版與視覺強調準則】（非常重要）：
+1. 精美表格：分析結果若包含比較、清單或矩陣，請「務必」使用 Markdown 表格呈現。系統會自動將其渲染為高質感的 HTML 表格。
+2. 顧問式文章：所有的回答必須以流暢的繁體中文「文章與段落」來撰寫，絕對禁止直接輸出原始資料庫格式（如 JSON 陣列、XML 等程式碼）。
+3. 風險與重點強調區塊：針對特別需要主管或團隊注意的地方（如：致命風險、紅旗條款、重要決策點、機會），請「直接使用以下 HTML Tailwind 顏色區塊語法」進行強烈視覺提示：
+   - 🔴 致命風險 / 警告：
+     <div class="bg-red-50 border-l-4 border-red-500 p-4 my-4 rounded-r-lg shadow-sm"><h4 class="text-red-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> 致命風險警告</h4><p class="text-red-700 text-sm m-0">此處說明風險內容...</p></div>
+   - 🔵 核心策略 / 洞察：
+     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-4 rounded-r-lg shadow-sm"><h4 class="text-blue-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-lightbulb"></i> 核心策略洞察</h4><p class="text-blue-700 text-sm m-0">此處說明策略...</p></div>
+   - 🟢 勝選關鍵 / 加分項：
+     <div class="bg-green-50 border-l-4 border-green-500 p-4 my-4 rounded-r-lg shadow-sm"><h4 class="text-green-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> 勝選關鍵要素</h4><p class="text-green-700 text-sm m-0">此處說明加分項...</p></div>
+   - 🟠 潛在成本 / 財務注意：
+     <div class="bg-orange-50 border-l-4 border-orange-500 p-4 my-4 rounded-r-lg shadow-sm"><h4 class="text-orange-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> 財務與報價提醒</h4><p class="text-orange-700 text-sm m-0">此處說明成本風險...</p></div>`;
+
+        const TONY_PERSONA = `請稱呼我TONY老師。我的職業是: 一位AI的導師，一位大學的講師，一位數位行銷科技的資深顧問，一位創業者，一位AI的老師。我的背景:我喜歡創新，我喜歡新科技應用，我喜歡思考，我喜歡行銷，我是一位60歲非常有經驗的品牌行銷、行銷科技、生成式AI創作者及講師，我善良、喜歡學習、有自己的觀點，想創新想發展自己的教學方法與框架，擁有設計、行銷、商業、創業的實務經驗，擔任過上市公司14年的發言人。在開始撰寫任何回覆之前，請主動執行以下步驟：
+第一步：專家優化 - 你現在是一名深耕 AI 領域的顧問，專精於提示詞優化邏輯。當我輸入「原始提示詞」時，請先將其轉化為更精確、能讓模型發揮最高效能的指令。 優化核心原則： 最有效的提示詞平均約為21個字。若原始提示詞過於簡短，請務必在轉化過程中強化「背景資訊」維度，以確保回覆品質。 轉化時必須包含以下四個維度：[角色任務]：定義專業身份與核心目標。 [背景資訊]：提供必要的情境。[具體指令]：拆解明確的操作步驟。[約束條件]：規定字數、格式、語氣，且一律使用「正向表述」。
+第二步：直接答覆 - 優化完成後，請立即依照該套優化後的指令進行答覆，產出最終內容。並運用 Markdown 語法讓結構清晰。`;
+
+        // State variables
+        let currentApiKey = localStorage.getItem('gemini_api_key') || '';
+        let uploadedImages = [];
+        let rfpParsedFiles = [];      // 獨立存儲 RFP 檔案
+        let proposalParsedFiles = []; // 獨立存儲 Proposal 檔案
+        let rfpUrls = [];             // 獨立存儲 RFP 網址
+        let proposalUrls = [];        // 獨立存儲 Proposal 網址
+        let chatHistory = [
+            { role: "user", parts: [{ text: "哈囉" }] },
+            { role: "model", parts: [{ text: "你好！我是 **TONY 老師**，你的資深數位行銷科技顧問與 AI 導師。請問關於 RFP 拆解或提案策略，有什麼我可以協助你的？" }] }
+        ];
+
+        // UI Elements
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveKeyBtn = document.getElementById('saveKeyBtn');
+        const rfpContext = document.getElementById('rfpContext');
+        const proposalContext = document.getElementById('proposalContext');
+        const workflowButtonsContainer = document.getElementById('workflowButtons');
+        
+        const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('loadingState');
+        const resultContent = document.getElementById('resultContent');
+        const statusBadge = document.getElementById('statusBadge');
+        
+        const copyBtn = document.getElementById('copyBtn');
+        const exportWordBtn = document.getElementById('exportWordBtn');
+
+        const fileUpload = document.getElementById('fileUpload');
+        const proposalFileUpload = document.getElementById('proposalFileUpload');
+        
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const rfpFileTagsContainer = document.getElementById('rfpFileTagsContainer');
+        const proposalFileTagsContainer = document.getElementById('proposalFileTagsContainer');
+        const rfpUrlTagsContainer = document.getElementById('rfpUrlTagsContainer');
+        const proposalUrlTagsContainer = document.getElementById('proposalUrlTagsContainer');
+
+        const saveLocalBtn = document.getElementById('saveLocalBtn');
+        const loadLocalBtn = document.getElementById('loadLocalBtn');
+        const exportBackupBtn = document.getElementById('exportBackupBtn');
+        const importBackupFile = document.getElementById('importBackupFile');
+
+        // Review Buttons
+        const optimizeDraftBtn = document.getElementById('optimizeDraftBtn');
+        const winAnalysisBtn = document.getElementById('winAnalysisBtn');
+        const lossAnalysisBtn = document.getElementById('lossAnalysisBtn');
+        
+        // URL Buttons
+        const addRfpUrlBtn = document.getElementById('addRfpUrlBtn');
+        const addProposalUrlBtn = document.getElementById('addProposalUrlBtn');
+
+        // Chatbot Elements
+        const chatbotContainer = document.getElementById('chatbot-container');
+        const chatToggleHeader = document.getElementById('chatToggleHeader');
+        const chatToggleBtn = document.getElementById('chatToggleBtn');
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInputArea = document.getElementById('chatInputArea');
+        const chatInput = document.getElementById('chatInput');
+        const chatSendBtn = document.getElementById('chatSendBtn');
+        const chatCopyBtn = document.getElementById('chatCopyBtn');
+        const chatExportBtn = document.getElementById('chatExportBtn');
+
+        const workflows = [
+            { id: 1, title: "1. RFP Intake & 需求抽取", icon: "fa-crosshairs", prompt: "請分析附上的 [RFP 文件]，並為我產出一份「一頁式戰情摘要表」。\n請務必包含以下欄位，並以表格呈現：\n1. 專案名稱與客戶背景。\n2. 專案核心目標（客戶真正想解決的問題）。\n3. 服務範圍（Scope of Work）條列與分類。\n4. 專案時程與合約期間。\n5. 資格門檻與法務要求（如 NDA、財報等）。\n6. 預期交付物清單（Deliverables）。" },
+            { id: 2, title: "2. Scoring 反推評分邏輯", icon: "fa-scale-balanced", prompt: "請針對 [RFP 文件] 中的「Evaluation Criteria and Weight（評選標準與權重）」段落進行深度反向工程。\n請產出一個表格，包含：\n1. 評分項目與權重。\n2. AI 洞察：客戶在乎這個項目的「潛台詞」是什麼？\n3. 我方應對策略：我們在提案中必須強調什麼才能拿滿分？" },
+            { id: 3, title: "3. Risk & Gap 分析缺口", icon: "fa-triangle-exclamation", prompt: "請比對上述的 RFP 需求與評分標準，進行 Risk & Gap 分析。\n請列出：\n1. 致命風險（Red Flags）：可能無法達標的硬性規定及替代方案。\n2. 執行風險：專案執行過程中可能遇到的最大困難。\n3. 競爭劣勢缺口：競爭對手可能攻擊我們的弱點及防禦策略。" },
+            { id: 4, title: "4. Win Theme 產出勝選主軸", icon: "fa-flag-checkered", prompt: "基於 RFP 拆解，請為這個提案設計 3 個不同切入點的「Win Theme (勝選主軸)」。\n包含：\n1. 主軸名稱（中英雙語）。\n2. 核心論述。\n3. 支撐此主軸的 3 個關鍵戰略支柱（Key Pillars）。\n請挑選出勝率最高的一個並說明原因。" },
+            { id: 5, title: "5. Proposal 生成提案大綱", icon: "fa-list-ol", prompt: "請基於 RFP 評分權重，幫我擬定一份「提案簡報大綱 (Table of Contents)」。\n規則：對應 RFP 審查順序，將 Scope 拆解成 5-8 個「工作包」，並列出各章節核心目的與預計圖表。" },
+            { id: 6, title: "6. Compliance 逐條回應矩陣", icon: "fa-table-list", prompt: "請幫我建立一份「Compliance Matrix (合規回應矩陣)」。\n逐條掃描 RFP，列出要求、頁碼、類別（資格/法務/執行/創意/報價），及我方對應的回應章節。" },
+            { id: 7, title: "7. Cost Breakdown 建立報價邏輯", icon: "fa-file-invoice-dollar", prompt: "請檢視 RFP 報價要求，建立「報價邏輯模型框架」。\n列出計價單元，以及潛在的隱藏成本（Hidden Costs）提醒清單。" },
+            { id: 8, title: "8. Q&A List 產出澄清問題", icon: "fa-clipboard-question", prompt: "請找出這份 RFP 中語意模糊、高風險條款，草擬 5-8 個專業的「澄清問題 (Clarification Questions)」，準備詢問客戶。" },
+            { id: 9, title: "9. Final Proposal 最終封裝清單", icon: "fa-box-open", prompt: "請根據 RFP 的所有要求，幫我列出一份最終投標 Check-list。區分法務文件、簡報附件、報價單格式、遞交方式。" }
+        ];
+
+        workflows.forEach(wf => {
+            const btn = document.createElement('button');
+            btn.className = 'w-full text-left px-4 py-3 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all group flex items-center justify-between text-sm text-slate-700 font-medium bg-white';
+            btn.innerHTML = `<span class="flex items-center gap-3"><i class="fa-solid ${wf.icon} text-slate-400 group-hover:text-blue-600 transition-colors w-5 text-center"></i> ${wf.title}</span><i class="fa-solid fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>`;
+            btn.onclick = () => runAnalysis(wf);
+            workflowButtonsContainer.appendChild(btn);
+        });
+
+        // Initialize API Key UI
+        if (currentApiKey && apiKeyInput) {
+            apiKeyInput.value = currentApiKey;
+            if (saveKeyBtn) {
+                saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已儲存';
+                saveKeyBtn.classList.replace('bg-blue-600', 'bg-green-600');
+                saveKeyBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+            }
+        }
+
+        if (saveKeyBtn) {
+            saveKeyBtn.onclick = () => {
+                const key = apiKeyInput.value.trim();
+                if (key) {
+                    localStorage.setItem('gemini_api_key', key);
+                    currentApiKey = key;
+                    saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已儲存';
+                    saveKeyBtn.classList.replace('bg-blue-600', 'bg-green-600');
+                    saveKeyBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+                } else {
+                    alert('請輸入有效的 API Key');
+                }
+            };
+        }
+
+        // ==========================================
+        // 網址標籤管理邏輯 (多筆 URL)
+        // ==========================================
+        function renderUrlTags(urlsArray, containerId, removeFnName) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            urlsArray.forEach((url, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs px-2 py-1 rounded flex items-center gap-1 shadow-sm shrink-0 mb-1';
+                tag.innerHTML = `<i class="fa-solid fa-link"></i> <span class="max-w-[200px] truncate" title="${url}">${url}</span>
+                                 <button class="text-indigo-400 hover:text-red-500 transition ml-1" onclick="${removeFnName}(${index})" title="移除連結"><i class="fa-solid fa-xmark"></i></button>`;
+                container.appendChild(tag);
+            });
+        }
+
+        window.removeRfpUrl = function(index) { rfpUrls.splice(index, 1); renderUrlTags(rfpUrls, 'rfpUrlTagsContainer', 'removeRfpUrl'); };
+        window.removeProposalUrl = function(index) { proposalUrls.splice(index, 1); renderUrlTags(proposalUrls, 'proposalUrlTagsContainer', 'removeProposalUrl'); };
+
+        if (addRfpUrlBtn) {
+            addRfpUrlBtn.onclick = () => {
+                const urlInput = document.getElementById('rfpUrlInput');
+                const url = urlInput.value.trim();
+                if(url) {
+                    rfpUrls.push(url);
+                    renderUrlTags(rfpUrls, 'rfpUrlTagsContainer', 'removeRfpUrl');
+                    urlInput.value = '';
+                }
+            };
+        }
+
+        if (addProposalUrlBtn) {
+            addProposalUrlBtn.onclick = () => {
+                const urlInput = document.getElementById('proposalUrlInput');
+                const url = urlInput.value.trim();
+                if(url) {
+                    proposalUrls.push(url);
+                    renderUrlTags(proposalUrls, 'proposalUrlTagsContainer', 'removeProposalUrl');
+                    urlInput.value = '';
+                }
+            };
+        }
+
+        // ==========================================
+        // 核心檔案萃取引擎 (支援多格式)
+        // ==========================================
+        async function extractTextFromFile(file) {
+            const fileName = file.name.toLowerCase();
+            try {
+                if (fileName.endsWith('.txt') || fileName.endsWith('.csv')) {
+                    return await file.text();
+                } else if (fileName.endsWith('.docx')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+                    return result.value;
+                } else if (fileName.endsWith('.pdf')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                    let fullText = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(' ') + '\n';
+                    }
+                    return fullText;
+                } else if (fileName.match(/\.(xlsx|xls)$/)) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer, {type: 'array'});
+                    let excelText = '';
+                    workbook.SheetNames.forEach(sheetName => {
+                        const sheet = workbook.Sheets[sheetName];
+                        excelText += `[工作表: ${sheetName}]\n` + XLSX.utils.sheet_to_csv(sheet) + '\n\n';
+                    });
+                    return excelText;
+                }
+            } catch (err) {
+                alert(`解析檔案 ${file.name} 時發生錯誤: ` + err.message);
+            }
+            return null;
+        }
+
+        // 渲染檔案標籤 UI
+        function renderFileTags(filesArray, containerId, removeFnName) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            filesArray.forEach((fileObj, index) => {
+                const tag = document.createElement('div');
+                tag.className = 'bg-blue-50 text-blue-700 border border-blue-200 text-xs px-2 py-1 rounded flex items-center gap-1 shadow-sm shrink-0 mb-1';
+                tag.innerHTML = `<i class="fa-solid fa-file"></i> <span class="max-w-[150px] truncate" title="${fileObj.name}">${fileObj.name}</span>
+                                 <button class="text-blue-400 hover:text-red-500 transition ml-1" onclick="${removeFnName}(${index})" title="移除檔案"><i class="fa-solid fa-xmark"></i></button>`;
+                container.appendChild(tag);
+            });
+        }
+
+        window.removeRfpFile = function(index) { rfpParsedFiles.splice(index, 1); renderFileTags(rfpParsedFiles, 'rfpFileTagsContainer', 'removeRfpFile'); };
+        window.removeProposalFile = function(index) { proposalParsedFiles.splice(index, 1); renderFileTags(proposalParsedFiles, 'proposalFileTagsContainer', 'removeProposalFile'); };
+        window.removeImage = function(btn, index) { uploadedImages.splice(index, 1); btn.parentElement.remove(); };
+
+        // 監聽 RFP 檔案上傳
+        if (fileUpload) {
+            fileUpload.addEventListener('change', async (e) => {
+                const files = e.target.files;
+                if(!files.length) return;
+                
+                rfpContext.placeholder = "正在解析檔案內容中，請稍候...";
+                for(let file of files) {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (ev) => {
+                            uploadedImages.push({ mimeType: file.type, data: ev.target.result.split(',')[1], name: file.name });
+                            const img = document.createElement('div');
+                            img.className = 'relative w-14 h-14 rounded overflow-hidden border border-slate-300 shadow-sm group shrink-0 mb-1';
+                            img.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover">
+                                             <button class="absolute top-0 right-0 bg-red-500/80 text-white text-[10px] w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeImage(this, ${uploadedImages.length - 1})" title="移除圖片"><i class="fa-solid fa-xmark"></i></button>`;
+                            imagePreviewContainer.appendChild(img);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        const text = await extractTextFromFile(file);
+                        if(text) rfpParsedFiles.push({ name: file.name, text: text });
+                    }
+                }
+                renderFileTags(rfpParsedFiles, 'rfpFileTagsContainer', 'removeRfpFile');
+                rfpContext.placeholder = "在此直接貼上 RFP 文件內容...";
+                fileUpload.value = '';
+            });
+        }
+
+        // 監聽提案覆盤檔案上傳
+        if (proposalFileUpload) {
+            proposalFileUpload.addEventListener('change', async (e) => {
+                const files = e.target.files;
+                if(!files.length) return;
+                
+                proposalContext.placeholder = "正在解析提案檔案中，請稍候...";
+                for(let file of files) {
+                    const text = await extractTextFromFile(file);
+                    if(text) proposalParsedFiles.push({ name: file.name, text: text });
+                }
+                renderFileTags(proposalParsedFiles, 'proposalFileTagsContainer', 'removeProposalFile');
+                proposalContext.placeholder = "在此貼上我方提案內容...";
+                proposalFileUpload.value = '';
+            });
+        }
+
+        // ==========================================
+        // 本機 / 雲端備份邏輯
+        // ==========================================
+        function getBackupState() {
+            return JSON.stringify({
+                textContext: rfpContext.value,
+                proposalText: proposalContext.value,
+                images: uploadedImages,
+                rfpFiles: rfpParsedFiles,
+                proposalFiles: proposalParsedFiles,
+                rfpUrls: rfpUrls,
+                proposalUrls: proposalUrls,
+                chat: chatHistory
+            });
+        }
+
+        if (saveLocalBtn) { saveLocalBtn.onclick = () => { localStorage.setItem('cogito_rfp_backup', getBackupState()); alert('工作階段已儲存至瀏覽器本機！'); }; }
+        if (loadLocalBtn) { loadLocalBtn.onclick = () => { const dataStr = localStorage.getItem('cogito_rfp_backup'); if(dataStr) restoreWorkspaceState(dataStr); else alert('找不到本機備份。'); }; }
+        if (exportBackupBtn) {
+            exportBackupBtn.onclick = () => {
+                const blob = new Blob([getBackupState()], {type: "application/json"});
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `Cogito_Workspace_${new Date().toISOString().slice(0,10)}.json`;
+                a.click();
+            };
+        }
+
+        if (importBackupFile) {
+            importBackupFile.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if(!file) return;
+                restoreWorkspaceState(await file.text());
+                importBackupFile.value = '';
+                alert('已從雲端備份檔還原狀態！');
+            });
+        }
+
+        function restoreWorkspaceState(jsonStr) {
+            try {
+                const data = JSON.parse(jsonStr);
+                if (rfpContext) rfpContext.value = data.textContext || '';
+                if (proposalContext) proposalContext.value = data.proposalText || '';
+                uploadedImages = data.images || [];
+                rfpParsedFiles = data.rfpFiles || [];
+                proposalParsedFiles = data.proposalFiles || [];
+                rfpUrls = data.rfpUrls || [];
+                proposalUrls = data.proposalUrls || [];
+                chatHistory = data.chat || chatHistory;
+                
+                if (imagePreviewContainer) {
+                    imagePreviewContainer.innerHTML = '';
+                    uploadedImages.forEach((img, i) => {
+                        const el = document.createElement('div');
+                        el.className = 'relative w-14 h-14 rounded overflow-hidden border border-slate-300 shadow-sm group shrink-0 mb-1';
+                        el.innerHTML = `<img src="data:${img.mimeType};base64,${img.data}" class="w-full h-full object-cover"><button class="absolute top-0 right-0 bg-red-500/80 text-white text-[10px] w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeImage(this, ${i})"><i class="fa-solid fa-xmark"></i></button>`;
+                        imagePreviewContainer.appendChild(el);
+                    });
+                }
+                renderFileTags(rfpParsedFiles, 'rfpFileTagsContainer', 'removeRfpFile');
+                renderFileTags(proposalParsedFiles, 'proposalFileTagsContainer', 'removeProposalFile');
+                renderUrlTags(rfpUrls, 'rfpUrlTagsContainer', 'removeRfpUrl');
+                renderUrlTags(proposalUrls, 'proposalUrlTagsContainer', 'removeProposalUrl');
+                renderChatHistory();
+            } catch(e) { alert('備份還原失敗。'); }
+        }
+
+        // ==========================================
+        // 主工作流分析邏輯
+        // ==========================================
+        async function runAnalysis(workflow, isReview = false) {
+            if (!currentApiKey) { alert('請先在上方輸入並儲存 API Key'); apiKeyInput.focus(); return; }
+
+            // 組合 RFP 文本 (文字框 + 所有標籤檔案 + 所有網址)
+            let finalRfpText = rfpContext.value.trim();
+            if (rfpParsedFiles.length > 0) {
+                finalRfpText += '\n\n' + rfpParsedFiles.map(f => `--- [客戶 RFP 檔案: ${f.name}] ---\n${f.text}`).join('\n\n');
+            }
+            if (rfpUrls.length > 0) {
+                finalRfpText += '\n\n' + rfpUrls.map(url => `--- [請參考此連結內容]: ${url} ---\n`).join('\n\n');
+            }
+
+            // 組合 提案 文本 (文字框 + 所有標籤檔案 + 所有網址)
+            let finalProposalText = proposalContext.value.trim();
+            if (proposalParsedFiles.length > 0) {
+                finalProposalText += '\n\n' + proposalParsedFiles.map(f => `--- [我方提案檔案: ${f.name}] ---\n${f.text}`).join('\n\n');
+            }
+            if (proposalUrls.length > 0) {
+                finalProposalText += '\n\n' + proposalUrls.map(url => `--- [請參考此連結內容]: ${url} ---\n`).join('\n\n');
+            }
+
+            if (!isReview && !finalRfpText && uploadedImages.length === 0) {
+                alert('請先在「2. 提案上下文」貼上內容、加入連結或上傳檔案');
+                return;
+            }
+
+            if (isReview && !finalProposalText) {
+                alert('請先在「4. 提案評估與歷史覆盤」輸入內容、加入連結或上傳我們遞交的提案檔案！');
+                return;
+            }
+
+            // UI State to Loading
+            emptyState.classList.add('hidden'); resultContent.classList.add('hidden'); loadingState.classList.remove('hidden'); copyBtn.classList.add('hidden'); exportWordBtn.classList.add('hidden');
+            statusBadge.textContent = '處理中...'; statusBadge.className = 'px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium animate-pulse';
+
+            let fullPrompt = workflow.prompt;
+            if (isReview) {
+                fullPrompt += "\n\n【客戶 RFP 原始需求】:\n" + finalRfpText + "\n\n【我方遞交之提案草案/內容】:\n" + finalProposalText;
+            } else {
+                fullPrompt += "\n\n【客戶 RFP 原始需求】:\n" + finalRfpText;
+            }
+            
+            const parts = [{ text: fullPrompt }];
+            uploadedImages.forEach(img => { parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } }); });
+
+            try {
+                // 已更換為 gemini-3.5-flash 正式版模型
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${currentApiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                        contents: [{ parts: parts }],
+                        generationConfig: { temperature: 0.7, maxOutputTokens: 8192 }
+                    })
+                });
+
+                if (!response.ok) throw new Error((await response.json().catch(()=>({}))).error?.message || 'API 請求失敗');
+
+                const aiText = (await response.json()).candidates[0].content.parts[0].text;
+                
+                resultContent.innerHTML = parseMarkdown(aiText);
+                loadingState.classList.add('hidden'); resultContent.classList.remove('hidden'); copyBtn.classList.remove('hidden'); exportWordBtn.classList.remove('hidden');
+                statusBadge.textContent = workflow.title.split('.')[0] + '完成'; statusBadge.className = 'px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium';
+
+            } catch (error) {
+                loadingState.classList.add('hidden'); resultContent.classList.remove('hidden');
+                resultContent.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200"><h3 class="font-bold mb-2"><i class="fa-solid fa-triangle-exclamation"></i> 發生錯誤</h3><p class="text-sm">${error.message}</p></div>`;
+                statusBadge.textContent = '錯誤'; statusBadge.className = 'px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium';
+            }
+        }
+
+        // Review Button Bindings
+        if (optimizeDraftBtn) {
+            optimizeDraftBtn.onclick = () => runAnalysis({
+                title: "✨ 提案草案評估與優化建議",
+                prompt: "這是一份尚未提交的提案草案。請以最嚴格的採購評委視角，對比 RFP 需求幫我挑毛病並給出優化建議：\n1. 🔴 合規缺口：是否漏掉硬性要求（交付物、法務、評分標準）？\n2. 🟠 說服力弱點：勝選主軸是否夠清晰？哪裡像是罐頭文字？\n3. 🟢 優化建議：請給出 3-5 個可立即執行的強效修改建議。\n\n【嚴格格式要求】：請以「專業企管顧問」的口吻，使用流暢的繁體中文段落撰寫深度文字報告。嚴格使用色塊與 Markdown 表格排版。**絕對禁止直接輸出 JSON 陣列、資料庫格式或純程式碼**。"
+            }, true);
+        }
+        if (winAnalysisBtn) {
+            winAnalysisBtn.onclick = () => runAnalysis({
+                title: "🏆 勝選提案關鍵分析",
+                prompt: "這是一個成功得標的案例。請比對 RFP 需求與最終提案告訴我：\n1. 🟢 勝選關鍵要素：最精準打中痛點的 3 個關鍵？\n2. 🔵 差異化優勢：哪些部分展現了超越常規的洞察？\n3. 💡 未來可複製模組：哪些經驗可以被模組化到未來提案？\n\n【嚴格格式要求】：請以「專業企管顧問」的口吻，使用流暢的繁體中文段落撰寫深度文字報告。嚴格使用色塊與 Markdown 表格排版。**絕對禁止直接輸出 JSON 陣列、資料庫格式或純程式碼**。"
+            }, true);
+        }
+        if (lossAnalysisBtn) {
+            lossAnalysisBtn.onclick = () => runAnalysis({
+                title: "💔 敗選提案覆盤剖析",
+                prompt: "這是一個不幸落敗的案例。請比對 RFP 需求與最終提案告訴我：\n1. 🔴 致命風險與缺口：最大的失分點是什麼？漏掉了哪些隱性需求？\n2. 🟠 策略與報價檢討：從邏輯、合規性或執行風險來看，哪些失誤讓客戶疑慮？\n3. 💡 未來改進建議：請提出未來的防範機制與 SOP。\n\n【嚴格格式要求】：請以「專業企管顧問」的口吻，使用流暢的繁體中文段落撰寫深度文字報告。嚴格使用色塊與 Markdown 表格排版。**絕對禁止直接輸出 JSON 陣列、資料庫格式或純程式碼**。"
+            }, true);
+        }
+
+        // Utilities
+        function fallbackCopyTextToClipboard(text, successCallback) {
+            const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; document.body.appendChild(textArea); textArea.focus(); textArea.select();
+            try { if(document.execCommand('copy') && successCallback) successCallback(); } catch (err) { alert("複製失敗。"); } document.body.removeChild(textArea);
+        }
+
+        function exportHTMLToWord(htmlContent, filename) {
+            const sourceHTML = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body { font-family: 'Microsoft JhengHei', 'Inter', sans-serif; } table { border-collapse: collapse; width: 100%; margin-bottom: 1em; } th, td { border: 1px solid #ccc; padding: 8px; text-align: left; } th { background-color: #f2f2f2; } h1,h2,h3 { color: #333; margin-top: 1em; }</style></head><body>" + htmlContent + "</body></html>";
+            const a = document.createElement("a"); a.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML); a.download = filename + '.doc'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        function parseMarkdown(text) {
+            if (typeof marked !== 'undefined') {
+                let html = marked.parse(text);
+                return html.replace(/<table/g, '<div class="overflow-x-auto mb-6"><table').replace(/<\/table>/g, '</table></div>');
+            } else { return `<p>${text}</p>`; }
+        }
+
+        if (copyBtn) {
+            copyBtn.onclick = () => {
+                fallbackCopyTextToClipboard(resultContent.innerText, () => {
+                    const orig = copyBtn.innerHTML; copyBtn.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>'; setTimeout(() => copyBtn.innerHTML = orig, 2000);
+                });
+            };
+        }
+        if (exportWordBtn) exportWordBtn.onclick = () => exportHTMLToWord(resultContent.innerHTML, 'Cogito_RFP_Analysis_Report');
+
+        // ==========================================
+        // TONY 顧問 AI Chatbot 邏輯
+        // ==========================================
+        let isChatOpen = false;
+        if (chatToggleHeader) chatToggleHeader.addEventListener('click', (e) => { if (!e.target.closest('button')) toggleChat(); });
+
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            chatbotContainer.style.height = isChatOpen ? '550px' : '50px';
+            chatMessages.style.display = isChatOpen ? 'flex' : 'none';
+            chatInputArea.style.display = isChatOpen ? 'flex' : 'none';
+            chatToggleBtn.innerHTML = isChatOpen ? '<i class="fa-solid fa-chevron-down text-lg"></i>' : '<i class="fa-solid fa-chevron-up text-lg"></i>';
+        }
+
+        function renderChatHistory() {
+            if (!chatMessages) return;
+            chatMessages.innerHTML = '';
+            for(let i=1; i<chatHistory.length; i++) appendChatMessage(chatHistory[i].role, chatHistory[i].parts[0].text, false);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function appendChatMessage(role, text, animate = false) {
+            if (!chatMessages) return;
+            const wrapper = document.createElement('div'); wrapper.className = `flex items-end gap-2 ${role === 'user' ? 'flex-row-reverse' : ''}`;
+            const avatar = role === 'user' ? `<div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs shrink-0"><i class="fa-solid fa-user"></i></div>` : `<img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-7 h-7 rounded-full object-cover shrink-0 border border-slate-200">`;
+            const bubbleStyle = role === 'user' ? `bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-sm shadow-sm text-[13px] leading-relaxed` : `bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm markdown-body text-[13px] leading-relaxed`;
+            wrapper.innerHTML = `${avatar}<div class="chat-message ${bubbleStyle}">${role === 'user' ? text : parseMarkdown(text)}</div>`;
+            chatMessages.appendChild(wrapper);
+            if(animate) chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        if (chatSendBtn) {
+            chatSendBtn.onclick = async () => {
+                if (!currentApiKey) return alert("請先輸入 API Key！");
+                const text = chatInput.value.trim(); if(!text) return;
+                appendChatMessage('user', text, true); chatHistory.push({ role: "user", parts: [{ text }] }); chatInput.value = '';
+
+                const loaderId = 'chat-loading-' + Date.now();
+                chatMessages.insertAdjacentHTML('beforeend', `<div id="${loaderId}" class="flex items-end gap-2"><img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-7 h-7 rounded-full object-cover shrink-0 border border-slate-200"><div class="chat-message bg-white border border-slate-200 text-slate-500 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm text-[13px]">TONY 老師正在思考中<span class="loading-dots"></span></div></div>`);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                try {
+                    // 已更換為 gemini-3.5-flash 正式版模型
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${currentApiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ system_instruction: { parts: [{ text: TONY_PERSONA }] }, contents: chatHistory, generationConfig: { temperature: 0.7 } })
+                    });
+                    if (!res.ok) throw new Error("API 請求失敗");
+                    const aiText = (await res.json()).candidates[0].content.parts[0].text;
+                    document.getElementById(loaderId).remove();
+                    appendChatMessage('model', aiText, true); chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+                } catch (err) {
+                    document.getElementById(loaderId).remove(); appendChatMessage('model', `**發生錯誤**: ${err.message}`, true); chatHistory.pop();
+                }
+            };
+        }
+
+        if (chatInput) chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatSendBtn.click(); } });
+
+        if (chatCopyBtn) {
+            chatCopyBtn.onclick = (e) => {
+                e.stopPropagation(); let fullChat = "【TONY 顧問對話紀錄】\n\n";
+                chatHistory.slice(1).forEach(msg => fullChat += (msg.role === 'user' ? "👉【我的提問】\n" : "💡【TONY 老師】\n") + msg.parts[0].text + "\n\n");
+                fallbackCopyTextToClipboard(fullChat, () => { const o = chatCopyBtn.innerHTML; chatCopyBtn.innerHTML = '<i class="fa-solid fa-check text-green-400 text-lg"></i>'; setTimeout(() => chatCopyBtn.innerHTML = o, 2000); });
+            };
+        }
+
+        if (chatExportBtn) {
+            chatExportBtn.onclick = (e) => {
+                e.stopPropagation(); let htmlChat = "<h1>TONY 顧問對話紀錄</h1><br/>";
+                chatHistory.slice(1).forEach(msg => htmlChat += `<p><b>${msg.role === 'user' ? "【我的提問】" : "【TONY 老師】"}</b><br/>${parseMarkdown(msg.parts[0].text)}</p><hr/>`);
+                exportHTMLToWord(htmlChat, 'TONY_Chat_History');
+            };
+        }
+
+        renderChatHistory();
+
+    </script>
+</body>
+</html>
