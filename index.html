@@ -144,6 +144,9 @@
                     </div>
                     
                     <div class="flex gap-2">
+                        <button id="newBlankProjectBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap" title="清除所有資料並建立空白專案">
+                            <i class="fa-solid fa-file-circle-plus"></i> 空白新案
+                        </button>
                         <button id="projectManagerBtnMain" class="flex-grow bg-orange-500 hover:bg-orange-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow flex items-center justify-center gap-2">
                             <i class="fa-solid fa-cloud-bolt"></i> 雲端專案列表 / 新增
                         </button>
@@ -518,6 +521,7 @@
         const rfpUrlTagsContainer = document.getElementById('rfpUrlTagsContainer');
         const proposalUrlTagsContainer = document.getElementById('proposalUrlTagsContainer');
 
+        const newBlankProjectBtn = document.getElementById('newBlankProjectBtn');
         const projectManagerBtnMain = document.getElementById('projectManagerBtnMain');
         const quickSaveProjectBtn = document.getElementById('quickSaveProjectBtn');
         const currentProjectDisplayMain = document.getElementById('currentProjectDisplayMain');
@@ -806,6 +810,38 @@
                 projectListLoading.classList.add('hidden');
             });
         };
+
+        // 新增：一鍵清除並建立空白新專案功能
+        function resetWorkspace() {
+            currentProjectId = null; currentProjectName = '未命名專案'; updateProjectDisplay();
+            rfpContext.value = ''; proposalContext.value = '';
+            uploadedImages = []; rfpParsedFiles = []; proposalParsedFiles = [];
+            rfpUrls = []; proposalUrls = [];
+            imagePreviewContainer.innerHTML = '';
+            rfpFileTagsContainer.innerHTML = ''; proposalFileTagsContainer.innerHTML = '';
+            rfpUrlTagsContainer.innerHTML = ''; proposalUrlTagsContainer.innerHTML = '';
+            
+            // 重置聊天室
+            chatHistory = [
+                { role: "user", parts: [{ text: "哈囉" }] },
+                { role: "model", parts: [{ text: "你好！我是 **TONY 老師**，你的資深數位行銷科技顧問與 AI 導師。請問關於 RFP 拆解或提案策略，有什麼我可以協助你的？" }] }
+            ];
+            renderChatHistory();
+
+            // 重置右側分析結果區塊
+            resultContent.innerHTML = ''; resultContent.classList.add('hidden');
+            emptyState.classList.remove('hidden'); copyBtn.classList.add('hidden'); exportWordBtn.classList.add('hidden');
+            statusBadge.textContent = '等待指令'; statusBadge.className = 'px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded-full font-medium transition-colors duration-300';
+        }
+
+        if(newBlankProjectBtn) {
+            newBlankProjectBtn.onclick = () => {
+                showDialog('確定要開啟空白新專案嗎？這將會清除您目前工作區中所有未儲存的資料！', 'confirm', () => {
+                    resetWorkspace();
+                    showDialog('已清除工作區，準備好開始新專案！');
+                });
+            };
+        }
 
         projectManagerBtnMain.onclick = () => { projectModal.classList.remove('hidden'); fetchProjects(); updateProjectDisplay(); };
         closeProjectModalBtn.onclick = () => projectModal.classList.add('hidden');
