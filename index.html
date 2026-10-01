@@ -92,6 +92,14 @@
         .chat-message.markdown-body h1 { font-size: 1.5em; line-height: 1.2; }
         .chat-message.markdown-body h2 { font-size: 1.3em; }
         .chat-message.markdown-body h3 { font-size: 1.15em; }
+
+        /* Skeleton Loading for Firebase */
+        .skeleton-row { animation: skeleton-loading 1.5s infinite linear; }
+        @keyframes skeleton-loading {
+            0% { background-color: #f1f5f9; }
+            50% { background-color: #e2e8f0; }
+            100% { background-color: #f1f5f9; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
@@ -147,10 +155,10 @@
                         <button id="newBlankProjectBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap" title="清除所有資料並建立空白專案">
                             <i class="fa-solid fa-file-circle-plus"></i> 空白新案
                         </button>
-                        <button id="projectManagerBtnMain" class="flex-grow bg-orange-500 hover:bg-orange-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-cloud-bolt"></i> 雲端專案列表 / 新增
+                        <button id="projectManagerBtnMain" class="flex-grow bg-orange-500 hover:bg-orange-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow flex items-center justify-center gap-2 disabled:opacity-70">
+                            <i class="fa-solid fa-cloud-bolt"></i> 雲端專案管理
                         </button>
-                        <button id="quickSaveProjectBtn" class="bg-white hover:bg-slate-50 text-orange-600 border border-orange-200 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm flex items-center justify-center gap-2 hidden" title="快速覆寫目前專案">
+                        <button id="quickSaveProjectBtn" class="bg-white hover:bg-slate-50 text-orange-600 border border-orange-200 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm flex items-center justify-center gap-2 hidden disabled:opacity-50" title="快速覆寫目前專案">
                             <i class="fa-solid fa-floppy-disk"></i>
                         </button>
                     </div>
@@ -268,14 +276,14 @@
                 <textarea id="proposalContext" rows="4" placeholder="在此貼上我方提案內容。提交前可評估；結束可覆盤..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y text-sm mb-3 transition-shadow"></textarea>
                 
                 <div class="flex flex-col gap-2">
-                    <button id="optimizeDraftBtn" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2.5 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm">
+                    <button id="optimizeDraftBtn" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2.5 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-70">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> 草案紅隊評估與優化
                     </button>
                     <div class="grid grid-cols-2 gap-2 mt-1">
-                        <button id="winAnalysisBtn" class="bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm">
+                        <button id="winAnalysisBtn" class="bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-70">
                             <i class="fa-solid fa-trophy"></i> 事後：勝選關鍵
                         </button>
-                        <button id="lossAnalysisBtn" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm">
+                        <button id="lossAnalysisBtn" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-70">
                             <i class="fa-solid fa-heart-crack"></i> 事後：敗選剖析
                         </button>
                     </div>
@@ -329,9 +337,10 @@
                     <div id="loadingState" class="absolute inset-0 flex flex-col items-center justify-center text-blue-500 p-8 text-center hidden bg-white/90 backdrop-blur-sm z-10">
                         <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i>
                         <h3 class="text-lg font-medium text-slate-700 mb-1">AI 正在深度拆解中</h3>
-                        <p class="text-sm text-slate-500">正在分析文本與連結資料並建立關聯，請稍候...</p>
+                        <p class="text-sm text-slate-500">正在分析文本與連結資料並進行推演，請稍候...</p>
                     </div>
-                    <div id="resultContent" class="markdown-body hidden opacity-0 transition-opacity duration-500"></div>
+                    <!-- The output section for the parsed JSON -->
+                    <div id="resultContent" class="hidden opacity-0 transition-opacity duration-500"></div>
                 </div>
             </div>
         </div>
@@ -348,7 +357,7 @@
     <div id="customDialog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] hidden flex-col items-center justify-center p-4 transition-opacity duration-200">
         <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-200" id="customDialogBox">
             <div id="customDialogIcon" class="mb-4 text-4xl"></div>
-            <h3 id="customDialogMessage" class="text-slate-800 font-medium mb-6 text-sm leading-relaxed"></h3>
+            <h3 id="customDialogMessage" class="text-slate-800 font-medium mb-6 text-sm leading-relaxed whitespace-pre-wrap"></h3>
             <div class="flex justify-center gap-3">
                 <button id="customDialogCancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm transition-colors hidden font-medium">取消</button>
                 <button id="customDialogConfirm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors shadow-sm font-medium">確定</button>
@@ -368,7 +377,7 @@
             <div class="p-6 flex-grow flex flex-col gap-4 overflow-hidden">
                 <div class="flex gap-2">
                     <input type="text" id="newProjectName" placeholder="輸入新專案名稱..." class="flex-grow bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
-                    <button id="saveNewProjectBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm whitespace-nowrap flex items-center gap-2">
+                    <button id="saveNewProjectBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm whitespace-nowrap flex items-center gap-2 disabled:opacity-50">
                         <i class="fa-solid fa-plus"></i> 建立新專案
                     </button>
                 </div>
@@ -388,7 +397,7 @@
                     </table>
                     <div id="projectListLoading" class="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center text-orange-500 hidden z-20">
                         <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i>
-                        <span class="text-sm font-medium text-slate-600">連線至資料庫中...</span>
+                        <span class="text-sm font-medium text-slate-600 mt-2">連線至資料庫中...</span>
                     </div>
                 </div>
             </div>
@@ -425,13 +434,108 @@
         </div>
         <div class="p-3 bg-white border-t border-slate-200 flex gap-2" style="display: none;" id="chatInputArea">
             <textarea id="chatInput" rows="2" class="flex-grow border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none transition-shadow" placeholder="問問 TONY 顧問任何問題..."></textarea>
-            <button id="chatSendBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg transition-colors flex items-center justify-center shadow-sm"><i class="fa-solid fa-paper-plane"></i></button>
+            <button id="chatSendBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg transition-colors flex items-center justify-center shadow-sm disabled:opacity-50"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
     <!-- MAIN JAVASCRIPT -->
     <script>
-        // Custom Dialog System (Replaces alert & confirm)
+        /**
+         * System Prompt Refactored for Robust JSON Output (Self-Healing Ready)
+         */
+        const SYSTEM_PROMPT = `你現在是 TonyStudio 企業的首席提案策略師（Chief Proposal Strategist）與 B2B 採購分析專家。
+你擅長解讀大型企業的 RFP，能看透表層需求，挖掘隱性與決策需求。
+你的目標是協助團隊制定勝率最高的提案架構、規避合約與執行風險，並規劃出最合理的成本與專案管理模型。
+
+【輸出格式嚴格限制】（極度重要）
+你必須「僅」輸出一個合法的 JSON 格式字串，絕對不可包含任何 Markdown 代碼塊標記（如 \`\`\`json ），也不要加上任何額外的問候語或解釋。前端系統將會自動解析並渲染你的 JSON。
+
+【JSON 結構與欄位定義】
+{
+  "report_title": "本次分析的總標題",
+  "summary": "簡短的執行摘要（一段話）",
+  "sections": [
+    {
+      "heading": "區塊標題（如：專案核心目標、風險評估等）",
+      "alert_type": "區塊強調樣式。請嚴格從以下枚舉值擇一：'none' (一般段落), 'warning' (致命風險/警告), 'strategy' (核心策略/洞察), 'success' (勝選關鍵/加分項), 'finance' (潛在成本/財務注意)",
+      "content": "詳細內容說明，支援 Markdown 語法（粗體、清單等）。請以流暢的繁體中文「文章與段落」撰寫，展現專業企管顧問的深度。",
+      "table": [
+        { "欄位A": "值A", "欄位B": "值B" }
+      ] // 若需要呈現矩陣或清單比較，請使用此表格陣列；若無表格，請輸出空陣列 []
+    }
+  ]
+}
+
+【Few-Shot 結構化範例】
+{
+  "report_title": "RFP 戰情摘要與風險分析",
+  "summary": "本專案旨在提供全方位數位轉型服務，但具有嚴格的合約時程限制與財務門檻。",
+  "sections": [
+    {
+      "heading": "1. 致命合約風險",
+      "alert_type": "warning",
+      "content": "客戶要求在**簽約後 30 天內**上線，這對開發時程是極大挑戰。建議準備「階段性交付」的備案。",
+      "table": []
+    },
+    {
+      "heading": "2. 潛在隱藏成本",
+      "alert_type": "finance",
+      "content": "請注意 RFP 中提到的「軟體授權費」，可能未包含次年的維護費用。",
+      "table": [
+        { "項目": "AWS 伺服器", "預估成本": "每月 $500", "風險": "超量計費" }
+      ]
+    },
+    {
+      "heading": "3. 核心得標策略",
+      "alert_type": "strategy",
+      "content": "應強調我們過去在**同業的成功導入經驗**，這是競爭對手缺乏的獨家優勢。",
+      "table": []
+    }
+  ]
+}
+請確保 JSON 格式 100% 正確，所有字串需使用雙引號，不要有多餘的逗號。`;
+
+        const TONY_PERSONA = `請稱呼我TONY老師。我的職業是: 一位AI的導師，一位大學的講師，一位數位行銷科技的資深顧問，一位創業者，一位AI的老師。我的背景:我喜歡創新，我喜歡新科技應用，我喜歡思考，我喜歡行銷，我是一位60歲非常有經驗的品牌行銷、行銷科技、生成式AI創作者及講師，我善良、喜歡學習、有自己的觀點，想創新想發展自己的教學方法與框架，擁有設計、行銷、商業、創業的實務經驗，擔任過上市公司14年的發言人。在開始撰寫任何回覆之前，請主動執行以下步驟：
+第一步：專家優化 - 你現在是一名深耕 AI 領域的顧問，專精於提示詞優化邏輯。當我輸入「原始提示詞」時，請先將其轉化為更精確、能讓模型發揮最高效能的指令。 優化核心原則： 最有效的提示詞平均約為21個字。若原始提示詞過於簡短，請務必在轉化過程中強化「背景資訊」維度，以確保回覆品質。 轉化時必須包含以下四個維度：[角色任務]：定義專業身份與核心目標。 [背景資訊]：提供必要的情境。[具體指令]：拆解明確的操作步驟。[約束條件]：規定字數、格式、語氣，且一律使用「正向表述」。
+第二步：直接答覆 - 優化完成後，請立即依照該套優化後的指令進行答覆，產出最終內容。並運用 Markdown 語法讓結構清晰。`;
+
+        // 系統變數初始化
+        let currentApiKey = localStorage.getItem('gemini_api_key') || '';
+        let uploadedImages = [], rfpParsedFiles = [], proposalParsedFiles = [];
+        let rfpUrls = [], proposalUrls = [];
+        let chatHistory = [
+            { role: "user", parts: [{ text: "哈囉" }] },
+            { role: "model", parts: [{ text: "你好！我是 **TONY 老師**，你的資深數位行銷科技顧問與 AI 導師。請問關於 RFP 拆解或提案策略，有什麼我可以協助你的？" }] }
+        ];
+        let currentProjectId = null;
+        let currentProjectName = '未命名專案';
+        let isProcessing = false;
+
+        // UI 元素綁定
+        const ui = {
+            apiKeyInput: document.getElementById('apiKeyInput'),
+            saveKeyBtn: document.getElementById('saveKeyBtn'),
+            rfpContext: document.getElementById('rfpContext'),
+            proposalContext: document.getElementById('proposalContext'),
+            workflowBtns: document.getElementById('workflowButtons'),
+            emptyState: document.getElementById('emptyState'),
+            loadingState: document.getElementById('loadingState'),
+            resultContent: document.getElementById('resultContent'),
+            statusBadge: document.getElementById('statusBadge'),
+            copyBtn: document.getElementById('copyBtn'),
+            exportWordBtn: document.getElementById('exportWordBtn'),
+            fileUpload: document.getElementById('fileUpload'),
+            propUpload: document.getElementById('proposalFileUpload'),
+            imgContainer: document.getElementById('imagePreviewContainer'),
+            rfpTags: document.getElementById('rfpFileTagsContainer'),
+            propTags: document.getElementById('proposalFileTagsContainer'),
+            rfpUrlTags: document.getElementById('rfpUrlTagsContainer'),
+            propUrlTags: document.getElementById('proposalUrlTagsContainer')
+        };
+
+        /**
+         * Custom Dialog System
+         */
         function showDialog(message, type = 'alert', onConfirm = null) {
             const dialog = document.getElementById('customDialog');
             const box = document.getElementById('customDialogBox');
@@ -442,243 +546,172 @@
 
             msgEl.textContent = message;
             dialog.classList.remove('hidden'); dialog.classList.add('flex');
-            setTimeout(() => box.classList.remove('scale-95'), 10);
+            // Force reflow for animation
+            void box.offsetWidth; 
+            box.classList.remove('scale-95');
+
+            // Reset state
+            cancelBtn.classList.add('hidden');
+            confirmBtn.className = 'px-4 py-2 text-white rounded-lg text-sm transition-colors shadow-sm font-medium';
 
             if (type === 'confirm') {
                 iconEl.innerHTML = '<i class="fa-solid fa-circle-question text-orange-500"></i>';
                 cancelBtn.classList.remove('hidden');
-                confirmBtn.className = 'px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-sm transition-colors shadow-sm font-medium';
+                confirmBtn.classList.add('bg-orange-600', 'hover:bg-orange-700');
             } else if (type === 'error') {
                 iconEl.innerHTML = '<i class="fa-solid fa-circle-exclamation text-red-500"></i>';
-                cancelBtn.classList.add('hidden');
-                confirmBtn.className = 'px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors shadow-sm font-medium';
+                confirmBtn.classList.add('bg-red-600', 'hover:bg-red-700');
             } else {
                 iconEl.innerHTML = '<i class="fa-solid fa-circle-check text-green-500"></i>';
-                cancelBtn.classList.add('hidden');
-                confirmBtn.className = 'px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors shadow-sm font-medium';
+                confirmBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
             }
 
             const closeDialog = () => {
                 box.classList.add('scale-95');
-                setTimeout(() => { dialog.classList.add('hidden'); dialog.classList.remove('flex'); }, 200);
-                confirmBtn.onclick = null; cancelBtn.onclick = null;
+                setTimeout(() => { 
+                    dialog.classList.add('hidden'); dialog.classList.remove('flex'); 
+                }, 200);
             };
 
             cancelBtn.onclick = closeDialog;
-            confirmBtn.onclick = () => { closeDialog(); if (onConfirm) onConfirm(); };
+            confirmBtn.onclick = () => { 
+                closeDialog(); 
+                if (onConfirm) onConfirm(); 
+            };
         }
 
-        // System Prompt defined by Tony
-        const SYSTEM_PROMPT = `你現在是 TonyStudio 企業的首席提案策略師（Chief Proposal Strategist）與 B2B 採購分析專家。你擅長解讀大型企業的 RFP，能看透表層需求，挖掘隱性與決策需求。你的目標是協助團隊制定勝率最高的提案架構、規避合約與執行風險，並規劃出最合理的成本與專案管理模型。請以專業、結構化、具備商業洞察的繁體中文回答。
+        /**
+         * Enterprise Robust JSON Parsing Pipeline (Self-Healing)
+         */
+        function parseAIResponse(text) {
+            try {
+                // 1. 直觀解析 (最佳情況)
+                return JSON.parse(text);
+            } catch (err1) {
+                console.warn("JSON 首輪解析失敗，啟動正則修復容錯機制...", err1.message);
+                try {
+                    // 2. 正則提取有效區塊 (處理帶有 markdown code block 或前後贅字的情況)
+                    const match = text.match(/\{[\s\S]*\}/);
+                    if (!match) throw new Error("文本中找不到 JSON 定界符");
+                    
+                    let cleaned = match[0]
+                        // 過濾潛在的隱形控制字元，保留合法換行與 Tab
+                        .replace(/[\u0000-\u001F\u007F-\u009F]/g, c => ('\n\r\t'.includes(c) ? c : ""));
+                    
+                    return JSON.parse(cleaned);
+                } catch (err2) {
+                    console.error("JSON 深度容錯解析失敗:", err2, "\n原始文本:", text);
+                    throw new Error("AI 回傳的分析格式發生嚴重異常。系統已安全攔截，請嘗試重新執行分析。");
+                }
+            }
+        }
 
-【排版與視覺強調準則】（非常重要）：
-1. 精美表格：分析結果若包含比較、清單或矩陣，請「務必」使用 Markdown 表格呈現。系統會自動將其渲染為高質感的 HTML 表格。
-2. 顧問式文章：所有的回答必須以流暢的繁體中文「文章與段落」來撰寫，絕對禁止直接輸出原始資料庫格式（如 JSON 陣列、XML 等程式碼）。
-3. 風險與重點強調區塊：針對特別需要主管或團隊注意的地方（如：致命風險、紅旗條款、重要決策點、機會），請「直接使用以下 HTML Tailwind 顏色區塊語法」進行強烈視覺提示：
-   - 🔴 致命風險 / 警告：
-     <div class="bg-red-50 border-l-4 border-red-500 p-4 my-4 rounded-r-lg shadow-sm"><h4 class="text-red-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> 致命風險警告</h4><p class="text-red-700 text-sm m-0">此處說明風險內容...</p></div>
-   - 🔵 核心策略 / 洞察：
-     <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-4 rounded-r-lg shadow-sm"><h4 class="text-blue-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-lightbulb"></i> 核心策略洞察</h4><p class="text-blue-700 text-sm m-0">此處說明策略...</p></div>
-   - 🟢 勝選關鍵 / 加分項：
-     <div class="bg-green-50 border-l-4 border-green-500 p-4 my-4 rounded-r-lg shadow-sm"><h4 class="text-green-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> 勝選關鍵要素</h4><p class="text-green-700 text-sm m-0">此處說明加分項...</p></div>
-   - 🟠 潛在成本 / 財務注意：
-     <div class="bg-orange-50 border-l-4 border-orange-500 p-4 my-4 rounded-r-lg shadow-sm"><h4 class="text-orange-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> 財務與報價提醒</h4><p class="text-orange-700 text-sm m-0">此處說明成本風險...</p></div>`;
+        /**
+         * Dynamic HTML Rendering from JSON Structure
+         */
+        function renderReportFromJSON(data) {
+            let html = `<div class="mb-6"><h1 class="text-2xl font-bold text-slate-800 mb-2">${data.report_title || '戰略分析報告'}</h1>`;
+            if (data.summary) {
+                html += `<p class="text-slate-600 mb-4 text-sm leading-relaxed">${data.summary}</p>`;
+            }
+            html += `</div>`;
 
-        const TONY_PERSONA = `請稱呼我TONY老師。我的職業是: 一位AI的導師，一位大學的講師，一位數位行銷科技的資深顧問，一位創業者，一位AI的老師。我的背景:我喜歡創新，我喜歡新科技應用，我喜歡思考，我喜歡行銷，我是一位60歲非常有經驗的品牌行銷、行銷科技、生成式AI創作者及講師，我善良、喜歡學習、有自己的觀點，想創新想發展自己的教學方法與框架，擁有設計、行銷、商業、創業的實務經驗，擔任過上市公司14年的發言人。在開始撰寫任何回覆之前，請主動執行以下步驟：
-第一步：專家優化 - 你現在是一名深耕 AI 領域的顧問，專精於提示詞優化邏輯。當我輸入「原始提示詞」時，請先將其轉化為更精確、能讓模型發揮最高效能的指令。 優化核心原則： 最有效的提示詞平均約為21個字。若原始提示詞過於簡短，請務必在轉化過程中強化「背景資訊」維度，以確保回覆品質。 轉化時必須包含以下四個維度：[角色任務]：定義專業身份與核心目標。 [背景資訊]：提供必要的情境。[具體指令]：拆解明確的操作步驟。[約束條件]：規定字數、格式、語氣，且一律使用「正向表述」。
-第二步：直接答覆 - 優化完成後，請立即依照該套優化後的指令進行答覆，產出最終內容。並運用 Markdown 語法讓結構清晰。`;
+            if (data.sections && Array.isArray(data.sections)) {
+                data.sections.forEach(sec => {
+                    let wrapperClass = "mb-6";
+                    let headerHTML = `<h2 class="text-lg font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">${sec.heading}</h2>`;
+                    
+                    switch(sec.alert_type) {
+                        case 'warning':
+                            wrapperClass = "bg-red-50 border-l-4 border-red-500 p-4 my-4 rounded-r-lg shadow-sm";
+                            headerHTML = `<h4 class="text-red-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> ${sec.heading}</h4>`;
+                            break;
+                        case 'strategy':
+                            wrapperClass = "bg-blue-50 border-l-4 border-blue-500 p-4 my-4 rounded-r-lg shadow-sm";
+                            headerHTML = `<h4 class="text-blue-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-lightbulb"></i> ${sec.heading}</h4>`;
+                            break;
+                        case 'success':
+                            wrapperClass = "bg-green-50 border-l-4 border-green-500 p-4 my-4 rounded-r-lg shadow-sm";
+                            headerHTML = `<h4 class="text-green-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> ${sec.heading}</h4>`;
+                            break;
+                        case 'finance':
+                            wrapperClass = "bg-orange-50 border-l-4 border-orange-500 p-4 my-4 rounded-r-lg shadow-sm";
+                            headerHTML = `<h4 class="text-orange-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> ${sec.heading}</h4>`;
+                            break;
+                        case 'none':
+                        default:
+                            break;
+                    }
 
-        // State variables
-        let currentApiKey = localStorage.getItem('gemini_api_key') || '';
-        let uploadedImages = [];
-        let rfpParsedFiles = [];
-        let proposalParsedFiles = [];
-        let rfpUrls = [];
-        let proposalUrls = [];
-        let chatHistory = [
-            { role: "user", parts: [{ text: "哈囉" }] },
-            { role: "model", parts: [{ text: "你好！我是 **TONY 老師**，你的資深數位行銷科技顧問與 AI 導師。請問關於 RFP 拆解或提案策略，有什麼我可以協助你的？" }] }
-        ];
+                    html += `<div class="${wrapperClass}">${headerHTML}`;
+                    
+                    if (sec.content) {
+                        const parsedContent = typeof marked !== 'undefined' ? marked.parse(sec.content) : `<p>${sec.content}</p>`;
+                        html += `<div class="text-sm text-slate-700 leading-relaxed mb-3 ${sec.alert_type !== 'none' ? 'opacity-90' : ''} markdown-body" style="font-size: 0.9rem;">${parsedContent}</div>`;
+                    }
 
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const saveKeyBtn = document.getElementById('saveKeyBtn');
-        const rfpContext = document.getElementById('rfpContext');
-        const proposalContext = document.getElementById('proposalContext');
-        const workflowButtonsContainer = document.getElementById('workflowButtons');
-        
-        const emptyState = document.getElementById('emptyState');
-        const loadingState = document.getElementById('loadingState');
-        const resultContent = document.getElementById('resultContent');
-        const statusBadge = document.getElementById('statusBadge');
-        const copyBtn = document.getElementById('copyBtn');
-        const exportWordBtn = document.getElementById('exportWordBtn');
+                    if (sec.table && Array.isArray(sec.table) && sec.table.length > 0) {
+                        html += `<div class="overflow-x-auto mt-3"><table class="w-full text-sm text-left border-collapse bg-white rounded-lg overflow-hidden shadow-sm border border-slate-200">`;
+                        const headers = Object.keys(sec.table[0]);
+                        html += `<thead class="bg-slate-100 text-slate-600"><tr>`;
+                        headers.forEach(h => html += `<th class="px-4 py-2 border-b border-slate-200 font-semibold">${h}</th>`);
+                        html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
+                        sec.table.forEach(row => {
+                            html += `<tr class="hover:bg-slate-50 transition-colors">`;
+                            headers.forEach(h => html += `<td class="px-4 py-2 text-slate-700 align-top">${row[h] || ''}</td>`);
+                            html += `</tr>`;
+                        });
+                        html += `</tbody></table></div>`;
+                    }
+                    
+                    html += `</div>`;
+                });
+            }
+            return html;
+        }
 
-        const fileUpload = document.getElementById('fileUpload');
-        const proposalFileUpload = document.getElementById('proposalFileUpload');
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
-        const rfpFileTagsContainer = document.getElementById('rfpFileTagsContainer');
-        const proposalFileTagsContainer = document.getElementById('proposalFileTagsContainer');
-        const rfpUrlTagsContainer = document.getElementById('rfpUrlTagsContainer');
-        const proposalUrlTagsContainer = document.getElementById('proposalUrlTagsContainer');
-
-        const newBlankProjectBtn = document.getElementById('newBlankProjectBtn');
-        const projectManagerBtnMain = document.getElementById('projectManagerBtnMain');
-        const quickSaveProjectBtn = document.getElementById('quickSaveProjectBtn');
-        const currentProjectDisplayMain = document.getElementById('currentProjectDisplayMain');
-        const saveLocalBtn = document.getElementById('saveLocalBtn');
-        const loadLocalBtn = document.getElementById('loadLocalBtn');
-        const projectModal = document.getElementById('projectModal');
-        const closeProjectModalBtn = document.getElementById('closeProjectModalBtn');
-        const newProjectName = document.getElementById('newProjectName');
-        const saveNewProjectBtn = document.getElementById('saveNewProjectBtn');
-        const projectListBody = document.getElementById('projectListBody');
-        const projectListLoading = document.getElementById('projectListLoading');
-        const exportBackupBtn = document.getElementById('exportBackupBtn');
-        const importBackupFile = document.getElementById('importBackupFile');
-
-        let currentProjectId = null;
-        let currentProjectName = '未命名專案';
-
+        // 模組定義
         const workflows = [
-            { id: 1, title: "1. RFP Intake & 需求抽取", icon: "fa-crosshairs", prompt: "請分析附上的 [RFP 文件]，並為我產出一份「一頁式戰情摘要表」。\n請務必包含以下欄位，並以表格呈現：\n1. 專案名稱與客戶背景。\n2. 專案核心目標（客戶真正想解決的問題）。\n3. 服務範圍（Scope of Work）條列與分類。\n4. 專案時程與合約期間。\n5. 資格門檻與法務要求（如 NDA、財報等）。\n6. 預期交付物清單（Deliverables）。" },
-            { id: 2, title: "2. Scoring 反推評分邏輯", icon: "fa-scale-balanced", prompt: "請針對 [RFP 文件] 中的「Evaluation Criteria and Weight（評選標準與權重）」段落進行深度反向工程。\n請產出一個表格，包含：\n1. 評分項目與權重。\n2. AI 洞察：客戶在乎這個項目的「潛台詞」是什麼？\n3. 我方應對策略：我們在提案中必須強調什麼才能拿滿分？" },
-            { id: 3, title: "3. Risk & Gap 分析缺口", icon: "fa-triangle-exclamation", prompt: "請比對上述的 RFP 需求與評分標準，進行 Risk & Gap 分析。\n請列出：\n1. 致命風險（Red Flags）：可能無法達標的硬性規定及替代方案。\n2. 執行風險：專案執行過程中可能遇到的最大困難。\n3. 競爭劣勢缺口：競爭對手可能攻擊我們的弱點及防禦策略。" },
-            { id: 4, title: "4. Win Theme 產出勝選主軸", icon: "fa-flag-checkered", prompt: "基於 RFP 拆解，請為這個提案設計 3 個不同切入點的「Win Theme (勝選主軸)」。\n包含：\n1. 主軸名稱（中英雙語）。\n2. 核心論述。\n3. 支撐此主軸的 3 個關鍵戰略支柱（Key Pillars）。\n請挑選出勝率最高的一個並說明原因。" },
-            { id: 5, title: "5. Proposal 生成提案大綱", icon: "fa-list-ol", prompt: "請基於 RFP 評分權重，幫我擬定一份「提案簡報大綱 (Table of Contents)」。\n規則：對應 RFP 審查順序，將 Scope 拆解成 5-8 個「工作包」，並列出各章節核心目的與預計圖表。" },
-            { id: 6, title: "6. Compliance 逐條回應矩陣", icon: "fa-table-list", prompt: "請幫我建立一份「Compliance Matrix (合規回應矩陣)」。\n逐條掃描 RFP，列出要求、頁碼、類別（資格/法務/執行/創意/報價），及我方對應的回應章節。" },
-            { id: 7, title: "7. Cost Breakdown 建立報價邏輯", icon: "fa-file-invoice-dollar", prompt: "請檢視 RFP 報價要求，建立「報價邏輯模型框架」。\n列出計價單元，以及潛在的隱藏成本（Hidden Costs）提醒清單。" },
-            { id: 8, title: "8. Q&A List 產出澄清問題", icon: "fa-clipboard-question", prompt: "請找出這份 RFP 中語意模糊、高風險條款，草擬 5-8 個專業的「澄清問題 (Clarification Questions)」，準備詢問客戶。" },
-            { id: 9, title: "9. Final Proposal 最終封裝清單", icon: "fa-box-open", prompt: "請根據 RFP 的所有要求，幫我列出一份最終投標 Check-list。區分法務文件、簡報附件、報價單格式、遞交方式。" }
+            { id: 1, title: "1. RFP Intake & 需求抽取", icon: "fa-crosshairs", prompt: "請分析附上的 [RFP 文件]，並產出「戰情摘要」。包含專案核心目標、服務範圍、時程限制。" },
+            { id: 2, title: "2. Scoring 反推評分邏輯", icon: "fa-scale-balanced", prompt: "請針對 [RFP 文件] 的「評選標準與權重」進行反向工程，產出應對策略表格。" },
+            { id: 3, title: "3. Risk & Gap 分析缺口", icon: "fa-triangle-exclamation", prompt: "比對 RFP 需求，進行 Risk & Gap 分析。列出致命風險、執行困難與競爭弱點。" },
+            { id: 4, title: "4. Win Theme 產出勝選主軸", icon: "fa-flag-checkered", prompt: "為此提案設計 3 個不同切入點的「Win Theme (勝選主軸)」，並詳細評估勝率。" },
+            { id: 5, title: "5. Proposal 生成提案大綱", icon: "fa-list-ol", prompt: "基於 RFP，擬定提案簡報大綱 (TOC)，對應審查順序拆解工作包。" },
+            { id: 6, title: "6. Compliance 逐條回應矩陣", icon: "fa-table-list", prompt: "建立一份「Compliance Matrix (合規回應矩陣)」。逐條掃描硬性規定。" },
+            { id: 7, title: "7. Cost Breakdown 建立報價邏輯", icon: "fa-file-invoice-dollar", prompt: "檢視報價要求，建立報價邏輯模型框架，並特別標示隱藏成本。" },
+            { id: 8, title: "8. Q&A List 產出澄清問題", icon: "fa-clipboard-question", prompt: "找出語意模糊的高風險條款，草擬 5-8 個專業的澄清問題 (Clarifications)。" },
+            { id: 9, title: "9. Final Proposal 最終封裝清單", icon: "fa-box-open", prompt: "整理最終投標 Check-list。涵蓋法務文件、附件與遞交規範。" }
         ];
 
         workflows.forEach(wf => {
             const btn = document.createElement('button');
-            btn.className = 'w-full text-left px-4 py-3 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group flex items-center justify-between text-sm text-slate-700 font-medium bg-white hover:shadow-sm';
+            btn.className = 'w-full text-left px-4 py-3 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group flex items-center justify-between text-sm text-slate-700 font-medium bg-white hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed';
             btn.innerHTML = `<span class="flex items-center gap-3"><i class="fa-solid ${wf.icon} text-slate-400 group-hover:text-blue-600 transition-colors w-5 text-center"></i> ${wf.title}</span><i class="fa-solid fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>`;
             btn.onclick = () => runAnalysis(wf);
-            workflowButtonsContainer.appendChild(btn);
+            ui.workflowBtns.appendChild(btn);
         });
 
-        if (currentApiKey && apiKeyInput) {
-            apiKeyInput.value = currentApiKey;
-            saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已儲存';
-            saveKeyBtn.classList.replace('bg-blue-600', 'bg-green-600');
-            saveKeyBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+        // 綁定 API Key
+        if (currentApiKey) {
+            ui.apiKeyInput.value = currentApiKey;
+            ui.saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已儲存';
+            ui.saveKeyBtn.classList.replace('bg-blue-600', 'bg-green-600');
+            ui.saveKeyBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
         }
 
-        saveKeyBtn.onclick = () => {
-            const key = apiKeyInput.value.trim();
+        ui.saveKeyBtn.onclick = () => {
+            const key = ui.apiKeyInput.value.trim();
             if (key) {
                 localStorage.setItem('gemini_api_key', key);
                 currentApiKey = key;
-                saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已儲存';
-                saveKeyBtn.classList.replace('bg-blue-600', 'bg-green-600');
-                saveKeyBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
+                ui.saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已儲存';
+                ui.saveKeyBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm';
             } else {
                 showDialog('請輸入有效的 API Key', 'error');
             }
         };
 
-        function renderUrlTags(urlsArray, containerId, removeFnName) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            container.innerHTML = '';
-            urlsArray.forEach((url, index) => {
-                const tag = document.createElement('div');
-                tag.className = 'bg-indigo-50 text-indigo-700 border border-indigo-200 text-xs px-2 py-1.5 rounded flex items-center gap-1 shadow-sm shrink-0 mb-1 transition-all';
-                tag.innerHTML = `<i class="fa-solid fa-link"></i> <span class="max-w-[200px] truncate" title="${url}">${url}</span>
-                                 <button class="text-indigo-400 hover:text-red-500 transition-colors ml-1" onclick="${removeFnName}(${index})" title="移除連結"><i class="fa-solid fa-xmark"></i></button>`;
-                container.appendChild(tag);
-            });
-        }
-
-        window.removeRfpUrl = function(index) { rfpUrls.splice(index, 1); renderUrlTags(rfpUrls, 'rfpUrlTagsContainer', 'removeRfpUrl'); };
-        window.removeProposalUrl = function(index) { proposalUrls.splice(index, 1); renderUrlTags(proposalUrls, 'proposalUrlTagsContainer', 'removeProposalUrl'); };
-
-        document.getElementById('addRfpUrlBtn').onclick = () => {
-            const urlInput = document.getElementById('rfpUrlInput'); const url = urlInput.value.trim();
-            if(url) { rfpUrls.push(url); renderUrlTags(rfpUrls, 'rfpUrlTagsContainer', 'removeRfpUrl'); urlInput.value = ''; }
-        };
-
-        document.getElementById('addProposalUrlBtn').onclick = () => {
-            const urlInput = document.getElementById('proposalUrlInput'); const url = urlInput.value.trim();
-            if(url) { proposalUrls.push(url); renderUrlTags(proposalUrls, 'proposalUrlTagsContainer', 'removeProposalUrl'); urlInput.value = ''; }
-        };
-
-        async function extractTextFromFile(file) {
-            const fileName = file.name.toLowerCase();
-            try {
-                if (fileName.endsWith('.txt') || fileName.endsWith('.csv')) return await file.text();
-                else if (fileName.endsWith('.docx')) return (await mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()})).value;
-                else if (fileName.endsWith('.pdf')) {
-                    const pdf = await pdfjsLib.getDocument({data: await file.arrayBuffer()}).promise;
-                    let fullText = '';
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const textContent = await (await pdf.getPage(i)).getTextContent();
-                        fullText += textContent.items.map(item => item.str).join(' ') + '\n';
-                    }
-                    return fullText;
-                } else if (fileName.match(/\.(xlsx|xls)$/)) {
-                    const workbook = XLSX.read(await file.arrayBuffer(), {type: 'array'});
-                    let excelText = '';
-                    workbook.SheetNames.forEach(sheetName => { excelText += `[工作表: ${sheetName}]\n` + XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]) + '\n\n'; });
-                    return excelText;
-                }
-            } catch (err) { showDialog(`解析檔案 ${file.name} 時發生錯誤: ` + err.message, 'error'); }
-            return null;
-        }
-
-        function renderFileTags(filesArray, containerId, removeFnName) {
-            const container = document.getElementById(containerId);
-            if (!container) return;
-            container.innerHTML = '';
-            filesArray.forEach((fileObj, index) => {
-                const tag = document.createElement('div');
-                tag.className = 'bg-blue-50 text-blue-700 border border-blue-200 text-xs px-2 py-1.5 rounded flex items-center gap-1 shadow-sm shrink-0 mb-1 transition-all';
-                tag.innerHTML = `<i class="fa-solid fa-file"></i> <span class="max-w-[150px] truncate" title="${fileObj.name}">${fileObj.name}</span>
-                                 <button class="text-blue-400 hover:text-red-500 transition-colors ml-1" onclick="${removeFnName}(${index})" title="移除檔案"><i class="fa-solid fa-xmark"></i></button>`;
-                container.appendChild(tag);
-            });
-        }
-
-        window.removeRfpFile = function(index) { rfpParsedFiles.splice(index, 1); renderFileTags(rfpParsedFiles, 'rfpFileTagsContainer', 'removeRfpFile'); };
-        window.removeProposalFile = function(index) { proposalParsedFiles.splice(index, 1); renderFileTags(proposalParsedFiles, 'proposalFileTagsContainer', 'removeProposalFile'); };
-        window.removeImage = function(btn, index) { uploadedImages.splice(index, 1); btn.parentElement.remove(); };
-
-        fileUpload.addEventListener('change', async (e) => {
-            const files = e.target.files; if(!files.length) return;
-            rfpContext.placeholder = "正在解析檔案內容中，請稍候...";
-            for(let file of files) {
-                if (file.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        uploadedImages.push({ mimeType: file.type, data: ev.target.result.split(',')[1], name: file.name });
-                        const img = document.createElement('div');
-                        img.className = 'relative w-14 h-14 rounded overflow-hidden border border-slate-300 shadow-sm group shrink-0 mb-1';
-                        img.innerHTML = `<img src="${ev.target.result}" class="w-full h-full object-cover"><button class="absolute top-0 right-0 bg-red-500/80 text-white text-[10px] w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeImage(this, ${uploadedImages.length - 1})" title="移除圖片"><i class="fa-solid fa-xmark"></i></button>`;
-                        imagePreviewContainer.appendChild(img);
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    const text = await extractTextFromFile(file);
-                    if(text) rfpParsedFiles.push({ name: file.name, text: text });
-                }
-            }
-            renderFileTags(rfpParsedFiles, 'rfpFileTagsContainer', 'removeRfpFile');
-            rfpContext.placeholder = "或在此直接貼上 RFP 文件內容..."; fileUpload.value = '';
-        });
-
-        proposalFileUpload.addEventListener('change', async (e) => {
-            const files = e.target.files; if(!files.length) return;
-            proposalContext.placeholder = "正在解析提案檔案中，請稍候...";
-            for(let file of files) {
-                const text = await extractTextFromFile(file);
-                if(text) proposalParsedFiles.push({ name: file.name, text: text });
-            }
-            renderFileTags(proposalParsedFiles, 'proposalFileTagsContainer', 'removeProposalFile');
-            proposalContext.placeholder = "在此貼上我方提案內容..."; proposalFileUpload.value = '';
-        });
-
+        // Firebase Setup
         const firebaseConfig = {
             apiKey: "AIzaSyDuShpehg2d_VHNt6FheUooh6kHH9mSizg",
             authDomain: "k5-rfp-analysisystem.firebaseapp.com",
@@ -697,57 +730,189 @@
         const loginBtn = document.getElementById('loginBtn');
         const logoutBtn = document.getElementById('logoutBtn');
         const userInfo = document.getElementById('userInfo');
-        const userAvatar = document.getElementById('userAvatar');
-        const userName = document.getElementById('userName');
 
         auth.onAuthStateChanged((user) => {
             currentUser = user;
             if (user) {
                 loginBtn.classList.add('hidden');
                 userInfo.classList.remove('hidden'); userInfo.classList.add('flex');
-                userAvatar.src = user.photoURL; userName.textContent = user.displayName;
+                document.getElementById('userAvatar').src = user.photoURL; 
+                document.getElementById('userName').textContent = user.displayName;
             } else {
                 loginBtn.classList.remove('hidden');
                 userInfo.classList.add('hidden'); userInfo.classList.remove('flex');
             }
-            if (!projectModal.classList.contains('hidden')) fetchProjects();
+            if (!document.getElementById('projectModal').classList.contains('hidden')) fetchProjects();
         });
 
         loginBtn.onclick = () => auth.signInWithPopup(provider).catch(e => showDialog('登入失敗: ' + e.message, 'error'));
         logoutBtn.onclick = () => auth.signOut().then(() => {
-            currentProjectId = null; currentProjectName = '未命名專案';
-            updateProjectDisplay();
+            resetWorkspace();
             showDialog('已成功登出！');
         });
 
-        function getBackupState() {
-            return JSON.stringify({
-                textContext: rfpContext.value, proposalText: proposalContext.value,
-                images: uploadedImages, rfpFiles: rfpParsedFiles, proposalFiles: proposalParsedFiles,
-                rfpUrls: rfpUrls, proposalUrls: proposalUrls, chat: chatHistory
+        // 渲染 Tags
+        function renderTags(arr, container, type, removeName) {
+            container.innerHTML = '';
+            arr.forEach((item, i) => {
+                const el = document.createElement('div');
+                const label = type === 'url' ? item : item.name;
+                const icon = type === 'url' ? 'fa-link' : 'fa-file';
+                const style = type === 'url' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-blue-50 text-blue-700 border-blue-200';
+                
+                el.className = `${style} border text-xs px-2 py-1.5 rounded flex items-center gap-1 shadow-sm shrink-0 mb-1 transition-all`;
+                el.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="max-w-[150px] truncate" title="${label}">${label}</span>
+                                <button class="text-slate-400 hover:text-red-500 transition-colors ml-1" onclick="${removeName}(${i})" title="移除"><i class="fa-solid fa-xmark"></i></button>`;
+                container.appendChild(el);
             });
         }
 
-        saveLocalBtn.onclick = () => { localStorage.setItem('cogito_rfp_backup', getBackupState()); showDialog('工作階段已儲存至瀏覽器本機！'); };
-        loadLocalBtn.onclick = () => { const dataStr = localStorage.getItem('cogito_rfp_backup'); if(dataStr) restoreWorkspaceState(dataStr); else showDialog('找不到本機備份。', 'error'); };
-        
-        const PROJECT_COLLECTION = 'tonystudio_projects';
+        window.removeRfpUrl = (i) => { rfpUrls.splice(i, 1); renderTags(rfpUrls, ui.rfpUrlTags, 'url', 'removeRfpUrl'); };
+        window.removePropUrl = (i) => { proposalUrls.splice(i, 1); renderTags(proposalUrls, ui.propUrlTags, 'url', 'removePropUrl'); };
+        window.removeRfpFile = (i) => { rfpParsedFiles.splice(i, 1); renderTags(rfpParsedFiles, ui.rfpTags, 'file', 'removeRfpFile'); };
+        window.removePropFile = (i) => { proposalParsedFiles.splice(i, 1); renderTags(proposalParsedFiles, ui.propTags, 'file', 'removePropFile'); };
+        window.removeImage = (i) => { 
+            uploadedImages.splice(i, 1); 
+            ui.imgContainer.innerHTML = '';
+            uploadedImages.forEach((img, idx) => appendImagePreview(img, idx));
+        };
+
+        function appendImagePreview(imgObj, index) {
+            const img = document.createElement('div');
+            img.className = 'relative w-14 h-14 rounded overflow-hidden border border-slate-300 shadow-sm group shrink-0 mb-1';
+            img.innerHTML = `<img src="data:${imgObj.mimeType};base64,${imgObj.data}" class="w-full h-full object-cover">
+                             <button class="absolute top-0 right-0 bg-red-500/80 text-white text-[10px] w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeImage(${index})"><i class="fa-solid fa-xmark"></i></button>`;
+            ui.imgContainer.appendChild(img);
+        }
+
+        document.getElementById('addRfpUrlBtn').onclick = () => {
+            const v = document.getElementById('rfpUrlInput').value.trim();
+            if(v) { rfpUrls.push(v); renderTags(rfpUrls, ui.rfpUrlTags, 'url', 'removeRfpUrl'); document.getElementById('rfpUrlInput').value = ''; }
+        };
+
+        document.getElementById('addProposalUrlBtn').onclick = () => {
+            const v = document.getElementById('proposalUrlInput').value.trim();
+            if(v) { proposalUrls.push(v); renderTags(proposalUrls, ui.propUrlTags, 'url', 'removePropUrl'); document.getElementById('proposalUrlInput').value = ''; }
+        };
+
+        async function extractTextFromFile(file) {
+            const name = file.name.toLowerCase();
+            try {
+                if (name.endsWith('.txt') || name.endsWith('.csv')) return await file.text();
+                else if (name.endsWith('.docx')) return (await mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()})).value;
+                else if (name.endsWith('.pdf')) {
+                    const pdf = await pdfjsLib.getDocument({data: await file.arrayBuffer()}).promise;
+                    let text = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const content = await (await pdf.getPage(i)).getTextContent();
+                        text += content.items.map(it => it.str).join(' ') + '\n';
+                    }
+                    return text;
+                } else if (name.match(/\.(xlsx|xls)$/)) {
+                    const wb = XLSX.read(await file.arrayBuffer(), {type: 'array'});
+                    return wb.SheetNames.map(sn => `[工作表: ${sn}]\n` + XLSX.utils.sheet_to_csv(wb.Sheets[sn])).join('\n\n');
+                }
+            } catch (err) { showDialog(`解析檔案失敗: ${err.message}`, 'error'); }
+            return null;
+        }
+
+        ui.fileUpload.addEventListener('change', async (e) => {
+            const files = e.target.files; if(!files.length) return;
+            ui.rfpContext.placeholder = "正在解析檔案...";
+            for(let f of files) {
+                if (f.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const imgObj = { mimeType: f.type, data: ev.target.result.split(',')[1], name: f.name };
+                        uploadedImages.push(imgObj);
+                        appendImagePreview(imgObj, uploadedImages.length - 1);
+                    };
+                    reader.readAsDataURL(f);
+                } else {
+                    const text = await extractTextFromFile(f);
+                    if(text) rfpParsedFiles.push({ name: f.name, text });
+                }
+            }
+            renderTags(rfpParsedFiles, ui.rfpTags, 'file', 'removeRfpFile');
+            ui.rfpContext.placeholder = "或在此直接貼上 RFP 文件內容..."; ui.fileUpload.value = '';
+        });
+
+        ui.propUpload.addEventListener('change', async (e) => {
+            const files = e.target.files; if(!files.length) return;
+            ui.proposalContext.placeholder = "正在解析...";
+            for(let f of files) {
+                const text = await extractTextFromFile(f);
+                if(text) proposalParsedFiles.push({ name: f.name, text });
+            }
+            renderTags(proposalParsedFiles, ui.propTags, 'file', 'removePropFile');
+            ui.proposalContext.placeholder = "在此貼上我方提案內容..."; ui.propUpload.value = '';
+        });
+
+        // 專案管理邏輯
+        function getWorkspaceState() {
+            return JSON.stringify({
+                textContext: ui.rfpContext.value, proposalText: ui.proposalContext.value,
+                images: uploadedImages, rfpFiles: rfpParsedFiles, proposalFiles: proposalParsedFiles,
+                rfpUrls, proposalUrls, chat: chatHistory
+            });
+        }
+
+        function restoreWorkspaceState(jsonStr) {
+            try {
+                const data = JSON.parse(jsonStr);
+                ui.rfpContext.value = data.textContext || ''; ui.proposalContext.value = data.proposalText || '';
+                uploadedImages = data.images || []; rfpParsedFiles = data.rfpFiles || []; proposalParsedFiles = data.proposalFiles || [];
+                rfpUrls = data.rfpUrls || []; proposalUrls = data.proposalUrls || []; chatHistory = data.chat || chatHistory;
+                
+                ui.imgContainer.innerHTML = '';
+                uploadedImages.forEach((img, i) => appendImagePreview(img, i));
+                renderTags(rfpParsedFiles, ui.rfpTags, 'file', 'removeRfpFile'); renderTags(proposalParsedFiles, ui.propTags, 'file', 'removePropFile');
+                renderTags(rfpUrls, ui.rfpUrlTags, 'url', 'removeRfpUrl'); renderTags(proposalUrls, ui.propUrlTags, 'url', 'removePropUrl');
+                renderChatHistory();
+            } catch(e) { showDialog('載入備份失敗，格式可能損壞。', 'error'); }
+        }
 
         function updateProjectDisplay() {
-            currentProjectDisplayMain.textContent = currentProjectName;
+            const display = document.getElementById('currentProjectDisplayMain');
+            const quickSaveBtn = document.getElementById('quickSaveProjectBtn');
+            display.textContent = currentProjectName;
             if(currentProjectId) {
-                currentProjectDisplayMain.classList.replace('text-orange-700', 'text-green-700');
-                currentProjectDisplayMain.previousElementSibling.innerHTML = '<i class="fa-solid fa-circle-dot text-green-500 text-[8px]"></i> 目前專案：';
-                quickSaveProjectBtn.classList.remove('hidden');
+                display.classList.replace('text-orange-700', 'text-green-700');
+                quickSaveBtn.classList.remove('hidden');
             } else {
-                currentProjectDisplayMain.classList.replace('text-green-700', 'text-orange-700');
-                currentProjectDisplayMain.previousElementSibling.innerHTML = '<i class="fa-solid fa-circle-dot text-green-500 text-[8px]"></i> 目前專案：';
-                quickSaveProjectBtn.classList.add('hidden');
+                display.classList.replace('text-green-700', 'text-orange-700');
+                quickSaveBtn.classList.add('hidden');
             }
         }
 
+        function resetWorkspace() {
+            currentProjectId = null; currentProjectName = '未命名專案'; updateProjectDisplay();
+            ui.rfpContext.value = ''; ui.proposalContext.value = '';
+            uploadedImages = []; rfpParsedFiles = []; proposalParsedFiles = []; rfpUrls = []; proposalUrls = [];
+            ui.imgContainer.innerHTML = ''; ui.rfpTags.innerHTML = ''; ui.propTags.innerHTML = '';
+            ui.rfpUrlTags.innerHTML = ''; ui.propUrlTags.innerHTML = '';
+            
+            chatHistory = [
+                { role: "user", parts: [{ text: "哈囉" }] },
+                { role: "model", parts: [{ text: "你好！我是 **TONY 老師**，你的資深數位行銷科技顧問與 AI 導師。請問關於 RFP 拆解或提案策略，有什麼我可以協助你的？" }] }
+            ];
+            renderChatHistory();
+
+            ui.resultContent.innerHTML = ''; ui.resultContent.classList.add('hidden');
+            ui.emptyState.classList.remove('hidden'); ui.copyBtn.classList.add('hidden'); ui.exportWordBtn.classList.add('hidden');
+            ui.statusBadge.textContent = '等待指令'; ui.statusBadge.className = 'px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded-full font-medium';
+        }
+
+        document.getElementById('newBlankProjectBtn').onclick = () => {
+            showDialog('確定要開啟空白新專案嗎？未儲存的資料將會遺失！', 'confirm', resetWorkspace);
+        };
+
+        const PROJECT_COLLECTION = 'tonystudio_projects';
+        
         async function fetchProjects() {
-            projectListLoading.classList.remove('hidden');
+            const loading = document.getElementById('projectListLoading');
+            const tbody = document.getElementById('projectListBody');
+            loading.classList.remove('hidden');
             try {
                 const snapshot = await db.collection(PROJECT_COLLECTION).get();
                 let projects = [];
@@ -758,323 +923,301 @@
                     projects.push({ id: doc.id, name: data.name || '未命名', updatedAt: data.updatedAt?.toDate() || new Date(0), author: data.author || '匿名' });
                 });
                 projects.sort((a, b) => b.updatedAt - a.updatedAt);
-                renderProjectList(projects);
-            } catch (error) { projectListBody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-red-500">載入失敗，請檢查資料庫與權限設定。</td></tr>`; }
-            projectListLoading.classList.add('hidden');
-        }
-
-        function renderProjectList(projects) {
-            projectListBody.innerHTML = '';
-            if(projects.length === 0) { projectListBody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-slate-400">目前雲端沒有任何專案。</td></tr>`; return; }
-            projects.forEach(proj => {
-                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50 transition-colors group";
-                tr.innerHTML = `
-                    <td class="px-4 py-3 font-medium text-slate-700 flex items-center gap-2"><i class="fa-solid fa-folder text-orange-400"></i> ${proj.name}
-                        ${proj.id === currentProjectId ? '<span class="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded ml-2 shadow-sm border border-green-200">目前載入</span>' : ''}
-                        <span class="text-[10px] text-slate-400 font-normal ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0"><i class="fa-solid fa-user"></i> ${proj.author}</span>
-                    </td>
-                    <td class="px-4 py-3 text-slate-500 text-xs">${proj.updatedAt.toLocaleString('zh-TW', { year:'numeric', month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit' })}</td>
-                    <td class="px-4 py-3 text-center">
-                        <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="loadProject('${proj.id}', '${proj.name}')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1.5 rounded text-xs transition-colors shadow-sm" title="載入此專案"><i class="fa-solid fa-download"></i></button>
-                            <button onclick="deleteProject('${proj.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1.5 rounded text-xs transition-colors shadow-sm" title="永久刪除"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
-                    </td>`;
-                projectListBody.appendChild(tr);
-            });
+                
+                tbody.innerHTML = '';
+                if(projects.length === 0) { 
+                    tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-slate-400">目前雲端沒有任何專案。</td></tr>`; 
+                } else {
+                    projects.forEach(proj => {
+                        tbody.insertAdjacentHTML('beforeend', `
+                            <tr class="hover:bg-slate-50 transition-colors group">
+                                <td class="px-4 py-3 font-medium text-slate-700 flex items-center gap-2">
+                                    <i class="fa-solid fa-folder text-orange-400"></i> ${proj.name}
+                                    ${proj.id === currentProjectId ? '<span class="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded ml-2 shadow-sm border border-green-200">目前載入</span>' : ''}
+                                    <span class="text-[10px] text-slate-400 font-normal ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0"><i class="fa-solid fa-user"></i> ${proj.author}</span>
+                                </td>
+                                <td class="px-4 py-3 text-slate-500 text-xs">${proj.updatedAt.toLocaleString('zh-TW')}</td>
+                                <td class="px-4 py-3 text-center">
+                                    <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <button onclick="loadProject('${proj.id}', '${proj.name}')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1.5 rounded text-xs transition-colors shadow-sm" title="載入此專案"><i class="fa-solid fa-download"></i></button>
+                                        <button onclick="deleteProject('${proj.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1.5 rounded text-xs transition-colors shadow-sm" title="永久刪除"><i class="fa-solid fa-trash-can"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `);
+                    });
+                }
+            } catch (error) { 
+                tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-red-500">載入失敗，請檢查資料庫。</td></tr>`; 
+            } finally {
+                loading.classList.add('hidden');
+            }
         }
 
         window.loadProject = (id, name) => {
-            showDialog(`確定要載入專案「${name}」嗎？這將覆寫您目前工作區中未儲存的內容。`, 'confirm', async () => {
-                projectListLoading.classList.remove('hidden');
+            showDialog(`確定要載入專案「${name}」嗎？目前未儲存的工作將被覆寫。`, 'confirm', async () => {
+                document.getElementById('projectListLoading').classList.remove('hidden');
                 try {
                     const doc = await db.collection(PROJECT_COLLECTION).doc(id).get();
                     if (doc.exists && doc.data().data) {
                         restoreWorkspaceState(doc.data().data);
                         currentProjectId = id; currentProjectName = name;
-                        updateProjectDisplay(); projectModal.classList.add('hidden');
+                        updateProjectDisplay(); 
+                        document.getElementById('projectModal').classList.add('hidden');
                     }
                 } catch (error) { showDialog('載入失敗。', 'error'); }
-                projectListLoading.classList.add('hidden');
+                document.getElementById('projectListLoading').classList.add('hidden');
             });
         };
 
         window.deleteProject = (id) => {
             showDialog('確定要永久刪除這個專案嗎？此動作無法復原。', 'confirm', async () => {
-                projectListLoading.classList.remove('hidden');
+                document.getElementById('projectListLoading').classList.remove('hidden');
                 try {
                     await db.collection(PROJECT_COLLECTION).doc(id).delete();
-                    if(id === currentProjectId) { currentProjectId = null; currentProjectName = '未命名專案'; updateProjectDisplay(); }
+                    if(id === currentProjectId) resetWorkspace();
                     await fetchProjects();
                 } catch (error) { showDialog('刪除失敗。', 'error'); }
-                projectListLoading.classList.add('hidden');
+                document.getElementById('projectListLoading').classList.add('hidden');
             });
         };
 
-        // 新增：一鍵清除並建立空白新專案功能
-        function resetWorkspace() {
-            currentProjectId = null; currentProjectName = '未命名專案'; updateProjectDisplay();
-            rfpContext.value = ''; proposalContext.value = '';
-            uploadedImages = []; rfpParsedFiles = []; proposalParsedFiles = [];
-            rfpUrls = []; proposalUrls = [];
-            imagePreviewContainer.innerHTML = '';
-            rfpFileTagsContainer.innerHTML = ''; proposalFileTagsContainer.innerHTML = '';
-            rfpUrlTagsContainer.innerHTML = ''; proposalUrlTagsContainer.innerHTML = '';
+        document.getElementById('projectManagerBtnMain').onclick = () => { 
+            document.getElementById('projectModal').classList.remove('hidden'); 
+            fetchProjects(); 
+        };
+        document.getElementById('closeProjectModalBtn').onclick = () => document.getElementById('projectModal').classList.add('hidden');
+
+        document.getElementById('saveNewProjectBtn').onclick = async () => {
+            const nameInput = document.getElementById('newProjectName');
+            const name = nameInput.value.trim();
+            const btn = document.getElementById('saveNewProjectBtn');
+            if(!name) return showDialog('請輸入專案名稱', 'error');
             
-            // 重置聊天室
-            chatHistory = [
-                { role: "user", parts: [{ text: "哈囉" }] },
-                { role: "model", parts: [{ text: "你好！我是 **TONY 老師**，你的資深數位行銷科技顧問與 AI 導師。請問關於 RFP 拆解或提案策略，有什麼我可以協助你的？" }] }
-            ];
-            renderChatHistory();
-
-            // 重置右側分析結果區塊
-            resultContent.innerHTML = ''; resultContent.classList.add('hidden');
-            emptyState.classList.remove('hidden'); copyBtn.classList.add('hidden'); exportWordBtn.classList.add('hidden');
-            statusBadge.textContent = '等待指令'; statusBadge.className = 'px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded-full font-medium transition-colors duration-300';
-        }
-
-        if(newBlankProjectBtn) {
-            newBlankProjectBtn.onclick = () => {
-                showDialog('確定要開啟空白新專案嗎？這將會清除您目前工作區中所有未儲存的資料！', 'confirm', () => {
-                    resetWorkspace();
-                    showDialog('已清除工作區，準備好開始新專案！');
-                });
-            };
-        }
-
-        projectManagerBtnMain.onclick = () => { projectModal.classList.remove('hidden'); fetchProjects(); updateProjectDisplay(); };
-        closeProjectModalBtn.onclick = () => projectModal.classList.add('hidden');
-
-        saveNewProjectBtn.onclick = async () => {
-            const name = newProjectName.value.trim();
-            if(!name) return showDialog('請先輸入新專案的名稱', 'error');
-            const btnOrig = saveNewProjectBtn.innerHTML; saveNewProjectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 建立中...';
+            btn.disabled = true;
+            const orig = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 建立中...';
             try {
-                const newDocRef = db.collection(PROJECT_COLLECTION).doc();
-                await newDocRef.set({ name: name, data: getBackupState(), updatedAt: firebase.firestore.FieldValue.serverTimestamp(), userId: currentUser ? currentUser.uid : null, author: currentUser ? currentUser.displayName : '匿名' });
-                currentProjectId = newDocRef.id; currentProjectName = name; newProjectName.value = '';
+                const ref = db.collection(PROJECT_COLLECTION).doc();
+                await ref.set({ 
+                    name, data: getWorkspaceState(), 
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(), 
+                    userId: currentUser ? currentUser.uid : null, 
+                    author: currentUser ? currentUser.displayName : '匿名' 
+                });
+                currentProjectId = ref.id; currentProjectName = name; nameInput.value = '';
                 updateProjectDisplay(); await fetchProjects();
-            } catch(error) { showDialog('儲存失敗，請檢查資料庫連線。', 'error'); }
-            saveNewProjectBtn.innerHTML = btnOrig;
+            } catch(e) { showDialog('儲存失敗', 'error'); }
+            btn.innerHTML = orig; btn.disabled = false;
         };
 
-        quickSaveProjectBtn.onclick = async () => {
+        document.getElementById('quickSaveProjectBtn').onclick = async () => {
             if(!currentProjectId) return;
-            const btnOrig = quickSaveProjectBtn.innerHTML; quickSaveProjectBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            const btn = document.getElementById('quickSaveProjectBtn');
+            btn.disabled = true; const orig = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             try {
-                await db.collection(PROJECT_COLLECTION).doc(currentProjectId).update({ data: getBackupState(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-                quickSaveProjectBtn.innerHTML = '<i class="fa-solid fa-check text-green-500"></i>'; setTimeout(() => quickSaveProjectBtn.innerHTML = btnOrig, 2000);
-            } catch(error) { showDialog('快速儲存失敗。', 'error'); quickSaveProjectBtn.innerHTML = btnOrig; }
-        };
-
-        exportBackupBtn.onclick = () => {
-            const blob = new Blob([getBackupState()], {type: "application/json"}); const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob); a.download = `TonyStudio_Workspace_${new Date().toISOString().slice(0,10)}.json`; a.click();
-        };
-
-        importBackupFile.addEventListener('change', async (e) => {
-            const file = e.target.files[0]; if(!file) return;
-            restoreWorkspaceState(await file.text()); importBackupFile.value = ''; showDialog('已從備份檔還原狀態！');
-        });
-
-        function restoreWorkspaceState(jsonStr) {
-            try {
-                const data = JSON.parse(jsonStr);
-                rfpContext.value = data.textContext || ''; proposalContext.value = data.proposalText || '';
-                uploadedImages = data.images || []; rfpParsedFiles = data.rfpFiles || []; proposalParsedFiles = data.proposalFiles || [];
-                rfpUrls = data.rfpUrls || []; proposalUrls = data.proposalUrls || []; chatHistory = data.chat || chatHistory;
-                
-                imagePreviewContainer.innerHTML = '';
-                uploadedImages.forEach((img, i) => {
-                    const el = document.createElement('div'); el.className = 'relative w-14 h-14 rounded overflow-hidden border border-slate-300 shadow-sm group shrink-0 mb-1';
-                    el.innerHTML = `<img src="data:${img.mimeType};base64,${img.data}" class="w-full h-full object-cover"><button class="absolute top-0 right-0 bg-red-500/80 text-white text-[10px] w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeImage(this, ${i})"><i class="fa-solid fa-xmark"></i></button>`;
-                    imagePreviewContainer.appendChild(el);
+                await db.collection(PROJECT_COLLECTION).doc(currentProjectId).update({ 
+                    data: getWorkspaceState(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
                 });
-                renderFileTags(rfpParsedFiles, 'rfpFileTagsContainer', 'removeRfpFile'); renderFileTags(proposalParsedFiles, 'proposalFileTagsContainer', 'removeProposalFile');
-                renderUrlTags(rfpUrls, 'rfpUrlTagsContainer', 'removeRfpUrl'); renderUrlTags(proposalUrls, 'proposalUrlTagsContainer', 'removeProposalUrl');
-                renderChatHistory();
-            } catch(e) { showDialog('備份還原失敗。', 'error'); }
-        }
+                btn.innerHTML = '<i class="fa-solid fa-check text-green-500"></i>'; 
+            } catch(e) { 
+                showDialog('快速儲存失敗。', 'error'); btn.innerHTML = orig; 
+            } finally {
+                setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
+            }
+        };
 
+        // 核心 AI 執行流程
         async function runAnalysis(workflow, isReview = false) {
-            if (!currentApiKey) { showDialog('請先在左側輸入並儲存 API Key', 'error'); apiKeyInput.focus(); return; }
+            if (isProcessing) return; // Prevent double trigger
+            if (!currentApiKey) return showDialog('請先在 Step 2 輸入 API Key', 'error');
 
-            let finalRfpText = rfpContext.value.trim();
-            if (rfpParsedFiles.length > 0) finalRfpText += '\n\n' + rfpParsedFiles.map(f => `--- [客戶 RFP 檔案: ${f.name}] ---\n${f.text}`).join('\n\n');
-            if (rfpUrls.length > 0) finalRfpText += '\n\n' + rfpUrls.map(url => `--- [請參考此連結內容]: ${url} ---\n`).join('\n\n');
+            let reqText = ui.rfpContext.value.trim();
+            if (rfpParsedFiles.length) reqText += '\n\n' + rfpParsedFiles.map(f => `--- [客戶 RFP: ${f.name}] ---\n${f.text}`).join('\n');
+            if (rfpUrls.length) reqText += '\n\n' + rfpUrls.map(u => `--- [參考連結]: ${u} ---`).join('\n');
 
-            let finalProposalText = proposalContext.value.trim();
-            if (proposalParsedFiles.length > 0) finalProposalText += '\n\n' + proposalParsedFiles.map(f => `--- [我方提案檔案: ${f.name}] ---\n${f.text}`).join('\n\n');
-            if (proposalUrls.length > 0) finalProposalText += '\n\n' + proposalUrls.map(url => `--- [請參考此連結內容]: ${url} ---\n`).join('\n\n');
+            let propText = ui.proposalContext.value.trim();
+            if (proposalParsedFiles.length) propText += '\n\n' + proposalParsedFiles.map(f => `--- [我方提案: ${f.name}] ---\n${f.text}`).join('\n');
+            if (proposalUrls.length) propText += '\n\n' + proposalUrls.map(u => `--- [提案連結]: ${u} ---`).join('\n');
 
-            if (!isReview && !finalRfpText && uploadedImages.length === 0) return showDialog('請先在「3. 提案上下文」貼上內容、加入連結或上傳檔案', 'error');
-            if (isReview && !finalProposalText) return showDialog('請先在「5. 提案評估與歷史覆盤」輸入內容、加入連結或上傳我們遞交的提案檔案！', 'error');
+            if (!isReview && !reqText && !uploadedImages.length) return showDialog('請先在 Step 3 輸入內容', 'error');
+            if (isReview && !propText) return showDialog('請先在 Step 5 輸入提案內容', 'error');
 
-            emptyState.classList.add('hidden'); resultContent.classList.add('hidden', 'opacity-0'); loadingState.classList.remove('hidden'); copyBtn.classList.add('hidden'); exportWordBtn.classList.add('hidden');
-            statusBadge.textContent = '處理中...'; statusBadge.className = 'px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium animate-pulse transition-colors duration-300';
+            isProcessing = true;
+            ui.emptyState.classList.add('hidden'); ui.resultContent.classList.add('hidden', 'opacity-0'); 
+            ui.loadingState.classList.remove('hidden'); ui.copyBtn.classList.add('hidden'); ui.exportWordBtn.classList.add('hidden');
+            ui.statusBadge.textContent = '深度運算中...'; 
+            ui.statusBadge.className = 'px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium animate-pulse transition-colors';
 
-            let fullPrompt = workflow.prompt;
-            if (isReview) fullPrompt += "\n\n【客戶 RFP 原始需求】:\n" + finalRfpText + "\n\n【我方遞交之提案草案/內容】:\n" + finalProposalText;
-            else fullPrompt += "\n\n【客戶 RFP 原始需求】:\n" + finalRfpText;
-            
-            const parts = [{ text: fullPrompt }];
-            uploadedImages.forEach(img => { parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } }); });
+            let promptStr = `${workflow.prompt}\n\n【客戶 RFP 原始需求】:\n${reqText}`;
+            if (isReview) promptStr += `\n\n【我方遞交之提案草案/內容】:\n${propText}`;
+            promptStr += `\n\n請依照 System Prompt 規定的 JSON 格式輸出，將分析結果結構化填入相應的欄位與陣列中。`;
+
+            const parts = [{ text: promptStr }];
+            uploadedImages.forEach(img => parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } }));
 
             try {
-                // Ensure the requested gemini-3.8-flash model is strictly used
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${currentApiKey}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, contents: [{ parts: parts }], generationConfig: { temperature: 0.7, maxOutputTokens: 8192 } })
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, 
+                        contents: [{ parts: parts }], 
+                        generationConfig: { 
+                            temperature: 0.2, // 確保輸出結構穩定
+                            maxOutputTokens: 8192,
+                            responseMimeType: "application/json" // 強化原生 JSON 輸出能力
+                        } 
+                    })
                 });
 
-                if (!response.ok) throw new Error((await response.json().catch(()=>({}))).error?.message || 'API 請求失敗');
+                if (!response.ok) throw new Error((await response.json().catch(()=>({}))).error?.message || 'API 請求連線失敗');
 
-                const aiText = (await response.json()).candidates[0].content.parts[0].text;
+                const rawText = (await response.json()).candidates[0].content.parts[0].text;
+                const parsedJSON = parseAIResponse(rawText); // 呼叫容錯解析器
                 
-                resultContent.innerHTML = parseMarkdown(aiText);
-                loadingState.classList.add('hidden'); resultContent.classList.remove('hidden'); 
-                setTimeout(() => resultContent.classList.remove('opacity-0'), 50); // fade in effect
-                copyBtn.classList.remove('hidden'); exportWordBtn.classList.remove('hidden');
-                statusBadge.textContent = workflow.title.split('.')[0] + '完成'; statusBadge.className = 'px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium transition-colors duration-300';
+                ui.resultContent.innerHTML = renderReportFromJSON(parsedJSON); // 渲染 HTML
+                
+                ui.loadingState.classList.add('hidden'); ui.resultContent.classList.remove('hidden'); 
+                setTimeout(() => ui.resultContent.classList.remove('opacity-0'), 50);
+                ui.copyBtn.classList.remove('hidden'); ui.exportWordBtn.classList.remove('hidden');
+                ui.statusBadge.textContent = workflow.title.split('.')[0] + ' 分析完成'; 
+                ui.statusBadge.className = 'px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium transition-colors';
 
             } catch (error) {
-                loadingState.classList.add('hidden'); resultContent.classList.remove('hidden', 'opacity-0');
-                resultContent.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200"><h3 class="font-bold mb-2"><i class="fa-solid fa-triangle-exclamation"></i> 發生錯誤</h3><p class="text-sm">${error.message}</p></div>`;
-                statusBadge.textContent = '錯誤'; statusBadge.className = 'px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium transition-colors duration-300';
+                ui.loadingState.classList.add('hidden'); ui.resultContent.classList.remove('hidden', 'opacity-0');
+                ui.resultContent.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200"><h3 class="font-bold mb-2"><i class="fa-solid fa-triangle-exclamation"></i> 系統發生異常</h3><p class="text-sm">${error.message}</p></div>`;
+                ui.statusBadge.textContent = '異常錯誤'; 
+                ui.statusBadge.className = 'px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium transition-colors';
+            } finally {
+                isProcessing = false;
             }
         }
 
-        document.getElementById('optimizeDraftBtn').onclick = () => runAnalysis({ title: "✨ 提案草案評估與優化建議", prompt: "這是一份尚未提交的提案草案。請以最嚴格的採購評委視角，對比 RFP 需求幫我挑毛病並給出優化建議：\n1. 🔴 合規缺口：是否漏掉硬性要求（交付物、法務、評分標準）？\n2. 🟠 說服力弱點：勝選主軸是否夠清晰？哪裡像是罐頭文字？\n3. 🟢 優化建議：請給出 3-5 個可立即執行的強效修改建議。\n\n【嚴格格式要求】：請以「專業企管顧問」的口吻，使用流暢的繁體中文段落撰寫深度文字報告。嚴格使用色塊與 Markdown 表格排版。**絕對禁止直接輸出 JSON 陣列、資料庫格式或純程式碼**。" }, true);
-        document.getElementById('winAnalysisBtn').onclick = () => runAnalysis({ title: "🏆 勝選提案關鍵分析", prompt: "這是一個成功得標的案例。請比對 RFP 需求與最終提案告訴我：\n1. 🟢 勝選關鍵要素：最精準打中痛點的 3 個關鍵？\n2. 🔵 差異化優勢：哪些部分展現了超越常規的洞察？\n3. 💡 未來可複製模組：哪些經驗可以被模組化到未來提案？\n\n【嚴格格式要求】：請以「專業企管顧問」的口吻，使用流暢的繁體中文段落撰寫深度文字報告。嚴格使用色塊與 Markdown 表格排版。**絕對禁止直接輸出 JSON 陣列、資料庫格式或純程式碼**。" }, true);
-        document.getElementById('lossAnalysisBtn').onclick = () => runAnalysis({ title: "💔 敗選提案覆盤剖析", prompt: "這是一個不幸落敗的案例。請比對 RFP 需求與最終提案告訴我：\n1. 🔴 致命風險與缺口：最大的失分點是什麼？漏掉了哪些隱性需求？\n2. 🟠 策略與報價檢討：從邏輯、合規性或執行風險來看，哪些失誤讓客戶疑慮？\n3. 💡 未來改進建議：請提出未來的防範機制與 SOP。\n\n【嚴格格式要求】：請以「專業企管顧問」的口吻，使用流暢的繁體中文段落撰寫深度文字報告。嚴格使用色塊與 Markdown 表格排版。**絕對禁止直接輸出 JSON 陣列、資料庫格式或純程式碼**。" }, true);
+        document.getElementById('optimizeDraftBtn').onclick = () => runAnalysis({ title: "✨ 提案草案評估", prompt: "這是一份尚未提交的草案。請以嚴格評委視角，對比 RFP 需求指出：合規缺口、說服力弱點，並給出優化建議。" }, true);
+        document.getElementById('winAnalysisBtn').onclick = () => runAnalysis({ title: "🏆 勝選關鍵分析", prompt: "這是一個成功案例。請比對 RFP 需求指出：勝選關鍵要素、差異化優勢、未來可複製模組。" }, true);
+        document.getElementById('lossAnalysisBtn').onclick = () => runAnalysis({ title: "💔 敗選覆盤剖析", prompt: "這是一個落敗案例。請比對 RFP 需求指出：致命風險與缺口、策略失誤、未來防範機制。" }, true);
 
-        function fallbackCopyTextToClipboard(text, successCallback) {
-            const textArea = document.createElement("textarea"); textArea.value = text; textArea.style.position = "fixed"; document.body.appendChild(textArea); textArea.focus(); textArea.select();
-            try { if(document.execCommand('copy') && successCallback) successCallback(); } catch (err) { showDialog("複製失敗。", 'error'); } document.body.removeChild(textArea);
-        }
-
-        function exportHTMLToWord(htmlContent, filename) {
-            const sourceHTML = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body { font-family: 'Microsoft JhengHei', 'Inter', sans-serif; } table { border-collapse: collapse; width: 100%; margin-bottom: 1em; } th, td { border: 1px solid #ccc; padding: 8px; text-align: left; } th { background-color: #f2f2f2; } h1,h2,h3 { color: #333; margin-top: 1em; }</style></head><body>" + htmlContent + "</body></html>";
-            const a = document.createElement("a"); a.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML); a.download = filename + '.doc'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        }
-
-        function parseMarkdown(text) {
-            if (typeof marked !== 'undefined') { return marked.parse(text).replace(/<table/g, '<div class="overflow-x-auto mb-6"><table').replace(/<\/table>/g, '</table></div>'); } 
-            else { return `<p>${text}</p>`; }
-        }
-
-        copyBtn.onclick = () => { fallbackCopyTextToClipboard(resultContent.innerText, () => { const orig = copyBtn.innerHTML; copyBtn.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>'; setTimeout(() => copyBtn.innerHTML = orig, 2000); }); };
-        exportWordBtn.onclick = () => exportHTMLToWord(resultContent.innerHTML, 'TonyStudio_RFP_Analysis');
-
-        const chatbotContainer = document.getElementById('chatbot-container');
-        const chatToggleHeader = document.getElementById('chatToggleHeader');
-        const chatToggleBtn = document.getElementById('chatToggleBtn');
-        const chatMessages = document.getElementById('chat-messages');
-        const chatInputArea = document.getElementById('chatInputArea');
-        const chatInput = document.getElementById('chatInput');
-        const chatSendBtn = document.getElementById('chatSendBtn');
-        const chatCopyBtn = document.getElementById('chatCopyBtn');
-        const chatExportBtn = document.getElementById('chatExportBtn');
-
-        let isChatOpen = false;
-        let chatLastWidth = 400; let chatLastHeight = 550;
+        // 剪貼簿與匯出功能
+        ui.copyBtn.onclick = () => { 
+            const el = document.createElement("textarea"); el.value = ui.resultContent.innerText; 
+            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
+            const orig = ui.copyBtn.innerHTML; ui.copyBtn.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>'; 
+            setTimeout(() => ui.copyBtn.innerHTML = orig, 2000); 
+        };
         
-        chatToggleHeader.addEventListener('click', (e) => { if (!e.target.closest('button') && e.target.closest('#chatResizer') === null) toggleChat(); });
+        ui.exportWordBtn.onclick = () => {
+            const src = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body { font-family: 'Microsoft JhengHei', 'Inter', sans-serif; } table { border-collapse: collapse; width: 100%; margin-bottom: 1em; } th, td { border: 1px solid #ccc; padding: 8px; text-align: left; } th { background-color: #f2f2f2; } h1,h2,h3,h4 { color: #333; margin-top: 1em; }</style></head><body>" + ui.resultContent.innerHTML + "</body></html>";
+            const a = document.createElement("a"); a.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(src); a.download = 'TonyStudio_Report.doc'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        };
+
+        // 聊天室邏輯
+        const chatUI = {
+            container: document.getElementById('chatbot-container'),
+            header: document.getElementById('chatToggleHeader'),
+            btn: document.getElementById('chatToggleBtn'),
+            messages: document.getElementById('chat-messages'),
+            inputArea: document.getElementById('chatInputArea'),
+            input: document.getElementById('chatInput'),
+            sendBtn: document.getElementById('chatSendBtn'),
+            resizer: document.getElementById('chatResizer')
+        };
+        
+        let isChatOpen = false;
+        let chatLastWidth = 400, chatLastHeight = 550;
+        
+        chatUI.header.addEventListener('click', (e) => { if (!e.target.closest('button') && !e.target.closest('#chatResizer')) toggleChat(); });
 
         function toggleChat() {
             isChatOpen = !isChatOpen;
-            if(isChatOpen) { chatbotContainer.style.height = chatLastHeight + 'px'; chatbotContainer.style.width = chatLastWidth + 'px'; } 
+            if(isChatOpen) { chatUI.container.style.height = chatLastHeight + 'px'; chatUI.container.style.width = chatLastWidth + 'px'; } 
             else {
-                chatLastHeight = parseInt(document.defaultView.getComputedStyle(chatbotContainer).height, 10) || 550;
-                chatLastWidth = parseInt(document.defaultView.getComputedStyle(chatbotContainer).width, 10) || 400;
-                chatbotContainer.style.height = '50px';
+                chatLastHeight = parseInt(getComputedStyle(chatUI.container).height, 10) || 550;
+                chatLastWidth = parseInt(getComputedStyle(chatUI.container).width, 10) || 400;
+                chatUI.container.style.height = '50px';
             }
-            chatMessages.style.display = isChatOpen ? 'flex' : 'none'; chatInputArea.style.display = isChatOpen ? 'flex' : 'none';
-            chatToggleBtn.innerHTML = isChatOpen ? '<i class="fa-solid fa-chevron-down text-sm"></i>' : '<i class="fa-solid fa-chevron-up text-sm"></i>';
+            chatUI.messages.style.display = isChatOpen ? 'flex' : 'none'; 
+            chatUI.inputArea.style.display = isChatOpen ? 'flex' : 'none';
+            chatUI.btn.innerHTML = isChatOpen ? '<i class="fa-solid fa-chevron-down text-sm"></i>' : '<i class="fa-solid fa-chevron-up text-sm"></i>';
         }
 
-        const chatResizer = document.getElementById('chatResizer');
-        let isResizingChat = false; let resizeStartX, resizeStartY, resizeStartWidth, resizeStartHeight;
-
-        chatResizer.addEventListener('mousedown', (e) => {
+        let isResizingChat = false, rx, ry, rw, rh;
+        chatUI.resizer.addEventListener('mousedown', (e) => {
             e.preventDefault(); e.stopPropagation(); isResizingChat = true;
-            resizeStartX = e.clientX; resizeStartY = e.clientY;
-            resizeStartWidth = parseInt(document.defaultView.getComputedStyle(chatbotContainer).width, 10);
-            resizeStartHeight = parseInt(document.defaultView.getComputedStyle(chatbotContainer).height, 10);
-            document.body.style.cursor = 'nwse-resize'; chatbotContainer.style.transition = 'none';
+            rx = e.clientX; ry = e.clientY; rw = parseInt(getComputedStyle(chatUI.container).width, 10); rh = parseInt(getComputedStyle(chatUI.container).height, 10);
+            document.body.style.cursor = 'nwse-resize'; chatUI.container.style.transition = 'none';
         });
 
         window.addEventListener('mousemove', (e) => {
             if (!isResizingChat) return;
-            const newWidth = Math.max(300, Math.min(window.innerWidth * 0.9, resizeStartWidth + (resizeStartX - e.clientX)));
-            chatbotContainer.style.width = newWidth + 'px'; chatLastWidth = newWidth;
-            if (isChatOpen) {
-                const newHeight = Math.max(200, Math.min(window.innerHeight * 0.9, resizeStartHeight + (resizeStartY - e.clientY)));
-                chatbotContainer.style.height = newHeight + 'px'; chatLastHeight = newHeight;
-            }
+            chatUI.container.style.width = Math.max(300, Math.min(window.innerWidth * 0.9, rw + (rx - e.clientX))) + 'px';
+            if (isChatOpen) chatUI.container.style.height = Math.max(200, Math.min(window.innerHeight * 0.9, rh + (ry - e.clientY))) + 'px';
         });
-        window.addEventListener('mouseup', () => { if (isResizingChat) { isResizingChat = false; document.body.style.cursor = 'default'; chatbotContainer.style.transition = ''; } });
+        window.addEventListener('mouseup', () => { if (isResizingChat) { isResizingChat = false; document.body.style.cursor = 'default'; chatUI.container.style.transition = ''; } });
 
-        let currentChatFontSize = 13;
-        const updateChatFontSize = () => chatbotContainer.style.setProperty('--chat-font-size', currentChatFontSize + 'px');
-        document.getElementById('chatFontIncreaseBtn').onclick = (e) => { e.stopPropagation(); currentChatFontSize = Math.min(24, currentChatFontSize + 1); updateChatFontSize(); };
-        document.getElementById('chatFontDecreaseBtn').onclick = (e) => { e.stopPropagation(); currentChatFontSize = Math.max(10, currentChatFontSize - 1); updateChatFontSize(); };
+        let chatFontSize = 13;
+        document.getElementById('chatFontIncreaseBtn').onclick = (e) => { e.stopPropagation(); chatFontSize = Math.min(24, chatFontSize + 1); chatUI.container.style.setProperty('--chat-font-size', chatFontSize + 'px'); };
+        document.getElementById('chatFontDecreaseBtn').onclick = (e) => { e.stopPropagation(); chatFontSize = Math.max(10, chatFontSize - 1); chatUI.container.style.setProperty('--chat-font-size', chatFontSize + 'px'); };
 
         function renderChatHistory() {
-            chatMessages.innerHTML = '';
+            chatUI.messages.innerHTML = '';
             for(let i=1; i<chatHistory.length; i++) appendChatMessage(chatHistory[i].role, chatHistory[i].parts[0].text, false);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            chatUI.messages.scrollTop = chatUI.messages.scrollHeight;
         }
 
         function appendChatMessage(role, text, animate = false) {
-            const wrapper = document.createElement('div'); wrapper.className = `flex items-end gap-2 ${role === 'user' ? 'flex-row-reverse' : ''}`;
+            const wrap = document.createElement('div'); wrap.className = `flex items-end gap-2 ${role === 'user' ? 'flex-row-reverse' : ''}`;
             const avatar = role === 'user' ? `<div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs shrink-0"><i class="fa-solid fa-user"></i></div>` : `<img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-7 h-7 rounded-full object-cover shrink-0 border border-slate-200">`;
-            const bubbleStyle = role === 'user' ? `bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-sm shadow-sm leading-relaxed` : `bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm markdown-body leading-relaxed`;
-            wrapper.innerHTML = `${avatar}<div class="chat-message ${bubbleStyle}">${role === 'user' ? text : parseMarkdown(text)}</div>`;
-            chatMessages.appendChild(wrapper);
-            if(animate) chatMessages.scrollTop = chatMessages.scrollHeight;
+            const style = role === 'user' ? `bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-sm shadow-sm` : `bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm markdown-body`;
+            
+            const content = role === 'user' ? text : (typeof marked !== 'undefined' ? marked.parse(text) : `<p>${text}</p>`);
+            wrap.innerHTML = `${avatar}<div class="chat-message ${style}">${content}</div>`;
+            chatUI.messages.appendChild(wrap);
+            if(animate) chatUI.messages.scrollTop = chatUI.messages.scrollHeight;
         }
 
-        chatSendBtn.onclick = async () => {
-            if (!currentApiKey) return showDialog("請先輸入上方 Step 2 的 API Key！", 'error');
-            const text = chatInput.value.trim(); if(!text) return;
-            appendChatMessage('user', text, true); chatHistory.push({ role: "user", parts: [{ text }] }); chatInput.value = '';
+        chatUI.sendBtn.onclick = async () => {
+            if (chatUI.sendBtn.disabled) return;
+            if (!currentApiKey) return showDialog("請先輸入 API Key！", 'error');
+            const text = chatUI.input.value.trim(); if(!text) return;
+            
+            appendChatMessage('user', text, true); chatHistory.push({ role: "user", parts: [{ text }] }); chatUI.input.value = '';
+            chatUI.sendBtn.disabled = true;
 
-            const loaderId = 'chat-loading-' + Date.now();
-            chatMessages.insertAdjacentHTML('beforeend', `<div id="${loaderId}" class="flex items-end gap-2"><img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-7 h-7 rounded-full object-cover shrink-0 border border-slate-200"><div class="chat-message bg-white border border-slate-200 text-slate-500 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm">TONY 老師正在思考中<span class="loading-dots"></span></div></div>`);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            const loaderId = 'chat-load-' + Date.now();
+            chatUI.messages.insertAdjacentHTML('beforeend', `<div id="${loaderId}" class="flex items-end gap-2"><img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-7 h-7 rounded-full object-cover shrink-0 border border-slate-200"><div class="chat-message bg-white border border-slate-200 text-slate-500 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm">思考中<span class="loading-dots"></span></div></div>`);
+            chatUI.messages.scrollTop = chatUI.messages.scrollHeight;
 
             try {
-                // Ensure the requested gemini-3.8-flash model is strictly used
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${currentApiKey}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ system_instruction: { parts: [{ text: TONY_PERSONA }] }, contents: chatHistory, generationConfig: { temperature: 0.7 } })
                 });
-                if (!res.ok) throw new Error("API 請求失敗");
+                if (!res.ok) throw new Error("API 異常");
                 const aiText = (await res.json()).candidates[0].content.parts[0].text;
                 document.getElementById(loaderId).remove();
                 appendChatMessage('model', aiText, true); chatHistory.push({ role: "model", parts: [{ text: aiText }] });
             } catch (err) {
-                document.getElementById(loaderId).remove(); appendChatMessage('model', `**發生錯誤**: ${err.message}`, true); chatHistory.pop();
+                document.getElementById(loaderId).remove(); appendChatMessage('model', `**錯誤**: ${err.message}`, true); chatHistory.pop();
+            } finally {
+                chatUI.sendBtn.disabled = false;
             }
         };
 
-        chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatSendBtn.click(); } });
-
-        chatCopyBtn.onclick = (e) => {
-            e.stopPropagation(); let fullChat = "【TONY 顧問對話紀錄】\n\n";
-            chatHistory.slice(1).forEach(msg => fullChat += (msg.role === 'user' ? "👉【我的提問】\n" : "💡【TONY 老師】\n") + msg.parts[0].text + "\n\n");
-            fallbackCopyTextToClipboard(fullChat, () => { const o = chatCopyBtn.innerHTML; chatCopyBtn.innerHTML = '<i class="fa-solid fa-check text-green-400 text-sm"></i>'; setTimeout(() => chatCopyBtn.innerHTML = o, 2000); });
-        };
-
-        chatExportBtn.onclick = (e) => {
-            e.stopPropagation(); let htmlChat = "<h1>TONY 顧問對話紀錄</h1><br/>";
-            chatHistory.slice(1).forEach(msg => htmlChat += `<p><b>${msg.role === 'user' ? "【我的提問】" : "【TONY 老師】"}</b><br/>${parseMarkdown(msg.parts[0].text)}</p><hr/>`);
-            exportHTMLToWord(htmlChat, 'TONY_Chat_History');
-        };
-
+        chatUI.input.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatUI.sendBtn.click(); } });
         renderChatHistory();
+
+        // Local Storage Bindings
+        document.getElementById('saveLocalBtn').onclick = () => { localStorage.setItem('tony_rfp_backup', getWorkspaceState()); showDialog('已儲存至瀏覽器本機！'); };
+        document.getElementById('loadLocalBtn').onclick = () => { const d = localStorage.getItem('tony_rfp_backup'); if(d) restoreWorkspaceState(d); else showDialog('無本機備份。', 'error'); };
+        document.getElementById('exportBackupBtn').onclick = () => {
+            const b = new Blob([getWorkspaceState()], {type: "application/json"}); const a = document.createElement("a");
+            a.href = URL.createObjectURL(b); a.download = `TonyStudio_Workspace_${new Date().toISOString().slice(0,10)}.json`; a.click();
+        };
+        document.getElementById('importBackupFile').addEventListener('change', async (e) => {
+            const file = e.target.files[0]; if(!file) return;
+            restoreWorkspaceState(await file.text()); document.getElementById('importBackupFile').value = ''; showDialog('已還原狀態！');
+        });
+
     </script>
 </body>
 </html>
