@@ -38,7 +38,7 @@
         body { font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
         
-        /* Custom Scrollbar for a premium look */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
@@ -46,65 +46,35 @@
 
         /* Advanced Markdown Styles */
         .markdown-body { font-size: 0.95rem; line-height: 1.7; color: #334155; }
-        .markdown-body h1 { font-size: 1.75em; font-weight: 800; margin-top: 1.5em; margin-bottom: 0.75em; color: #0f172a; line-height: 1.2; }
-        .markdown-body h2 { font-size: 1.4em; font-weight: 700; margin-top: 1.5em; margin-bottom: 0.75em; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.3em; }
-        .markdown-body h3 { font-size: 1.15em; font-weight: 700; margin-top: 1.2em; margin-bottom: 0.5em; color: #334155; }
-        .markdown-body p { margin-bottom: 1.2em; }
-        .markdown-body ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1.2em; }
-        .markdown-body ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1.2em; }
-        .markdown-body li { margin-bottom: 0.3em; }
+        .markdown-body h1 { font-size: 1.5em; font-weight: 800; margin-top: 1.2em; margin-bottom: 0.5em; color: #0f172a; }
+        .markdown-body h2 { font-size: 1.3em; font-weight: 700; margin-top: 1.2em; margin-bottom: 0.5em; color: #1e293b; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.3em; }
+        .markdown-body p { margin-bottom: 1em; }
+        .markdown-body ul { list-style-type: disc; margin-left: 1.5em; margin-bottom: 1em; }
+        .markdown-body ol { list-style-type: decimal; margin-left: 1.5em; margin-bottom: 1em; }
         .markdown-body strong { color: #0f172a; font-weight: 700; }
         
         /* Premium Table Design */
-        .markdown-body table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 1.5em; border-radius: 0.5rem; overflow: hidden; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; }
-        .markdown-body th, .markdown-body td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 0.75rem 1rem; text-align: left; }
+        .markdown-body table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 1.5em; border-radius: 0.5rem; overflow: hidden; border: 1px solid #e2e8f0; }
+        .markdown-body th, .markdown-body td { border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 0.5rem 0.75rem; text-align: left; }
         .markdown-body th:last-child, .markdown-body td:last-child { border-right: none; }
         .markdown-body tbody tr:last-child td { border-bottom: none; }
-        .markdown-body th { background-color: #f8fafc; font-weight: 600; color: #334155; border-bottom: 2px solid #cbd5e1; }
-        .markdown-body tbody tr { background-color: #ffffff; transition: background-color 0.2s; }
-        .markdown-body tbody tr:hover { background-color: #f1f5f9; }
+        .markdown-body th { background-color: #f8fafc; font-weight: 600; color: #334155; }
         
-        .markdown-body blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; margin-bottom: 1.2em; color: #475569; background: #eff6ff; padding: 0.5rem 1rem; border-radius: 0 0.5rem 0.5rem 0; font-style: italic; }
-        
-        /* Loading Animation */
-        .loading-dots::after {
-            content: '.';
-            animation: dots 1.5s steps(5, end) infinite;
-        }
-        @keyframes dots { 
-            0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 
-            40% { color: inherit; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0);} 
-            60% { text-shadow: .25em 0 0 inherit, .5em 0 0 rgba(0,0,0,0);} 
-            80%, 100% { text-shadow: .25em 0 0 inherit, .5em 0 0 inherit;}
-        }
-        
+        /* Evidence & Assumption Badges */
+        .badge-evidence { display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 2px 6px; border-radius: 4px; margin-top: 4px; font-weight: 500; }
+        .badge-assumption { display: inline-flex; align-items: center; gap: 4px; font-size: 0.75rem; background: #fffbeb; color: #b45309; border: 1px solid #fde68a; padding: 2px 6px; border-radius: 4px; margin-top: 4px; font-weight: 500; }
+        .badge-status-verified { background: #dcfce7; color: #166534; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
+        .badge-status-pending { background: #fef08a; color: #854d0e; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem; }
+
         /* Chatbot Resizable Container */
         #chatbot-container {
-            overflow: hidden;
-            min-width: 300px;
-            min-height: 50px; 
-            max-width: 90vw;
-            max-height: 90vh;
-            --chat-font-size: 13px;
+            overflow: hidden; min-width: 300px; min-height: 50px; max-width: 90vw; max-height: 90vh; --chat-font-size: 13px;
         }
         .chat-message { max-width: 85%; word-wrap: break-word; font-size: var(--chat-font-size) !important; }
-        .chat-message.markdown-body * { font-size: inherit; }
-        .chat-message.markdown-body h1 { font-size: 1.5em; line-height: 1.2; }
-        .chat-message.markdown-body h2 { font-size: 1.3em; }
-        .chat-message.markdown-body h3 { font-size: 1.15em; }
-
-        /* Skeleton Loading for Firebase */
-        .skeleton-row { animation: skeleton-loading 1.5s infinite linear; }
-        @keyframes skeleton-loading {
-            0% { background-color: #f1f5f9; }
-            50% { background-color: #e2e8f0; }
-            100% { background-color: #f1f5f9; }
-        }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
 
-    <!-- Top Navigation -->
     <header class="bg-slate-900 text-white shadow-md border-b border-slate-800 relative z-50 w-full">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -118,424 +88,265 @@
                 </div>
             </div>
             
-            <!-- Google Auth UI -->
             <div class="flex items-center gap-3">
-                <button id="loginBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 border border-blue-500 shadow-sm hover:shadow">
+                <button id="loginBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 border border-blue-500">
                     <i class="fa-brands fa-google"></i> Google 登入
                 </button>
-                <div id="userInfo" class="hidden items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 shadow-sm transition-all duration-300">
+                <div id="userInfo" class="hidden items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 transition-all">
                     <img id="userAvatar" src="" alt="Avatar" class="w-7 h-7 rounded-full border border-slate-500 object-cover">
                     <span id="userName" class="text-sm font-medium text-slate-200 hidden sm:block"></span>
-                    <div class="w-px h-4 bg-slate-600 mx-1 hidden sm:block"></div>
-                    <button id="logoutBtn" class="text-slate-400 hover:text-white text-xs transition-colors font-medium">登出</button>
+                    <button id="logoutBtn" class="text-slate-400 hover:text-white text-xs font-medium ml-2">登出</button>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Workspace -->
     <main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
         
-        <!-- Left Column: Input & Controls & Profile -->
-        <div class="lg:col-span-4 flex flex-col gap-6">
+        <!-- Left Column: Inputs & Controls -->
+        <div class="lg:col-span-4 flex flex-col gap-5">
             
             <!-- Step 1: Project Management -->
-            <div class="glass-panel rounded-xl p-5 shadow-sm border border-orange-200 bg-gradient-to-br from-orange-50 to-white hover:shadow-md transition-shadow duration-300">
-                <h2 class="text-lg font-bold mb-3 flex items-center justify-between text-orange-800">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-folder-tree"></i> 1. 專案與雲端空間管理</span>
-                </h2>
-                
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center justify-between bg-white px-3 py-2.5 border border-orange-100 rounded-lg shadow-sm">
-                        <span class="text-xs text-slate-500 font-medium flex items-center gap-1"><i class="fa-solid fa-circle-dot text-green-500 text-[8px]"></i> 目前專案：</span>
-                        <span id="currentProjectDisplayMain" class="font-bold text-orange-700 text-sm truncate max-w-[180px]">未命名專案</span>
+            <div class="glass-panel rounded-xl p-4 shadow-sm border border-orange-200 bg-gradient-to-br from-orange-50 to-white">
+                <h2 class="text-sm font-bold mb-3 flex items-center gap-2 text-orange-800"><i class="fa-solid fa-folder-tree"></i> 1. 專案空間管理</h2>
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center justify-between bg-white px-3 py-2 border border-orange-100 rounded-lg text-sm">
+                        <span class="text-xs text-slate-500">目前專案：</span>
+                        <span id="currentProjectDisplayMain" class="font-bold text-orange-700 truncate max-w-[150px]">未命名專案</span>
                     </div>
-                    
                     <div class="flex gap-2">
-                        <button id="newBlankProjectBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm flex items-center justify-center gap-2 whitespace-nowrap" title="清除所有資料並建立空白專案">
-                            <i class="fa-solid fa-file-circle-plus"></i> 空白新案
-                        </button>
-                        <button id="projectManagerBtnMain" class="flex-grow bg-orange-500 hover:bg-orange-600 text-white px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow flex items-center justify-center gap-2 disabled:opacity-70">
-                            <i class="fa-solid fa-cloud-bolt"></i> 雲端專案管理
-                        </button>
-                        <button id="quickSaveProjectBtn" class="bg-white hover:bg-slate-50 text-orange-600 border border-orange-200 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm flex items-center justify-center gap-2 hidden disabled:opacity-50" title="快速覆寫目前專案">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                        </button>
-                    </div>
-
-                    <!-- Local & Backup Operations -->
-                    <div class="flex justify-between items-center mt-1 pt-3 border-t border-orange-100/50">
-                        <span class="text-[11px] text-slate-400 font-medium">離線備份選項</span>
-                        <div class="flex gap-1">
-                             <button id="saveLocalBtn" class="bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-700 px-2 py-1 rounded transition-colors border border-slate-200 text-xs flex items-center gap-1" title="暫存至瀏覽器"><i class="fa-solid fa-hard-drive"></i> 本機</button>
-                             <button id="loadLocalBtn" class="bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-700 px-2 py-1 rounded transition-colors border border-slate-200 text-xs" title="從瀏覽器載入"><i class="fa-solid fa-rotate-left"></i></button>
-                             <div class="w-px h-4 bg-slate-200 mx-1 self-center"></div>
-                             <button id="exportBackupBtn" class="bg-slate-50 hover:bg-slate-100 text-blue-600 hover:text-blue-700 px-2 py-1 rounded transition-colors border border-slate-200 text-xs" title="下載專案檔案 (.json)"><i class="fa-solid fa-download"></i></button>
-                             <label class="cursor-pointer bg-slate-50 hover:bg-slate-100 text-blue-600 hover:text-blue-700 px-2 py-1 rounded transition-colors border border-slate-200 text-xs" title="匯入專案檔案">
-                                 <i class="fa-solid fa-upload"></i>
-                                 <input type="file" id="importBackupFile" class="hidden" accept=".json">
-                             </label>
-                        </div>
+                        <button id="newBlankProjectBtn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-3 py-2 rounded-lg text-xs font-medium transition-all shadow-sm flex items-center gap-1"><i class="fa-solid fa-file-circle-plus"></i> 空白新案</button>
+                        <button id="projectManagerBtnMain" class="flex-grow bg-orange-500 hover:bg-orange-600 text-white px-3 py-2 rounded-lg text-xs font-medium transition-all shadow-sm flex items-center justify-center gap-1"><i class="fa-solid fa-cloud-bolt"></i> 雲端專案管理</button>
+                        <button id="quickSaveProjectBtn" class="bg-white text-orange-600 border border-orange-200 px-3 py-2 rounded-lg text-xs font-medium transition-all shadow-sm hidden"><i class="fa-solid fa-floppy-disk"></i></button>
                     </div>
                 </div>
             </div>
 
             <!-- Step 2: API Key Setup -->
-            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200 bg-slate-900 text-white">
-                <h2 class="text-sm font-semibold mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-key text-yellow-400"></i> 2. 系統啟動金鑰
-                </h2>
-                <div class="flex flex-col gap-3">
-                    <input type="password" id="apiKeyInput" placeholder="點擊此處貼上您的 Gemini API Key..." 
-                           class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500 placeholder-slate-400 transition-all">
-                    <button id="saveKeyBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm">
-                        <i class="fa-solid fa-lock"></i> 儲存金鑰並解鎖系統
-                    </button>
+            <div class="glass-panel rounded-xl p-4 shadow-sm border border-slate-200 bg-slate-900 text-white">
+                <h2 class="text-sm font-semibold mb-2 flex items-center gap-2"><i class="fa-solid fa-key text-yellow-400"></i> 2. 系統啟動金鑰</h2>
+                <div class="flex gap-2">
+                    <input type="password" id="apiKeyInput" placeholder="貼上 Gemini API Key..." class="flex-grow bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-blue-500 outline-none">
+                    <button id="saveKeyBtn" class="bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-lg text-xs font-medium transition-all"><i class="fa-solid fa-lock"></i> 儲存</button>
                 </div>
-                <p class="text-[10px] text-slate-400 mt-3 text-center">金鑰僅加密暫存於瀏覽器，關閉即清除。</p>
             </div>
             
             <!-- Step 3: Context Input -->
-            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                <h2 class="text-lg font-semibold mb-4 flex items-center justify-between">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-file-lines text-blue-600"></i> 3. 提案上下文</span>
-                </h2>
-                
-                <div class="mb-3 flex flex-col gap-2">
-                    <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-sm w-full font-medium">
-                        <i class="fa-solid fa-cloud-arrow-up text-base"></i> 上傳 RFP 資料 (PDF/Word/Excel/圖)
-                        <input type="file" id="fileUpload" class="hidden" multiple accept=".pdf,.docx,.xlsx,.xls,.csv,.txt,.png,.jpg,.jpeg">
+            <div class="glass-panel rounded-xl p-4 shadow-sm border border-slate-200">
+                <h2 class="text-sm font-semibold mb-3 flex items-center gap-2"><i class="fa-solid fa-file-lines text-blue-600"></i> 3. 官方 RFP 資料 (事實庫)</h2>
+                <div class="mb-2 flex flex-col gap-2">
+                    <label class="cursor-pointer bg-slate-800 hover:bg-slate-700 text-white text-xs px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-all font-medium">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> 上傳 RFP 檔案 (PDF/Word/Excel)
+                        <input type="file" id="fileUpload" class="hidden" multiple accept=".pdf,.docx,.xlsx,.xls,.csv,.txt,.png,.jpg">
                     </label>
                 </div>
-
-                <div class="flex flex-col gap-2 mb-3">
-                    <div class="flex gap-2">
-                        <input type="text" id="rfpUrlInput" placeholder="貼上參考網頁或競爭對手連結..." class="flex-grow bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                        <button id="addRfpUrlBtn" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap shrink-0">新增連結</button>
-                    </div>
-                    <div id="rfpUrlTagsContainer" class="flex flex-wrap gap-2 empty:hidden"></div>
-                </div>
-
                 <div id="imagePreviewContainer" class="flex flex-wrap gap-2 mb-2 empty:hidden"></div>
                 <div id="rfpFileTagsContainer" class="flex flex-wrap gap-2 mb-2 empty:hidden"></div>
-                
-                <textarea id="rfpContext" rows="7" placeholder="或在此直接貼上 RFP 文件內容..." 
-                          class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y text-sm transition-shadow"></textarea>
+                <textarea id="rfpContext" rows="4" placeholder="在此直接貼上 RFP 文字條文..." class="w-full p-3 border border-slate-300 rounded-lg focus:border-blue-500 outline-none text-xs resize-y"></textarea>
+            </div>
+
+            <!-- Step 3.5: Entity Settings (CRITICAL FOR ACCURACY) -->
+            <div class="glass-panel rounded-xl p-4 shadow-sm border border-indigo-200 bg-indigo-50/50">
+                <h2 class="text-sm font-semibold mb-3 flex items-center gap-2 text-indigo-800"><i class="fa-solid fa-building-user"></i> 3.5 專案實體與邊界設定</h2>
+                <div class="space-y-2">
+                    <div>
+                        <label class="text-[10px] text-slate-500 font-bold">投標方 (我方) 企業名稱</label>
+                        <input type="text" id="ourEntityInput" placeholder="例如：TonyStudio、卡爾吉特..." class="w-full bg-white border border-slate-300 rounded md px-2 py-1.5 text-xs outline-none focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-500 font-bold">已確認之競爭對手 (無證據勿填)</label>
+                        <input type="text" id="competitorInput" placeholder="例如：A公司、B公司..." class="w-full bg-white border border-slate-300 rounded md px-2 py-1.5 text-xs outline-none focus:border-indigo-500">
+                    </div>
+                    <p class="text-[9px] text-indigo-600 leading-tight mt-1">⚠️ 系統將根據此設定嚴格區分我方與敵方，防止 AI 生成無依據的競品弱點。</p>
+                </div>
             </div>
 
             <!-- Step 4: Workflow Steps -->
-            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200">
-                <h2 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-wand-magic-sparkles text-blue-600"></i> 4. 選擇戰略分析模組
-                </h2>
-                
-                <details class="mb-4 group bg-blue-50 hover:bg-blue-100 transition-colors border border-blue-200 rounded-lg text-sm text-slate-700 open:bg-white open:shadow-sm">
-                    <summary class="cursor-pointer font-medium text-blue-800 px-4 py-3 flex items-center justify-between select-none list-none [&::-webkit-details-marker]:hidden">
-                        <span class="flex items-center gap-2"><i class="fa-solid fa-circle-info"></i> 模組使用說明與建議流程</span>
-                        <i class="fa-solid fa-chevron-down text-xs text-blue-500 transition-transform duration-300 group-open:rotate-180"></i>
-                    </summary>
-                    <div class="px-4 pb-4 border-t border-blue-100 pt-3 space-y-3 text-xs leading-relaxed text-slate-600">
-                        <p class="font-medium text-slate-700">💡 建議依序進行深度拆解，或根據當下需求獨立呼叫：</p>
-                        <div class="space-y-2">
-                            <p><strong class="text-blue-700">Phase 1 拆解與洞察：</strong> 先用 <span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">模組 1-3</span> 將 RFP 濃縮為戰情摘要，破解計分卡並找出缺口。</p>
-                            <p><strong class="text-blue-700">Phase 2 戰略與定位：</strong> 透過 <span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">模組 4</span> 發展核心勝選主軸 (Win Theme)。</p>
-                            <p><strong class="text-blue-700">Phase 3 提案建構：</strong> 利用 <span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">模組 5-6</span> 將戰略轉化為大綱，建立防漏分矩陣。</p>
-                            <p><strong class="text-blue-700">Phase 4 執行與收尾：</strong> 最後用 <span class="bg-blue-100 text-blue-700 px-1 py-0.5 rounded">模組 7-9</span> 把關報價邏輯與檢查清單。</p>
-                        </div>
-                    </div>
-                </details>
-
-                <div class="grid grid-cols-1 gap-2 max-h-[400px] overflow-y-auto pr-2" id="workflowButtons">
+            <div class="glass-panel rounded-xl p-4 shadow-sm border border-slate-200">
+                <h2 class="text-sm font-semibold mb-3 flex items-center gap-2"><i class="fa-solid fa-wand-magic-sparkles text-blue-600"></i> 4. 戰略與報告生成 (9大模組)</h2>
+                <div class="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-2" id="workflowButtons">
                     <!-- Buttons generated by JS -->
                 </div>
             </div>
 
-            <!-- Step 5: 歷史提案覆盤 -->
-            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                <h2 class="text-lg font-semibold mb-3 flex items-center justify-between">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-file-signature text-blue-600"></i> 5. 提案評估與歷史覆盤</span>
-                </h2>
-                
-                <div class="mb-3 flex flex-col gap-2">
-                    <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors border border-slate-300 shadow-sm w-full font-medium">
-                        <i class="fa-solid fa-file-arrow-up text-base"></i> 上傳我方提案 (PDF/Word/Excel)
-                        <input type="file" id="proposalFileUpload" class="hidden" multiple accept=".pdf,.docx,.xlsx,.xls,.csv,.txt">
+            <!-- Step 5: Proposal Upload (For Gap Analysis) -->
+            <div class="glass-panel rounded-xl p-4 shadow-sm border border-slate-200">
+                <h2 class="text-sm font-semibold mb-3 flex items-center gap-2"><i class="fa-solid fa-file-signature text-blue-600"></i> 5. 我方提案能力 (證據庫)</h2>
+                <div class="mb-2">
+                    <label class="cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-all border border-slate-300 font-medium">
+                        <i class="fa-solid fa-file-arrow-up"></i> 上傳我方提案/能力證明
+                        <input type="file" id="proposalFileUpload" class="hidden" multiple accept=".pdf,.docx,.xlsx,.xls,.txt">
                     </label>
                 </div>
-                
-                <div class="flex flex-col gap-2 mb-3">
-                    <div class="flex gap-2">
-                        <input type="text" id="proposalUrlInput" placeholder="貼上提案網頁或影片連結..." class="flex-grow bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
-                        <button id="addProposalUrlBtn" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-2 rounded-lg text-xs transition-colors whitespace-nowrap shrink-0">新增連結</button>
-                    </div>
-                    <div id="proposalUrlTagsContainer" class="flex flex-wrap gap-2 empty:hidden"></div>
-                </div>
-
                 <div id="proposalFileTagsContainer" class="flex flex-wrap gap-2 mb-2 empty:hidden"></div>
-                
-                <textarea id="proposalContext" rows="4" placeholder="在此貼上我方提案內容。提交前可評估；結束可覆盤..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none resize-y text-sm mb-3 transition-shadow"></textarea>
-                
-                <div class="flex flex-col gap-2">
-                    <button id="optimizeDraftBtn" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-2.5 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-70">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> 草案紅隊評估與優化
-                    </button>
-                    <div class="grid grid-cols-2 gap-2 mt-1">
-                        <button id="winAnalysisBtn" class="bg-green-50 hover:bg-green-100 text-green-700 border border-green-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-70">
-                            <i class="fa-solid fa-trophy"></i> 事後：勝選關鍵
-                        </button>
-                        <button id="lossAnalysisBtn" class="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-70">
-                            <i class="fa-solid fa-heart-crack"></i> 事後：敗選剖析
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TONY 顧問名片 -->
-            <div class="glass-panel rounded-xl p-5 shadow-sm border border-slate-200 bg-white">
-                <div class="flex items-start gap-4 mb-4">
-                    <img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" alt="TONY 老師" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 shadow-sm">
-                    <div>
-                        <h3 class="font-bold text-slate-800 text-lg leading-tight">TONY 楊文澤 老師</h3>
-                        <p class="text-xs text-blue-600 font-medium mt-1">資深數位行銷科技顧問 / 創業導師</p>
-                    </div>
-                </div>
-                <div class="text-xs text-slate-600 space-y-2">
-                    <p><strong><i class="fa-solid fa-briefcase text-slate-400 w-4"></i> 現職:</strong> 龍華科大 數位行銷講師 / 智策慧 品牌行銷科技顧問</p>
-                    <p><strong><i class="fa-solid fa-star text-slate-400 w-4"></i> 經歷:</strong> 脈動心聯 創辦人暨執行長 / 宏碁集團建碁 AOPEN 處長</p>
-                    <p><strong><i class="fa-solid fa-graduation-cap text-slate-400 w-4"></i> 學歷:</strong> 台大 EMBA 商學組 / 美國 ASU 互動多媒體設計</p>
+                <textarea id="proposalContext" rows="2" placeholder="在此輸入我方優勢、已備妥之資源..." class="w-full p-2 border border-slate-300 rounded-lg focus:border-blue-500 outline-none text-xs resize-y mb-2"></textarea>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="optimizeDraftBtn" class="col-span-2 bg-blue-50 text-blue-700 border border-blue-200 px-3 py-2 rounded-lg text-xs font-bold transition-all"><i class="fa-solid fa-scale-balanced"></i> 合規缺口比對 (RFP vs 我方)</button>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column: Results & Workspace (Responsive Height Fixed) -->
-        <div class="lg:col-span-8 flex flex-col min-h-[500px] lg:h-[calc(100vh-100px)] lg:sticky lg:top-24">
+        <!-- Right Column: Results & Workspace -->
+        <div class="lg:col-span-8 flex flex-col min-h-[600px] lg:h-[calc(100vh-100px)] lg:sticky lg:top-20">
             <div class="glass-panel rounded-xl shadow-sm flex flex-col h-full overflow-hidden border border-slate-200 bg-white">
                 
-                <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center">
-                    <h2 class="font-semibold text-slate-800 flex items-center gap-2">
-                        <i class="fa-solid fa-robot text-blue-600"></i> AI 戰略分析結果
+                <div class="bg-slate-50 border-b border-slate-200 px-5 py-3 flex justify-between items-center shrink-0">
+                    <h2 class="font-semibold text-slate-800 flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-robot text-blue-600"></i> AI 分析與合規報告區
                     </h2>
                     <div class="flex gap-2 items-center">
-                        <span id="statusBadge" class="px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded-full font-medium transition-colors duration-300">等待指令</span>
-                        <button id="exportWordBtn" class="bg-blue-50 hover:bg-blue-100 text-blue-700 px-3 py-1.5 rounded text-xs transition-colors border border-blue-200 hidden font-medium" title="匯出成 Word 檔案">
-                            <i class="fa-solid fa-file-word mr-1"></i> 匯出 Word
-                        </button>
-                        <button id="copyBtn" class="text-slate-500 hover:text-blue-600 transition-colors hidden px-2 py-1 bg-slate-50 hover:bg-slate-100 rounded border border-slate-200" title="複製內容">
-                            <i class="fa-regular fa-copy text-sm"></i>
-                        </button>
+                        <span id="statusBadge" class="px-2 py-1 bg-slate-200 text-slate-600 text-[10px] rounded font-medium">等待指令</span>
+                        <button id="exportWordBtn" class="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs border border-blue-200 hidden" title="匯出 Word"><i class="fa-solid fa-file-word"></i></button>
+                        <button id="copyBtn" class="bg-slate-50 text-slate-600 px-2 py-1 rounded border border-slate-200 hidden"><i class="fa-regular fa-copy"></i></button>
                     </div>
                 </div>
                 
-                <div class="p-6 overflow-y-auto flex-grow relative bg-white">
-                    <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center transition-opacity duration-300">
-                        <div class="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
-                            <i class="fa-solid fa-layer-group text-3xl text-slate-300"></i>
-                        </div>
-                        <h3 class="text-lg font-medium text-slate-600 mb-2">等待開始分析</h3>
-                        <p class="text-sm max-w-md">請在左側輸入 RFP 內容或上傳檔案，並選擇戰略分析模組。AI 將在此為您生成結構化報告。</p>
+                <div class="p-6 overflow-y-auto flex-grow relative bg-white" id="resultContainer">
+                    <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
+                        <i class="fa-solid fa-shield-halved text-4xl text-slate-200 mb-3"></i>
+                        <h3 class="text-sm font-medium text-slate-600">嚴謹的證據導向分析</h3>
+                        <p class="text-xs max-w-sm mt-2">基於您提供的 RFP 檔案進行分析。<br>系統已限制：不捏造權重、不混淆實體、保留原始公式與單位。</p>
                     </div>
-                    <div id="loadingState" class="absolute inset-0 flex flex-col items-center justify-center text-blue-500 p-8 text-center hidden bg-white/90 backdrop-blur-sm z-10">
-                        <i class="fa-solid fa-circle-notch fa-spin text-4xl mb-4"></i>
-                        <h3 class="text-lg font-medium text-slate-700 mb-1">AI 正在深度拆解中</h3>
-                        <p class="text-sm text-slate-500">正在分析文本與連結資料並進行推演，請稍候...</p>
+                    <div id="loadingState" class="absolute inset-0 flex flex-col items-center justify-center text-blue-500 p-8 text-center hidden bg-white/95 z-10">
+                        <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
+                        <h3 class="text-sm font-medium text-slate-700">正在進行交叉比對與反向工程...</h3>
+                        <p class="text-[10px] text-slate-500 mt-2">正從事實庫中提取證據，過濾幻覺參數</p>
                     </div>
-                    <!-- The output section for the parsed JSON -->
-                    <div id="resultContent" class="hidden opacity-0 transition-opacity duration-500"></div>
+                    <div id="resultContent" class="hidden transition-opacity duration-300"></div>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm border-t border-slate-800 mt-auto z-10 relative">
-        <div class="container mx-auto px-4">
-            <p>&copy; 2020 TonyStudio. 本教材由 TONY STUDIO 楊文澤顧問設計. All Rights Reserved.</p>
-        </div>
+    <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs border-t border-slate-800 mt-auto z-10 relative">
+        <p>&copy; 2020 TonyStudio. 本教材由 TONY STUDIO 楊文澤顧問設計. All Rights Reserved.</p>
     </footer>
 
-    <!-- Custom Dialog UI (Replaces alert/confirm) -->
-    <div id="customDialog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] hidden flex-col items-center justify-center p-4 transition-opacity duration-200">
-        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center transform scale-95 transition-transform duration-200" id="customDialogBox">
-            <div id="customDialogIcon" class="mb-4 text-4xl"></div>
-            <h3 id="customDialogMessage" class="text-slate-800 font-medium mb-6 text-sm leading-relaxed whitespace-pre-wrap"></h3>
-            <div class="flex justify-center gap-3">
-                <button id="customDialogCancel" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm transition-colors hidden font-medium">取消</button>
-                <button id="customDialogConfirm" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm transition-colors shadow-sm font-medium">確定</button>
+    <!-- Custom Dialog UI -->
+    <div id="customDialog" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] hidden flex-col items-center justify-center p-4">
+        <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 text-center transform scale-95 transition-transform" id="customDialogBox">
+            <div id="customDialogIcon" class="mb-3 text-3xl"></div>
+            <h3 id="customDialogMessage" class="text-slate-800 font-medium mb-5 text-sm whitespace-pre-wrap"></h3>
+            <div class="flex justify-center gap-2">
+                <button id="customDialogCancel" class="px-4 py-2 bg-slate-100 text-slate-700 rounded text-xs hidden">取消</button>
+                <button id="customDialogConfirm" class="px-4 py-2 bg-blue-600 text-white rounded text-xs">確定</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase Cloud Project Management Modal -->
+    <!-- Firebase Project Modal -->
     <div id="projectModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-3xl flex flex-col max-h-[85vh] overflow-hidden transform transition-all">
-            <div class="px-6 py-4 border-b border-slate-200 flex justify-between items-center bg-orange-50">
-                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fa-solid fa-cloud text-orange-500"></i> 雲端專案管理
-                </h2>
-                <button id="closeProjectModalBtn" class="text-slate-400 hover:text-red-500 transition-colors p-1"><i class="fa-solid fa-xmark text-xl"></i></button>
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[80vh]">
+            <div class="px-5 py-3 border-b border-slate-200 flex justify-between items-center bg-orange-50 rounded-t-xl">
+                <h2 class="text-sm font-bold text-slate-800"><i class="fa-solid fa-cloud text-orange-500"></i> 雲端專案管理</h2>
+                <button id="closeProjectModalBtn" class="text-slate-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div class="p-6 flex-grow flex flex-col gap-4 overflow-hidden">
+            <div class="p-5 flex flex-col gap-4 overflow-hidden flex-grow">
                 <div class="flex gap-2">
-                    <input type="text" id="newProjectName" placeholder="輸入新專案名稱..." class="flex-grow bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-all">
-                    <button id="saveNewProjectBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm whitespace-nowrap flex items-center gap-2 disabled:opacity-50">
-                        <i class="fa-solid fa-plus"></i> 建立新專案
-                    </button>
+                    <input type="text" id="newProjectName" placeholder="輸入新專案名稱..." class="flex-grow border border-slate-300 rounded px-3 py-2 text-xs outline-none">
+                    <button id="saveNewProjectBtn" class="bg-orange-500 text-white px-4 py-2 rounded text-xs font-medium"><i class="fa-solid fa-plus"></i> 建立</button>
                 </div>
-                <hr class="border-slate-100">
-                <div class="flex-grow overflow-y-auto relative border border-slate-200 rounded-lg bg-slate-50">
-                    <table class="w-full text-sm text-left">
-                        <thead class="text-xs text-slate-500 bg-slate-100 sticky top-0 z-10 shadow-sm">
-                            <tr>
-                                <th class="px-4 py-3 font-medium">專案名稱</th>
-                                <th class="px-4 py-3 font-medium w-40">最後更新時間</th>
-                                <th class="px-4 py-3 font-medium w-36 text-center">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="projectListBody" class="divide-y divide-slate-100 bg-white">
-                            <!-- Populated by JS -->
-                        </tbody>
+                <div class="flex-grow overflow-y-auto border border-slate-200 rounded relative">
+                    <table class="w-full text-xs text-left">
+                        <thead class="bg-slate-100 text-slate-500 sticky top-0 shadow-sm"><tr><th class="px-3 py-2">專案名稱</th><th class="px-3 py-2 w-32">更新時間</th><th class="px-3 py-2 w-20 text-center">操作</th></tr></thead>
+                        <tbody id="projectListBody" class="divide-y divide-slate-100"></tbody>
                     </table>
-                    <div id="projectListLoading" class="absolute inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center text-orange-500 hidden z-20">
-                        <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i>
-                        <span class="text-sm font-medium text-slate-600 mt-2">連線至資料庫中...</span>
-                    </div>
+                    <div id="projectListLoading" class="absolute inset-0 bg-white/90 flex flex-col items-center justify-center text-orange-500 hidden"><i class="fa-solid fa-spinner fa-spin text-2xl"></i></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- TONY 顧問 AI 助理 Chatbot -->
-    <div id="chatbot-container" class="fixed bottom-6 right-6 bg-white rounded-xl shadow-[0_0_40px_rgba(0,0,0,0.15)] border border-slate-200 flex flex-col transition-shadow hover:shadow-[0_0_50px_rgba(0,0,0,0.2)]" style="display: flex; height: 50px; width: 400px; z-index: 9999;">
-        <div id="chatResizer" class="absolute top-0 left-0 w-6 h-6 cursor-nwse-resize z-50 flex items-start justify-start opacity-50 hover:opacity-100 transition-opacity" title="拖曳調整大小">
-            <svg class="w-4 h-4 text-white m-0.5 drop-shadow" fill="currentColor" viewBox="0 0 24 24"><path d="M0 0 L16 0 L0 16 Z"/></svg>
+    <!-- TONY Chatbot -->
+    <div id="chatbot-container" class="fixed bottom-6 right-6 bg-white rounded-xl shadow-2xl border border-slate-200 flex flex-col transition-shadow" style="display: flex; height: 50px; width: 380px; z-index: 9999;">
+        <div id="chatResizer" class="absolute top-0 left-0 w-5 h-5 cursor-nwse-resize z-50 flex items-start justify-start opacity-50 hover:opacity-100">
+            <svg class="w-3 h-3 text-white m-1" fill="currentColor" viewBox="0 0 24 24"><path d="M0 0 L16 0 L0 16 Z"/></svg>
         </div>
-        <div class="bg-slate-900 text-white px-4 py-3 rounded-t-xl flex justify-between items-center cursor-pointer pl-7 relative select-none" id="chatToggleHeader">
-            <div class="flex items-center gap-3 pointer-events-none">
-                <div class="relative">
-                    <img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-9 h-9 rounded-full border-2 border-slate-600 object-cover" alt="TONY">
-                    <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
-                </div>
+        <div class="bg-slate-900 text-white px-4 py-2.5 rounded-t-xl flex justify-between items-center cursor-pointer pl-6" id="chatToggleHeader">
+            <div class="flex items-center gap-2 pointer-events-none">
+                <img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-7 h-7 rounded-full border border-slate-600 object-cover">
                 <div>
-                    <div class="font-bold text-sm leading-tight">TONY 顧問</div>
-                    <div class="text-[10px] text-slate-300">首席提案策略 AI 助理 <span class="bg-slate-800 text-blue-300 px-1 py-0.5 rounded ml-1 border border-slate-700">gemini-3.8-flash</span></div>
+                    <div class="font-bold text-[13px] leading-tight">TONY 顧問</div>
+                    <div class="text-[9px] text-slate-300">gemini-3.8-flash 驅動</div>
                 </div>
             </div>
             <div class="flex gap-2 items-center">
-                <button id="chatFontDecreaseBtn" class="text-slate-300 hover:text-white transition-colors p-1 font-bold font-mono text-xs flex items-center justify-center w-6 h-6 rounded hover:bg-slate-700" title="字體縮小">A-</button>
-                <button id="chatFontIncreaseBtn" class="text-slate-300 hover:text-white transition-colors p-1 font-bold font-mono text-xs flex items-center justify-center w-6 h-6 rounded hover:bg-slate-700" title="字體放大">A+</button>
-                <div class="w-px h-3 bg-slate-600 mx-1"></div>
-                <button id="chatExportBtn" class="text-slate-300 hover:text-white transition-colors p-1 w-7 h-7 flex items-center justify-center rounded hover:bg-slate-700" title="對話存成 Word"><i class="fa-solid fa-file-word text-sm"></i></button>
-                <button id="chatCopyBtn" class="text-slate-300 hover:text-white transition-colors p-1 w-7 h-7 flex items-center justify-center rounded hover:bg-slate-700" title="複製對話內容"><i class="fa-regular fa-copy text-sm"></i></button>
-                <button id="chatToggleBtn" class="text-slate-300 hover:text-white transition-colors p-1 w-7 h-7 flex items-center justify-center rounded hover:bg-slate-700 pointer-events-none" title="最小化/展開"><i class="fa-solid fa-chevron-up text-sm"></i></button>
+                <button id="chatToggleBtn" class="text-slate-300 pointer-events-none"><i class="fa-solid fa-chevron-up text-xs"></i></button>
             </div>
         </div>
-        <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-slate-50 flex flex-col gap-4 text-sm relative scroll-smooth" style="display: none;">
-            <!-- Messages -->
-        </div>
-        <div class="p-3 bg-white border-t border-slate-200 flex gap-2" style="display: none;" id="chatInputArea">
-            <textarea id="chatInput" rows="2" class="flex-grow border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none transition-shadow" placeholder="問問 TONY 顧問任何問題..."></textarea>
-            <button id="chatSendBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 rounded-lg transition-colors flex items-center justify-center shadow-sm disabled:opacity-50"><i class="fa-solid fa-paper-plane"></i></button>
+        <div id="chat-messages" class="flex-grow p-4 overflow-y-auto bg-slate-50 flex-col gap-3 text-xs hidden"></div>
+        <div class="p-2 bg-white border-t border-slate-200 flex gap-2 hidden" id="chatInputArea">
+            <textarea id="chatInput" rows="1" class="flex-grow border border-slate-300 rounded px-3 py-1.5 text-xs outline-none resize-none" placeholder="輸入問題..."></textarea>
+            <button id="chatSendBtn" class="bg-blue-600 text-white px-3 rounded"><i class="fa-solid fa-paper-plane text-xs"></i></button>
         </div>
     </div>
 
-    <!-- MAIN JAVASCRIPT -->
     <script>
         /**
-         * System Prompt Refactored for Robust JSON Output (Self-Healing Ready)
+         * 企業級系統提示詞 (Extreme Optimization based on Samsung SES Case)
+         * - 強制要求「來源引述」
+         * - 嚴禁填補未知資料 (如權重、機率、日期)
+         * - 明確區分「RFP 事實」與「顧問建議」
          */
-        const SYSTEM_PROMPT = `你現在是 TonyStudio 企業的首席提案策略師（Chief Proposal Strategist）與 B2B 採購分析專家。
-你擅長解讀大型企業的 RFP，能看透表層需求，挖掘隱性與決策需求。
-你的目標是協助團隊制定勝率最高的提案架構、規避合約與執行風險，並規劃出最合理的成本與專案管理模型。
+        const SYSTEM_PROMPT = `你是 TonyStudio 首席標案分析師。
+任務：對提供的 RFP 文件與我方資料進行極度嚴謹的分析。
 
-【輸出格式嚴格限制】（極度重要）
-你必須「僅」輸出一個合法的 JSON 格式字串，絕對不可包含任何 Markdown 代碼塊標記（如 \`\`\`json ），也不要加上任何額外的問候語或解釋。前端系統將會自動解析並渲染你的 JSON。
+【絕對禁忌事項】(違反將導致系統崩潰，請嚴格遵守)：
+1. 嚴禁發明評分權重：如果 RFP 只說「財務佔比」，沒給具體 %，請輸出「未公佈」。絕對不可自行假設湊滿 100%。不要將子項目 % 直接當成總評分 %。
+2. 嚴禁修改數字與單位：兩年 800 件就是兩年 800 件，不可改為「每年 400 件」。
+3. 嚴禁混淆實體：注意「投標方 (我方)」與「客戶方」的角色。若沒有提供競品資訊，絕對不可捏造「競品價格高、技術弱」等虛假判斷。
+4. 區分合規強度：「必須 (Mandatory)」與「可能 (May be)」不可混淆。未提供我方能力證明時，合規狀態只能是「待驗證 (Pending)」，不可寫「完全符合」。
+5. 嚴禁預測機率：不准產出虛構的「得標勝率」、「客戶偏好度」。
+6. 保留 Excel 邏輯：遇到工作表與公式，保留原始描述，不可自行修正或計算。
 
-【JSON 結構與欄位定義】
+【輸出格式嚴格限制】
+你必須「僅」輸出一個合法的 JSON 字串。
+絕對不可包含任何 Markdown 代碼塊標記 (如 \`\`\`json)，也不要加上問候語。
+
+【JSON 結構】
 {
-  "report_title": "本次分析的總標題",
-  "summary": "簡短的執行摘要（一段話）",
+  "report_title": "報告標題",
+  "summary": "執行摘要（僅限有來源的事實）",
   "sections": [
     {
-      "heading": "區塊標題（如：專案核心目標、風險評估等）",
-      "alert_type": "區塊強調樣式。請嚴格從以下枚舉值擇一：'none' (一般段落), 'warning' (致命風險/警告), 'strategy' (核心策略/洞察), 'success' (勝選關鍵/加分項), 'finance' (潛在成本/財務注意)",
-      "content": "詳細內容說明，支援 Markdown 語法（粗體、清單等）。請以流暢的繁體中文「文章與段落」撰寫，展現專業企管顧問的深度。",
-      "table": [
-        { "欄位A": "值A", "欄位B": "值B" }
-      ] // 若需要呈現矩陣或清單比較，請使用此表格陣列；若無表格，請輸出空陣列 []
+      "heading": "區塊標題",
+      "alert_type": "none | warning (合約/時程風險) | strategy (勝選主軸) | success (加分項) | finance (財務)",
+      "content": "詳細內容說明 (支援 Markdown)。",
+      "evidence_quote": "必須填寫：支持此論點的 RFP 原文擷取片段、頁碼或檔名。若是內部建議或推論，請填寫空字串 \"\"。",
+      "is_assumption": true/false, // 若為系統分析推論、我方建議、待澄清事項，請設為 true；若為 RFP 明文規定，設為 false。
+      "table": [ { "欄位A": "值A" } ] // 無表格請回傳 []
     }
   ]
 }
-
-【Few-Shot 結構化範例】
-{
-  "report_title": "RFP 戰情摘要與風險分析",
-  "summary": "本專案旨在提供全方位數位轉型服務，但具有嚴格的合約時程限制與財務門檻。",
-  "sections": [
-    {
-      "heading": "1. 致命合約風險",
-      "alert_type": "warning",
-      "content": "客戶要求在**簽約後 30 天內**上線，這對開發時程是極大挑戰。建議準備「階段性交付」的備案。",
-      "table": []
-    },
-    {
-      "heading": "2. 潛在隱藏成本",
-      "alert_type": "finance",
-      "content": "請注意 RFP 中提到的「軟體授權費」，可能未包含次年的維護費用。",
-      "table": [
-        { "項目": "AWS 伺服器", "預估成本": "每月 $500", "風險": "超量計費" }
-      ]
-    },
-    {
-      "heading": "3. 核心得標策略",
-      "alert_type": "strategy",
-      "content": "應強調我們過去在**同業的成功導入經驗**，這是競爭對手缺乏的獨家優勢。",
-      "table": []
-    }
-  ]
-}
-請確保 JSON 格式 100% 正確，所有字串需使用雙引號，不要有多餘的逗號。`;
-
-        const TONY_PERSONA = `請稱呼我TONY老師。我的職業是: 一位AI的導師，一位大學的講師，一位數位行銷科技的資深顧問，一位創業者，一位AI的老師。我的背景:我喜歡創新，我喜歡新科技應用，我喜歡思考，我喜歡行銷，我是一位60歲非常有經驗的品牌行銷、行銷科技、生成式AI創作者及講師，我善良、喜歡學習、有自己的觀點，想創新想發展自己的教學方法與框架，擁有設計、行銷、商業、創業的實務經驗，擔任過上市公司14年的發言人。在開始撰寫任何回覆之前，請主動執行以下步驟：
-第一步：專家優化 - 你現在是一名深耕 AI 領域的顧問，專精於提示詞優化邏輯。當我輸入「原始提示詞」時，請先將其轉化為更精確、能讓模型發揮最高效能的指令。 優化核心原則： 最有效的提示詞平均約為21個字。若原始提示詞過於簡短，請務必在轉化過程中強化「背景資訊」維度，以確保回覆品質。 轉化時必須包含以下四個維度：[角色任務]：定義專業身份與核心目標。 [背景資訊]：提供必要的情境。[具體指令]：拆解明確的操作步驟。[約束條件]：規定字數、格式、語氣，且一律使用「正向表述」。
-第二步：直接答覆 - 優化完成後，請立即依照該套優化後的指令進行答覆，產出最終內容。並運用 Markdown 語法讓結構清晰。`;
+確保 JSON 格式 100% 正確，字串使用雙引號，無多餘逗號。`;
 
         // 系統變數初始化
         let currentApiKey = localStorage.getItem('gemini_api_key') || '';
         let uploadedImages = [], rfpParsedFiles = [], proposalParsedFiles = [];
-        let rfpUrls = [], proposalUrls = [];
-        let chatHistory = [
-            { role: "user", parts: [{ text: "哈囉" }] },
-            { role: "model", parts: [{ text: "你好！我是 **TONY 老師**，你的資深數位行銷科技顧問與 AI 導師。請問關於 RFP 拆解或提案策略，有什麼我可以協助你的？" }] }
-        ];
+        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問，RFP 策略 AI 助理。資料已準備好時，隨時可以問我細節。" }] }];
         let currentProjectId = null;
         let currentProjectName = '未命名專案';
         let isProcessing = false;
 
-        // UI 元素綁定
+        // UI 綁定
         const ui = {
             apiKeyInput: document.getElementById('apiKeyInput'),
             saveKeyBtn: document.getElementById('saveKeyBtn'),
             rfpContext: document.getElementById('rfpContext'),
             proposalContext: document.getElementById('proposalContext'),
+            ourEntityInput: document.getElementById('ourEntityInput'),
+            competitorInput: document.getElementById('competitorInput'),
             workflowBtns: document.getElementById('workflowButtons'),
-            emptyState: document.getElementById('emptyState'),
-            loadingState: document.getElementById('loadingState'),
             resultContent: document.getElementById('resultContent'),
-            statusBadge: document.getElementById('statusBadge'),
-            copyBtn: document.getElementById('copyBtn'),
-            exportWordBtn: document.getElementById('exportWordBtn'),
+            loadingState: document.getElementById('loadingState'),
+            emptyState: document.getElementById('emptyState'),
             fileUpload: document.getElementById('fileUpload'),
             propUpload: document.getElementById('proposalFileUpload'),
-            imgContainer: document.getElementById('imagePreviewContainer'),
             rfpTags: document.getElementById('rfpFileTagsContainer'),
-            propTags: document.getElementById('proposalFileTagsContainer'),
-            rfpUrlTags: document.getElementById('rfpUrlTagsContainer'),
-            propUrlTags: document.getElementById('proposalUrlTagsContainer')
+            imgContainer: document.getElementById('imagePreviewContainer')
         };
 
-        /**
-         * Custom Dialog System
-         */
         function showDialog(message, type = 'alert', onConfirm = null) {
             const dialog = document.getElementById('customDialog');
             const box = document.getElementById('customDialogBox');
@@ -546,16 +357,13 @@
 
             msgEl.textContent = message;
             dialog.classList.remove('hidden'); dialog.classList.add('flex');
-            // Force reflow for animation
-            void box.offsetWidth; 
-            box.classList.remove('scale-95');
+            void box.offsetWidth; box.classList.remove('scale-95');
 
-            // Reset state
             cancelBtn.classList.add('hidden');
-            confirmBtn.className = 'px-4 py-2 text-white rounded-lg text-sm transition-colors shadow-sm font-medium';
+            confirmBtn.className = 'px-4 py-2 text-white rounded text-xs transition-colors shadow-sm font-medium';
 
             if (type === 'confirm') {
-                iconEl.innerHTML = '<i class="fa-solid fa-circle-question text-orange-500"></i>';
+                iconEl.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-orange-500"></i>';
                 cancelBtn.classList.remove('hidden');
                 confirmBtn.classList.add('bg-orange-600', 'hover:bg-orange-700');
             } else if (type === 'error') {
@@ -566,247 +374,153 @@
                 confirmBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
             }
 
-            const closeDialog = () => {
-                box.classList.add('scale-95');
-                setTimeout(() => { 
-                    dialog.classList.add('hidden'); dialog.classList.remove('flex'); 
-                }, 200);
-            };
-
+            const closeDialog = () => { box.classList.add('scale-95'); setTimeout(() => { dialog.classList.add('hidden'); dialog.classList.remove('flex'); }, 200); };
             cancelBtn.onclick = closeDialog;
-            confirmBtn.onclick = () => { 
-                closeDialog(); 
-                if (onConfirm) onConfirm(); 
-            };
+            confirmBtn.onclick = () => { closeDialog(); if (onConfirm) onConfirm(); };
         }
 
         /**
-         * Enterprise Robust JSON Parsing Pipeline (Self-Healing)
+         * 企業級 Robust JSON Parsing Pipeline (Self-Healing)
+         * 解決 LLM 返回帶有 Markdown 標記或廢話的 JSON 問題
          */
         function parseAIResponse(text) {
-            try {
-                // 1. 直觀解析 (最佳情況)
-                return JSON.parse(text);
-            } catch (err1) {
-                console.warn("JSON 首輪解析失敗，啟動正則修復容錯機制...", err1.message);
+            try { return JSON.parse(text); } 
+            catch (err) {
+                console.warn("初次 JSON 解析失敗，啟動容錯過濾機制...");
                 try {
-                    // 2. 正則提取有效區塊 (處理帶有 markdown code block 或前後贅字的情況)
-                    const match = text.match(/\{[\s\S]*\}/);
-                    if (!match) throw new Error("文本中找不到 JSON 定界符");
+                    // 1. 移除可能存在的 Markdown codeblock 標籤
+                    let cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
                     
-                    let cleaned = match[0]
-                        // 過濾潛在的隱形控制字元，保留合法換行與 Tab
-                        .replace(/[\u0000-\u001F\u007F-\u009F]/g, c => ('\n\r\t'.includes(c) ? c : ""));
+                    // 2. 尋找最外層的 {}
+                    const startIdx = cleanText.indexOf('{');
+                    const endIdx = cleanText.lastIndexOf('}');
                     
-                    return JSON.parse(cleaned);
-                } catch (err2) {
-                    console.error("JSON 深度容錯解析失敗:", err2, "\n原始文本:", text);
-                    throw new Error("AI 回傳的分析格式發生嚴重異常。系統已安全攔截，請嘗試重新執行分析。");
+                    if (startIdx !== -1 && endIdx !== -1 && startIdx < endIdx) {
+                        cleanText = cleanText.substring(startIdx, endIdx + 1);
+                        // 移除潛在不可見控制字元
+                        cleanText = cleanText.replace(/[\u0000-\u001F\u007F-\u009F]/g, c => ('\n\r\t'.includes(c) ? c : ""));
+                        return JSON.parse(cleanText);
+                    }
+                    throw new Error("無法定位 JSON 定界符");
+                } catch (fatalErr) {
+                    console.error("JSON 深度修復失敗:", fatalErr, text);
+                    throw new Error("AI 產生的格式異常，請嘗試重新執行分析。 (資料過於複雜或觸發模型限制)");
                 }
             }
         }
 
-        /**
-         * Dynamic HTML Rendering from JSON Structure
-         */
         function renderReportFromJSON(data) {
-            let html = `<div class="mb-6"><h1 class="text-2xl font-bold text-slate-800 mb-2">${data.report_title || '戰略分析報告'}</h1>`;
-            if (data.summary) {
-                html += `<p class="text-slate-600 mb-4 text-sm leading-relaxed">${data.summary}</p>`;
-            }
+            let html = `<div class="mb-5"><h1 class="text-xl font-bold text-slate-800 mb-1">${data.report_title || '戰略分析報告'}</h1>`;
+            if (data.summary) html += `<p class="text-slate-600 text-xs leading-relaxed">${data.summary}</p>`;
             html += `</div>`;
 
             if (data.sections && Array.isArray(data.sections)) {
                 data.sections.forEach(sec => {
-                    let wrapperClass = "mb-6";
-                    let headerHTML = `<h2 class="text-lg font-bold text-slate-800 mb-3 border-b border-slate-200 pb-2">${sec.heading}</h2>`;
+                    let wrapperClass = "mb-5 bg-white border border-slate-200 p-4 rounded-lg";
+                    let headerIcon = '';
                     
-                    switch(sec.alert_type) {
-                        case 'warning':
-                            wrapperClass = "bg-red-50 border-l-4 border-red-500 p-4 my-4 rounded-r-lg shadow-sm";
-                            headerHTML = `<h4 class="text-red-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i> ${sec.heading}</h4>`;
-                            break;
-                        case 'strategy':
-                            wrapperClass = "bg-blue-50 border-l-4 border-blue-500 p-4 my-4 rounded-r-lg shadow-sm";
-                            headerHTML = `<h4 class="text-blue-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-lightbulb"></i> ${sec.heading}</h4>`;
-                            break;
-                        case 'success':
-                            wrapperClass = "bg-green-50 border-l-4 border-green-500 p-4 my-4 rounded-r-lg shadow-sm";
-                            headerHTML = `<h4 class="text-green-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-check-circle"></i> ${sec.heading}</h4>`;
-                            break;
-                        case 'finance':
-                            wrapperClass = "bg-orange-50 border-l-4 border-orange-500 p-4 my-4 rounded-r-lg shadow-sm";
-                            headerHTML = `<h4 class="text-orange-800 font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-file-invoice-dollar"></i> ${sec.heading}</h4>`;
-                            break;
-                        case 'none':
-                        default:
-                            break;
-                    }
+                    if(sec.alert_type === 'warning') { wrapperClass = "mb-5 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm"; headerIcon = '<i class="fa-solid fa-triangle-exclamation text-red-600"></i> '; }
+                    else if(sec.alert_type === 'strategy') { wrapperClass = "mb-5 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg shadow-sm"; headerIcon = '<i class="fa-solid fa-lightbulb text-blue-600"></i> '; }
+                    else if(sec.alert_type === 'success') { wrapperClass = "mb-5 bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg shadow-sm"; headerIcon = '<i class="fa-solid fa-check-circle text-green-600"></i> '; }
+                    else if(sec.alert_type === 'finance') { wrapperClass = "mb-5 bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg shadow-sm"; headerIcon = '<i class="fa-solid fa-file-invoice-dollar text-orange-600"></i> '; }
 
-                    html += `<div class="${wrapperClass}">${headerHTML}`;
+                    html += `<div class="${wrapperClass}"><h2 class="text-sm font-bold text-slate-800 mb-2">${headerIcon}${sec.heading}</h2>`;
                     
+                    // Render Tags
+                    html += `<div class="flex gap-2 mb-2 flex-wrap">`;
+                    if (sec.is_assumption) {
+                        html += `<span class="badge-assumption"><i class="fa-solid fa-person-circle-question"></i> 內部推論/建議/待澄清</span>`;
+                    }
+                    if (sec.evidence_quote && sec.evidence_quote.trim() !== "") {
+                        html += `<span class="badge-evidence" title="${sec.evidence_quote}"><i class="fa-solid fa-file-contract"></i> 引述: ${sec.evidence_quote.substring(0, 30)}${sec.evidence_quote.length > 30 ? '...' : ''}</span>`;
+                    }
+                    html += `</div>`;
+
                     if (sec.content) {
                         const parsedContent = typeof marked !== 'undefined' ? marked.parse(sec.content) : `<p>${sec.content}</p>`;
-                        html += `<div class="text-sm text-slate-700 leading-relaxed mb-3 ${sec.alert_type !== 'none' ? 'opacity-90' : ''} markdown-body" style="font-size: 0.9rem;">${parsedContent}</div>`;
+                        html += `<div class="text-xs text-slate-700 leading-relaxed mb-3 markdown-body">${parsedContent}</div>`;
                     }
 
                     if (sec.table && Array.isArray(sec.table) && sec.table.length > 0) {
-                        html += `<div class="overflow-x-auto mt-3"><table class="w-full text-sm text-left border-collapse bg-white rounded-lg overflow-hidden shadow-sm border border-slate-200">`;
+                        html += `<div class="overflow-x-auto mt-2"><table class="w-full text-xs text-left border-collapse bg-white rounded overflow-hidden shadow-sm border border-slate-200">`;
                         const headers = Object.keys(sec.table[0]);
                         html += `<thead class="bg-slate-100 text-slate-600"><tr>`;
-                        headers.forEach(h => html += `<th class="px-4 py-2 border-b border-slate-200 font-semibold">${h}</th>`);
+                        headers.forEach(h => html += `<th class="px-3 py-1.5 border-b font-semibold">${h}</th>`);
                         html += `</tr></thead><tbody class="divide-y divide-slate-100">`;
                         sec.table.forEach(row => {
                             html += `<tr class="hover:bg-slate-50 transition-colors">`;
-                            headers.forEach(h => html += `<td class="px-4 py-2 text-slate-700 align-top">${row[h] || ''}</td>`);
+                            headers.forEach(h => html += `<td class="px-3 py-1.5 text-slate-700 align-top">${row[h] || ''}</td>`);
                             html += `</tr>`;
                         });
                         html += `</tbody></table></div>`;
                     }
-                    
                     html += `</div>`;
                 });
             }
             return html;
         }
 
-        // 模組定義
+        // 模組定義 (強化限制指令)
         const workflows = [
-            { id: 1, title: "1. RFP Intake & 需求抽取", icon: "fa-crosshairs", prompt: "請分析附上的 [RFP 文件]，並產出「戰情摘要」。包含專案核心目標、服務範圍、時程限制。" },
-            { id: 2, title: "2. Scoring 反推評分邏輯", icon: "fa-scale-balanced", prompt: "請針對 [RFP 文件] 的「評選標準與權重」進行反向工程，產出應對策略表格。" },
-            { id: 3, title: "3. Risk & Gap 分析缺口", icon: "fa-triangle-exclamation", prompt: "比對 RFP 需求，進行 Risk & Gap 分析。列出致命風險、執行困難與競爭弱點。" },
-            { id: 4, title: "4. Win Theme 產出勝選主軸", icon: "fa-flag-checkered", prompt: "為此提案設計 3 個不同切入點的「Win Theme (勝選主軸)」，並詳細評估勝率。" },
-            { id: 5, title: "5. Proposal 生成提案大綱", icon: "fa-list-ol", prompt: "基於 RFP，擬定提案簡報大綱 (TOC)，對應審查順序拆解工作包。" },
-            { id: 6, title: "6. Compliance 逐條回應矩陣", icon: "fa-table-list", prompt: "建立一份「Compliance Matrix (合規回應矩陣)」。逐條掃描硬性規定。" },
-            { id: 7, title: "7. Cost Breakdown 建立報價邏輯", icon: "fa-file-invoice-dollar", prompt: "檢視報價要求，建立報價邏輯模型框架，並特別標示隱藏成本。" },
-            { id: 8, title: "8. Q&A List 產出澄清問題", icon: "fa-clipboard-question", prompt: "找出語意模糊的高風險條款，草擬 5-8 個專業的澄清問題 (Clarifications)。" },
-            { id: 9, title: "9. Final Proposal 最終封裝清單", icon: "fa-box-open", prompt: "整理最終投標 Check-list。涵蓋法務文件、附件與遞交規範。" }
+            { id: 1, title: "1. 戰情摘要 (事實導向)", icon: "fa-crosshairs", prompt: "依據 RFP 文件產出戰情摘要。僅列出明確記載的專案目標、服務範圍、時程。若資訊缺失，列入待澄清事項，不可捏造。" },
+            { id: 2, title: "2. 評選反向工程", icon: "fa-scale-balanced", prompt: "解析 RFP 的評選標準。嚴格保留原文評分階層與權重。若未給定總和權重，標示為未公佈，不可自行計算湊滿 100%。" },
+            { id: 3, title: "3. Risk & Gap 分析", icon: "fa-triangle-exclamation", prompt: "比對 RFP 需求與我方能力進行 Risk & Gap 分析。區分「已明示風險」與「待驗證缺口」。無我方證據支持時，合規狀態必須列為「待驗證」。" },
+            { id: 4, title: "4. Win Theme 勝選主軸", icon: "fa-flag-checkered", prompt: "基於客戶真實需求，擬定勝選主軸 (策略建議，請標記為 is_assumption)。嚴禁產出虛構的勝率、偏好度或未經證實的競品弱點。" },
+            { id: 5, title: "5. 提案大綱與 WBS", icon: "fa-list-ol", prompt: "擬定提案簡報大綱與工作包分配 (皆為我方建議，需標記 assumption)。必須遵守 RFP 官方人力要求，不可擅自推定常駐或全員到場。" },
+            { id: 6, title: "6. 合規矩陣 (Compliance)", icon: "fa-table-list", prompt: "建立合規矩陣。嚴格分開「要求強度 (Must/May)」與「符合狀態 (Verified/Pending)」。條件式要求必須保留全部分支，不可簡化。" },
+            { id: 7, title: "7. 報價與商業模型", icon: "fa-file-invoice-dollar", prompt: "盤點報價要求。保留原始公式、數值與單位，不可轉換。若缺少 SLA、罰則或付款期，必須標示為待澄清，絕不可自行發明費率。" },
+            { id: 8, title: "8. 澄清問題 (Q&A)", icon: "fa-clipboard-question", prompt: "草擬澄清問題。問題的前提必須附上原文 Evidence。語氣需中立，不可將疑慮預設為客戶的不公平條款。" },
+            { id: 9, title: "9. 封裝與遞交 Check-list", icon: "fa-box-open", prompt: "整理遞交清單。區分「官方硬性規定」與「內部控管建議」。時間、格式等必須來自正式來源。" }
         ];
 
         workflows.forEach(wf => {
             const btn = document.createElement('button');
-            btn.className = 'w-full text-left px-4 py-3 rounded-lg border border-slate-200 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group flex items-center justify-between text-sm text-slate-700 font-medium bg-white hover:shadow-sm disabled:opacity-50 disabled:cursor-not-allowed';
-            btn.innerHTML = `<span class="flex items-center gap-3"><i class="fa-solid ${wf.icon} text-slate-400 group-hover:text-blue-600 transition-colors w-5 text-center"></i> ${wf.title}</span><i class="fa-solid fa-chevron-right text-xs opacity-0 group-hover:opacity-100 transition-opacity"></i>`;
+            btn.className = 'w-full text-left px-3 py-2.5 rounded border border-slate-200 hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700 transition-all text-xs text-slate-700 font-medium bg-white flex items-center justify-between group shadow-sm disabled:opacity-50';
+            btn.innerHTML = `<span class="flex items-center gap-2"><i class="fa-solid ${wf.icon} text-slate-400 group-hover:text-blue-600 w-4 text-center"></i> ${wf.title}</span>`;
             btn.onclick = () => runAnalysis(wf);
             ui.workflowBtns.appendChild(btn);
         });
 
-        // 綁定 API Key
-        if (currentApiKey) {
-            ui.apiKeyInput.value = currentApiKey;
-            ui.saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已儲存';
-            ui.saveKeyBtn.classList.replace('bg-blue-600', 'bg-green-600');
-            ui.saveKeyBtn.classList.replace('hover:bg-blue-700', 'hover:bg-green-700');
-        }
-
+        // Key Binding
+        if (currentApiKey) { ui.apiKeyInput.value = currentApiKey; ui.saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i>'; ui.saveKeyBtn.classList.replace('bg-blue-600', 'bg-green-600'); }
         ui.saveKeyBtn.onclick = () => {
             const key = ui.apiKeyInput.value.trim();
-            if (key) {
-                localStorage.setItem('gemini_api_key', key);
-                currentApiKey = key;
-                ui.saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i> 已儲存';
-                ui.saveKeyBtn.className = 'w-full bg-green-600 hover:bg-green-700 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer shadow-sm';
-            } else {
-                showDialog('請輸入有效的 API Key', 'error');
-            }
+            if (key) { localStorage.setItem('gemini_api_key', key); currentApiKey = key; ui.saveKeyBtn.innerHTML = '<i class="fa-solid fa-check"></i>'; ui.saveKeyBtn.className = 'px-3 py-2 bg-green-600 text-white rounded-lg text-xs font-medium transition-all'; } 
+            else showDialog('請輸入 API Key', 'error');
         };
 
-        // Firebase Setup
-        const firebaseConfig = {
-            apiKey: "AIzaSyDuShpehg2d_VHNt6FheUooh6kHH9mSizg",
-            authDomain: "k5-rfp-analysisystem.firebaseapp.com",
-            projectId: "k5-rfp-analysisystem",
-            storageBucket: "k5-rfp-analysisystem.firebasestorage.app",
-            messagingSenderId: "826718798807",
-            appId: "1:826718798807:web:cafb0f439856f7003a4192",
-            measurementId: "G-HP4ERN79HK"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyDuShpehg2d_VHNt6FheUooh6kHH9mSizg", authDomain: "k5-rfp-analysisystem.firebaseapp.com", projectId: "k5-rfp-analysisystem", storageBucket: "k5-rfp-analysisystem.firebasestorage.app", messagingSenderId: "826718798807", appId: "1:826718798807:web:cafb0f439856f7003a4192", measurementId: "G-HP4ERN79HK" };
         firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        const provider = new firebase.auth.GoogleAuthProvider();
-        let currentUser = null;
-
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const userInfo = document.getElementById('userInfo');
+        const db = firebase.firestore(); const auth = firebase.auth(); const provider = new firebase.auth.GoogleAuthProvider();
+        let currentUser = null; const PROJECT_COLLECTION = 'tonystudio_projects';
 
         auth.onAuthStateChanged((user) => {
             currentUser = user;
-            if (user) {
-                loginBtn.classList.add('hidden');
-                userInfo.classList.remove('hidden'); userInfo.classList.add('flex');
-                document.getElementById('userAvatar').src = user.photoURL; 
-                document.getElementById('userName').textContent = user.displayName;
-            } else {
-                loginBtn.classList.remove('hidden');
-                userInfo.classList.add('hidden'); userInfo.classList.remove('flex');
-            }
-            if (!document.getElementById('projectModal').classList.contains('hidden')) fetchProjects();
+            if (user) { document.getElementById('loginBtn').classList.add('hidden'); document.getElementById('userInfo').classList.remove('hidden'); document.getElementById('userInfo').classList.add('flex'); document.getElementById('userAvatar').src = user.photoURL; document.getElementById('userName').textContent = user.displayName; } 
+            else { document.getElementById('loginBtn').classList.remove('hidden'); document.getElementById('userInfo').classList.add('hidden'); document.getElementById('userInfo').classList.remove('flex'); }
         });
+        document.getElementById('loginBtn').onclick = () => auth.signInWithPopup(provider).catch(e => showDialog('登入失敗: ' + e.message, 'error'));
+        document.getElementById('logoutBtn').onclick = () => auth.signOut().then(() => showDialog('已登出'));
 
-        loginBtn.onclick = () => auth.signInWithPopup(provider).catch(e => showDialog('登入失敗: ' + e.message, 'error'));
-        logoutBtn.onclick = () => auth.signOut().then(() => {
-            resetWorkspace();
-            showDialog('已成功登出！');
-        });
-
-        // 渲染 Tags
-        function renderTags(arr, container, type, removeName) {
+        function renderTags(arr, container, removeFnName) {
             container.innerHTML = '';
             arr.forEach((item, i) => {
                 const el = document.createElement('div');
-                const label = type === 'url' ? item : item.name;
-                const icon = type === 'url' ? 'fa-link' : 'fa-file';
-                const style = type === 'url' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-blue-50 text-blue-700 border-blue-200';
-                
-                el.className = `${style} border text-xs px-2 py-1.5 rounded flex items-center gap-1 shadow-sm shrink-0 mb-1 transition-all`;
-                el.innerHTML = `<i class="fa-solid ${icon}"></i> <span class="max-w-[150px] truncate" title="${label}">${label}</span>
-                                <button class="text-slate-400 hover:text-red-500 transition-colors ml-1" onclick="${removeName}(${i})" title="移除"><i class="fa-solid fa-xmark"></i></button>`;
+                el.className = `bg-blue-50 text-blue-700 border border-blue-200 text-[10px] px-2 py-1 rounded flex items-center gap-1 shadow-sm shrink-0 mb-1`;
+                el.innerHTML = `<i class="fa-solid fa-file"></i> <span class="max-w-[120px] truncate">${item.name}</span> <button class="text-slate-400 hover:text-red-500 ml-1" onclick="${removeFnName}(${i})"><i class="fa-solid fa-xmark"></i></button>`;
                 container.appendChild(el);
             });
         }
-
-        window.removeRfpUrl = (i) => { rfpUrls.splice(i, 1); renderTags(rfpUrls, ui.rfpUrlTags, 'url', 'removeRfpUrl'); };
-        window.removePropUrl = (i) => { proposalUrls.splice(i, 1); renderTags(proposalUrls, ui.propUrlTags, 'url', 'removePropUrl'); };
-        window.removeRfpFile = (i) => { rfpParsedFiles.splice(i, 1); renderTags(rfpParsedFiles, ui.rfpTags, 'file', 'removeRfpFile'); };
-        window.removePropFile = (i) => { proposalParsedFiles.splice(i, 1); renderTags(proposalParsedFiles, ui.propTags, 'file', 'removePropFile'); };
-        window.removeImage = (i) => { 
-            uploadedImages.splice(i, 1); 
-            ui.imgContainer.innerHTML = '';
-            uploadedImages.forEach((img, idx) => appendImagePreview(img, idx));
-        };
-
-        function appendImagePreview(imgObj, index) {
-            const img = document.createElement('div');
-            img.className = 'relative w-14 h-14 rounded overflow-hidden border border-slate-300 shadow-sm group shrink-0 mb-1';
-            img.innerHTML = `<img src="data:${imgObj.mimeType};base64,${imgObj.data}" class="w-full h-full object-cover">
-                             <button class="absolute top-0 right-0 bg-red-500/80 text-white text-[10px] w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onclick="removeImage(${index})"><i class="fa-solid fa-xmark"></i></button>`;
-            ui.imgContainer.appendChild(img);
-        }
-
-        document.getElementById('addRfpUrlBtn').onclick = () => {
-            const v = document.getElementById('rfpUrlInput').value.trim();
-            if(v) { rfpUrls.push(v); renderTags(rfpUrls, ui.rfpUrlTags, 'url', 'removeRfpUrl'); document.getElementById('rfpUrlInput').value = ''; }
-        };
-
-        document.getElementById('addProposalUrlBtn').onclick = () => {
-            const v = document.getElementById('proposalUrlInput').value.trim();
-            if(v) { proposalUrls.push(v); renderTags(proposalUrls, ui.propUrlTags, 'url', 'removePropUrl'); document.getElementById('proposalUrlInput').value = ''; }
-        };
-
+        window.removeRfpFile = (i) => { rfpParsedFiles.splice(i, 1); renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile'); };
+        
         async function extractTextFromFile(file) {
             const name = file.name.toLowerCase();
             try {
                 if (name.endsWith('.txt') || name.endsWith('.csv')) return await file.text();
                 else if (name.endsWith('.docx')) return (await mammoth.extractRawText({arrayBuffer: await file.arrayBuffer()})).value;
                 else if (name.endsWith('.pdf')) {
-                    const pdf = await pdfjsLib.getDocument({data: await file.arrayBuffer()}).promise;
-                    let text = '';
-                    for (let i = 1; i <= pdf.numPages; i++) {
-                        const content = await (await pdf.getPage(i)).getTextContent();
-                        text += content.items.map(it => it.str).join(' ') + '\n';
-                    }
+                    const pdf = await pdfjsLib.getDocument({data: await file.arrayBuffer()}).promise; let text = '';
+                    for (let i = 1; i <= pdf.numPages; i++) text += (await (await pdf.getPage(i)).getTextContent()).items.map(it => it.str).join(' ') + '\n';
                     return text;
                 } else if (name.match(/\.(xlsx|xls)$/)) {
                     const wb = XLSX.read(await file.arrayBuffer(), {type: 'array'});
@@ -818,405 +532,116 @@
 
         ui.fileUpload.addEventListener('change', async (e) => {
             const files = e.target.files; if(!files.length) return;
-            ui.rfpContext.placeholder = "正在解析檔案...";
-            for(let f of files) {
-                if (f.type.startsWith('image/')) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        const imgObj = { mimeType: f.type, data: ev.target.result.split(',')[1], name: f.name };
-                        uploadedImages.push(imgObj);
-                        appendImagePreview(imgObj, uploadedImages.length - 1);
-                    };
-                    reader.readAsDataURL(f);
-                } else {
-                    const text = await extractTextFromFile(f);
-                    if(text) rfpParsedFiles.push({ name: f.name, text });
-                }
-            }
-            renderTags(rfpParsedFiles, ui.rfpTags, 'file', 'removeRfpFile');
-            ui.rfpContext.placeholder = "或在此直接貼上 RFP 文件內容..."; ui.fileUpload.value = '';
-        });
-
-        ui.propUpload.addEventListener('change', async (e) => {
-            const files = e.target.files; if(!files.length) return;
-            ui.proposalContext.placeholder = "正在解析...";
             for(let f of files) {
                 const text = await extractTextFromFile(f);
-                if(text) proposalParsedFiles.push({ name: f.name, text });
+                if(text) rfpParsedFiles.push({ name: f.name, text });
             }
-            renderTags(proposalParsedFiles, ui.propTags, 'file', 'removePropFile');
-            ui.proposalContext.placeholder = "在此貼上我方提案內容..."; ui.propUpload.value = '';
+            renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile'); ui.fileUpload.value = '';
         });
 
-        // 專案管理邏輯
         function getWorkspaceState() {
-            return JSON.stringify({
-                textContext: ui.rfpContext.value, proposalText: ui.proposalContext.value,
-                images: uploadedImages, rfpFiles: rfpParsedFiles, proposalFiles: proposalParsedFiles,
-                rfpUrls, proposalUrls, chat: chatHistory
-            });
+            return JSON.stringify({ rfpText: ui.rfpContext.value, propText: ui.proposalContext.value, ourEntity: ui.ourEntityInput.value, competitor: ui.competitorInput.value, rfpFiles: rfpParsedFiles });
         }
-
         function restoreWorkspaceState(jsonStr) {
             try {
-                const data = JSON.parse(jsonStr);
-                ui.rfpContext.value = data.textContext || ''; ui.proposalContext.value = data.proposalText || '';
-                uploadedImages = data.images || []; rfpParsedFiles = data.rfpFiles || []; proposalParsedFiles = data.proposalFiles || [];
-                rfpUrls = data.rfpUrls || []; proposalUrls = data.proposalUrls || []; chatHistory = data.chat || chatHistory;
-                
-                ui.imgContainer.innerHTML = '';
-                uploadedImages.forEach((img, i) => appendImagePreview(img, i));
-                renderTags(rfpParsedFiles, ui.rfpTags, 'file', 'removeRfpFile'); renderTags(proposalParsedFiles, ui.propTags, 'file', 'removePropFile');
-                renderTags(rfpUrls, ui.rfpUrlTags, 'url', 'removeRfpUrl'); renderTags(proposalUrls, ui.propUrlTags, 'url', 'removePropUrl');
-                renderChatHistory();
-            } catch(e) { showDialog('載入備份失敗，格式可能損壞。', 'error'); }
-        }
-
-        function updateProjectDisplay() {
-            const display = document.getElementById('currentProjectDisplayMain');
-            const quickSaveBtn = document.getElementById('quickSaveProjectBtn');
-            display.textContent = currentProjectName;
-            if(currentProjectId) {
-                display.classList.replace('text-orange-700', 'text-green-700');
-                quickSaveBtn.classList.remove('hidden');
-            } else {
-                display.classList.replace('text-green-700', 'text-orange-700');
-                quickSaveBtn.classList.add('hidden');
-            }
+                const d = JSON.parse(jsonStr);
+                ui.rfpContext.value = d.rfpText || ''; ui.proposalContext.value = d.propText || ''; ui.ourEntityInput.value = d.ourEntity || ''; ui.competitorInput.value = d.competitor || '';
+                rfpParsedFiles = d.rfpFiles || []; renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile');
+            } catch(e) { showDialog('載入失敗，檔案毀損。', 'error'); }
         }
 
         function resetWorkspace() {
-            currentProjectId = null; currentProjectName = '未命名專案'; updateProjectDisplay();
-            ui.rfpContext.value = ''; ui.proposalContext.value = '';
-            uploadedImages = []; rfpParsedFiles = []; proposalParsedFiles = []; rfpUrls = []; proposalUrls = [];
-            ui.imgContainer.innerHTML = ''; ui.rfpTags.innerHTML = ''; ui.propTags.innerHTML = '';
-            ui.rfpUrlTags.innerHTML = ''; ui.propUrlTags.innerHTML = '';
-            
-            chatHistory = [
-                { role: "user", parts: [{ text: "哈囉" }] },
-                { role: "model", parts: [{ text: "你好！我是 **TONY 老師**，你的資深數位行銷科技顧問與 AI 導師。請問關於 RFP 拆解或提案策略，有什麼我可以協助你的？" }] }
-            ];
-            renderChatHistory();
-
-            ui.resultContent.innerHTML = ''; ui.resultContent.classList.add('hidden');
-            ui.emptyState.classList.remove('hidden'); ui.copyBtn.classList.add('hidden'); ui.exportWordBtn.classList.add('hidden');
-            ui.statusBadge.textContent = '等待指令'; ui.statusBadge.className = 'px-2 py-1 bg-slate-200 text-slate-600 text-xs rounded-full font-medium';
+            currentProjectId = null; currentProjectName = '未命名專案'; document.getElementById('currentProjectDisplayMain').textContent = currentProjectName;
+            document.getElementById('quickSaveProjectBtn').classList.add('hidden');
+            ui.rfpContext.value = ''; ui.proposalContext.value = ''; ui.ourEntityInput.value = ''; ui.competitorInput.value = '';
+            rfpParsedFiles = []; ui.rfpTags.innerHTML = ''; ui.resultContent.innerHTML = ''; ui.resultContent.classList.add('hidden'); ui.emptyState.classList.remove('hidden');
         }
+        document.getElementById('newBlankProjectBtn').onclick = () => showDialog('確定要開啟空白新專案嗎？未儲存資料將遺失。', 'confirm', resetWorkspace);
 
-        document.getElementById('newBlankProjectBtn').onclick = () => {
-            showDialog('確定要開啟空白新專案嗎？未儲存的資料將會遺失！', 'confirm', resetWorkspace);
-        };
+        document.getElementById('projectManagerBtnMain').onclick = () => { document.getElementById('projectModal').classList.remove('hidden'); fetchProjects(); };
+        document.getElementById('closeProjectModalBtn').onclick = () => document.getElementById('projectModal').classList.add('hidden');
 
-        const PROJECT_COLLECTION = 'tonystudio_projects';
-        
         async function fetchProjects() {
-            const loading = document.getElementById('projectListLoading');
-            const tbody = document.getElementById('projectListBody');
-            loading.classList.remove('hidden');
+            document.getElementById('projectListLoading').classList.remove('hidden');
             try {
-                const snapshot = await db.collection(PROJECT_COLLECTION).get();
-                let projects = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (currentUser && data.userId && data.userId !== currentUser.uid) return;
-                    if (!currentUser && data.userId) return;
-                    projects.push({ id: doc.id, name: data.name || '未命名', updatedAt: data.updatedAt?.toDate() || new Date(0), author: data.author || '匿名' });
-                });
-                projects.sort((a, b) => b.updatedAt - a.updatedAt);
-                
-                tbody.innerHTML = '';
-                if(projects.length === 0) { 
-                    tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-slate-400">目前雲端沒有任何專案。</td></tr>`; 
-                } else {
-                    projects.forEach(proj => {
-                        tbody.insertAdjacentHTML('beforeend', `
-                            <tr class="hover:bg-slate-50 transition-colors group">
-                                <td class="px-4 py-3 font-medium text-slate-700 flex items-center gap-2">
-                                    <i class="fa-solid fa-folder text-orange-400"></i> ${proj.name}
-                                    ${proj.id === currentProjectId ? '<span class="bg-green-100 text-green-700 text-[10px] px-1.5 py-0.5 rounded ml-2 shadow-sm border border-green-200">目前載入</span>' : ''}
-                                    <span class="text-[10px] text-slate-400 font-normal ml-2 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0"><i class="fa-solid fa-user"></i> ${proj.author}</span>
-                                </td>
-                                <td class="px-4 py-3 text-slate-500 text-xs">${proj.updatedAt.toLocaleString('zh-TW')}</td>
-                                <td class="px-4 py-3 text-center">
-                                    <div class="flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onclick="loadProject('${proj.id}', '${proj.name}')" class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-2 py-1.5 rounded text-xs transition-colors shadow-sm" title="載入此專案"><i class="fa-solid fa-download"></i></button>
-                                        <button onclick="deleteProject('${proj.id}')" class="bg-red-50 text-red-600 hover:bg-red-100 px-2 py-1.5 rounded text-xs transition-colors shadow-sm" title="永久刪除"><i class="fa-solid fa-trash-can"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        `);
-                    });
-                }
-            } catch (error) { 
-                tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-red-500">載入失敗，請檢查資料庫。</td></tr>`; 
-            } finally {
-                loading.classList.add('hidden');
-            }
+                const snapshot = await db.collection(PROJECT_COLLECTION).get(); let projects = [];
+                snapshot.forEach(doc => { const d = doc.data(); if(currentUser && d.userId !== currentUser.uid && d.userId) return; if(!currentUser && d.userId) return; projects.push({ id: doc.id, name: d.name, date: d.updatedAt?.toDate() || new Date(0) }); });
+                projects.sort((a,b) => b.date - a.date);
+                const tbody = document.getElementById('projectListBody'); tbody.innerHTML = '';
+                projects.forEach(p => tbody.insertAdjacentHTML('beforeend', `<tr class="hover:bg-slate-50"><td class="px-3 py-2 font-medium">${p.name}</td><td class="px-3 py-2 text-slate-500">${p.date.toLocaleString()}</td><td class="px-3 py-2 text-center"><button onclick="loadProject('${p.id}', '${p.name}')" class="text-blue-600 mr-2"><i class="fa-solid fa-download"></i></button><button onclick="deleteProject('${p.id}')" class="text-red-600"><i class="fa-solid fa-trash"></i></button></td></tr>`));
+            } catch(e) {} finally { document.getElementById('projectListLoading').classList.add('hidden'); }
         }
 
         window.loadProject = (id, name) => {
-            showDialog(`確定要載入專案「${name}」嗎？目前未儲存的工作將被覆寫。`, 'confirm', async () => {
+            showDialog(`載入「${name}」？未儲存資料將被覆寫。`, 'confirm', async () => {
                 document.getElementById('projectListLoading').classList.remove('hidden');
-                try {
-                    const doc = await db.collection(PROJECT_COLLECTION).doc(id).get();
-                    if (doc.exists && doc.data().data) {
-                        restoreWorkspaceState(doc.data().data);
-                        currentProjectId = id; currentProjectName = name;
-                        updateProjectDisplay(); 
-                        document.getElementById('projectModal').classList.add('hidden');
-                    }
-                } catch (error) { showDialog('載入失敗。', 'error'); }
-                document.getElementById('projectListLoading').classList.add('hidden');
+                try { const doc = await db.collection(PROJECT_COLLECTION).doc(id).get(); if(doc.exists) { restoreWorkspaceState(doc.data().data); currentProjectId = id; currentProjectName = name; document.getElementById('currentProjectDisplayMain').textContent = name; document.getElementById('quickSaveProjectBtn').classList.remove('hidden'); document.getElementById('projectModal').classList.add('hidden'); } } catch(e) {} finally { document.getElementById('projectListLoading').classList.add('hidden'); }
             });
         };
-
-        window.deleteProject = (id) => {
-            showDialog('確定要永久刪除這個專案嗎？此動作無法復原。', 'confirm', async () => {
-                document.getElementById('projectListLoading').classList.remove('hidden');
-                try {
-                    await db.collection(PROJECT_COLLECTION).doc(id).delete();
-                    if(id === currentProjectId) resetWorkspace();
-                    await fetchProjects();
-                } catch (error) { showDialog('刪除失敗。', 'error'); }
-                document.getElementById('projectListLoading').classList.add('hidden');
-            });
-        };
-
-        document.getElementById('projectManagerBtnMain').onclick = () => { 
-            document.getElementById('projectModal').classList.remove('hidden'); 
-            fetchProjects(); 
-        };
-        document.getElementById('closeProjectModalBtn').onclick = () => document.getElementById('projectModal').classList.add('hidden');
+        window.deleteProject = (id) => showDialog('確定永久刪除？', 'confirm', async () => { await db.collection(PROJECT_COLLECTION).doc(id).delete(); fetchProjects(); });
 
         document.getElementById('saveNewProjectBtn').onclick = async () => {
-            const nameInput = document.getElementById('newProjectName');
-            const name = nameInput.value.trim();
-            const btn = document.getElementById('saveNewProjectBtn');
-            if(!name) return showDialog('請輸入專案名稱', 'error');
-            
-            btn.disabled = true;
-            const orig = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 建立中...';
+            const name = document.getElementById('newProjectName').value.trim(); if(!name) return;
             try {
                 const ref = db.collection(PROJECT_COLLECTION).doc();
-                await ref.set({ 
-                    name, data: getWorkspaceState(), 
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(), 
-                    userId: currentUser ? currentUser.uid : null, 
-                    author: currentUser ? currentUser.displayName : '匿名' 
-                });
-                currentProjectId = ref.id; currentProjectName = name; nameInput.value = '';
-                updateProjectDisplay(); await fetchProjects();
+                await ref.set({ name, data: getWorkspaceState(), updatedAt: firebase.firestore.FieldValue.serverTimestamp(), userId: currentUser?.uid || null });
+                currentProjectId = ref.id; currentProjectName = name; document.getElementById('currentProjectDisplayMain').textContent = name; document.getElementById('quickSaveProjectBtn').classList.remove('hidden'); fetchProjects(); document.getElementById('newProjectName').value = '';
             } catch(e) { showDialog('儲存失敗', 'error'); }
-            btn.innerHTML = orig; btn.disabled = false;
         };
 
-        document.getElementById('quickSaveProjectBtn').onclick = async () => {
-            if(!currentProjectId) return;
-            const btn = document.getElementById('quickSaveProjectBtn');
-            btn.disabled = true; const orig = btn.innerHTML; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-            try {
-                await db.collection(PROJECT_COLLECTION).doc(currentProjectId).update({ 
-                    data: getWorkspaceState(), updatedAt: firebase.firestore.FieldValue.serverTimestamp() 
-                });
-                btn.innerHTML = '<i class="fa-solid fa-check text-green-500"></i>'; 
-            } catch(e) { 
-                showDialog('快速儲存失敗。', 'error'); btn.innerHTML = orig; 
-            } finally {
-                setTimeout(() => { btn.innerHTML = orig; btn.disabled = false; }, 2000);
-            }
-        };
-
-        // 核心 AI 執行流程
-        async function runAnalysis(workflow, isReview = false) {
-            if (isProcessing) return; // Prevent double trigger
-            if (!currentApiKey) return showDialog('請先在 Step 2 輸入 API Key', 'error');
-
+        async function runAnalysis(workflow) {
+            if (isProcessing) return; if (!currentApiKey) return showDialog('請先輸入 API Key', 'error');
+            
             let reqText = ui.rfpContext.value.trim();
-            if (rfpParsedFiles.length) reqText += '\n\n' + rfpParsedFiles.map(f => `--- [客戶 RFP: ${f.name}] ---\n${f.text}`).join('\n');
-            if (rfpUrls.length) reqText += '\n\n' + rfpUrls.map(u => `--- [參考連結]: ${u} ---`).join('\n');
-
-            let propText = ui.proposalContext.value.trim();
-            if (proposalParsedFiles.length) propText += '\n\n' + proposalParsedFiles.map(f => `--- [我方提案: ${f.name}] ---\n${f.text}`).join('\n');
-            if (proposalUrls.length) propText += '\n\n' + proposalUrls.map(u => `--- [提案連結]: ${u} ---`).join('\n');
-
-            if (!isReview && !reqText && !uploadedImages.length) return showDialog('請先在 Step 3 輸入內容', 'error');
-            if (isReview && !propText) return showDialog('請先在 Step 5 輸入提案內容', 'error');
+            if (rfpParsedFiles.length) reqText += '\n\n' + rfpParsedFiles.map(f => `--- [檔案來源: ${f.name}] ---\n${f.text}`).join('\n');
+            if (!reqText) return showDialog('請先提供 RFP 內容或檔案', 'error');
 
             isProcessing = true;
-            ui.emptyState.classList.add('hidden'); ui.resultContent.classList.add('hidden', 'opacity-0'); 
-            ui.loadingState.classList.remove('hidden'); ui.copyBtn.classList.add('hidden'); ui.exportWordBtn.classList.add('hidden');
-            ui.statusBadge.textContent = '深度運算中...'; 
-            ui.statusBadge.className = 'px-2 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-medium animate-pulse transition-colors';
+            ui.emptyState.classList.add('hidden'); ui.resultContent.classList.add('hidden'); ui.loadingState.classList.remove('hidden');
+            
+            // 強制實體變數注入
+            const ourEntity = ui.ourEntityInput.value.trim() || "未指定 (請推斷或標示未知)";
+            const competitor = ui.competitorInput.value.trim() || "未指定 (無證據勿捏造競品)";
 
-            let promptStr = `${workflow.prompt}\n\n【客戶 RFP 原始需求】:\n${reqText}`;
-            if (isReview) promptStr += `\n\n【我方遞交之提案草案/內容】:\n${propText}`;
-            promptStr += `\n\n請依照 System Prompt 規定的 JSON 格式輸出，將分析結果結構化填入相應的欄位與陣列中。`;
-
-            const parts = [{ text: promptStr }];
-            uploadedImages.forEach(img => parts.push({ inlineData: { mimeType: img.mimeType, data: img.data } }));
+            let promptStr = `${workflow.prompt}\n\n【專案實體設定】\n投標方(我方): ${ourEntity}\n已知競爭對手: ${competitor}\n\n【事實庫 (RFP 來源)】:\n${reqText}`;
 
             try {
+                // 強制鎖定使用 gemini-3.8-flash，確保效能與成本控制
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${currentApiKey}`, {
-                    method: 'POST', 
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, 
-                        contents: [{ parts: parts }], 
-                        generationConfig: { 
-                            temperature: 0.2, // 確保輸出結構穩定
-                            maxOutputTokens: 8192,
-                            responseMimeType: "application/json" // 強化原生 JSON 輸出能力
-                        } 
+                        contents: [{ parts: [{ text: promptStr }] }], 
+                        generationConfig: { temperature: 0.1, responseMimeType: "application/json" } // 低溫確保事實準確性
                     })
                 });
 
-                if (!response.ok) throw new Error((await response.json().catch(()=>({}))).error?.message || 'API 請求連線失敗');
-
+                if (!response.ok) throw new Error("API 請求失敗");
                 const rawText = (await response.json()).candidates[0].content.parts[0].text;
-                const parsedJSON = parseAIResponse(rawText); // 呼叫容錯解析器
                 
-                ui.resultContent.innerHTML = renderReportFromJSON(parsedJSON); // 渲染 HTML
+                const parsedJSON = parseAIResponse(rawText);
+                ui.resultContent.innerHTML = renderReportFromJSON(parsedJSON);
                 
-                ui.loadingState.classList.add('hidden'); ui.resultContent.classList.remove('hidden'); 
+                ui.loadingState.classList.add('hidden'); ui.resultContent.classList.remove('hidden');
                 setTimeout(() => ui.resultContent.classList.remove('opacity-0'), 50);
-                ui.copyBtn.classList.remove('hidden'); ui.exportWordBtn.classList.remove('hidden');
-                ui.statusBadge.textContent = workflow.title.split('.')[0] + ' 分析完成'; 
-                ui.statusBadge.className = 'px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full font-medium transition-colors';
-
+                document.getElementById('statusBadge').textContent = '分析完成'; document.getElementById('statusBadge').className = 'px-2 py-1 bg-green-100 text-green-700 text-[10px] rounded font-medium';
             } catch (error) {
-                ui.loadingState.classList.add('hidden'); ui.resultContent.classList.remove('hidden', 'opacity-0');
-                ui.resultContent.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded-lg border border-red-200"><h3 class="font-bold mb-2"><i class="fa-solid fa-triangle-exclamation"></i> 系統發生異常</h3><p class="text-sm">${error.message}</p></div>`;
-                ui.statusBadge.textContent = '異常錯誤'; 
-                ui.statusBadge.className = 'px-2 py-1 bg-red-100 text-red-700 text-xs rounded-full font-medium transition-colors';
-            } finally {
-                isProcessing = false;
-            }
+                ui.loadingState.classList.add('hidden'); ui.resultContent.classList.remove('hidden');
+                ui.resultContent.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded border border-red-200 text-xs"><b>分析異常：</b><br>${error.message}</div>`;
+            } finally { isProcessing = false; }
         }
 
-        document.getElementById('optimizeDraftBtn').onclick = () => runAnalysis({ title: "✨ 提案草案評估", prompt: "這是一份尚未提交的草案。請以嚴格評委視角，對比 RFP 需求指出：合規缺口、說服力弱點，並給出優化建議。" }, true);
-        document.getElementById('winAnalysisBtn').onclick = () => runAnalysis({ title: "🏆 勝選關鍵分析", prompt: "這是一個成功案例。請比對 RFP 需求指出：勝選關鍵要素、差異化優勢、未來可複製模組。" }, true);
-        document.getElementById('lossAnalysisBtn').onclick = () => runAnalysis({ title: "💔 敗選覆盤剖析", prompt: "這是一個落敗案例。請比對 RFP 需求指出：致命風險與缺口、策略失誤、未來防範機制。" }, true);
-
-        // 剪貼簿與匯出功能
-        ui.copyBtn.onclick = () => { 
-            const el = document.createElement("textarea"); el.value = ui.resultContent.innerText; 
-            document.body.appendChild(el); el.select(); document.execCommand('copy'); document.body.removeChild(el);
-            const orig = ui.copyBtn.innerHTML; ui.copyBtn.innerHTML = '<i class="fa-solid fa-check text-green-600"></i>'; 
-            setTimeout(() => ui.copyBtn.innerHTML = orig, 2000); 
+        // Chat UI Toggle logic (simplified for single file)
+        const chatToggle = document.getElementById('chatToggleHeader');
+        let chatOpen = false;
+        chatToggle.onclick = (e) => {
+            if(e.target.closest('#chatResizer')) return;
+            chatOpen = !chatOpen;
+            document.getElementById('chatbot-container').style.height = chatOpen ? '450px' : '50px';
+            document.getElementById('chat-messages').style.display = chatOpen ? 'flex' : 'none';
+            document.getElementById('chatInputArea').style.display = chatOpen ? 'flex' : 'none';
+            document.getElementById('chatToggleBtn').innerHTML = chatOpen ? '<i class="fa-solid fa-chevron-down text-xs"></i>' : '<i class="fa-solid fa-chevron-up text-xs"></i>';
         };
-        
-        ui.exportWordBtn.onclick = () => {
-            const src = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body { font-family: 'Microsoft JhengHei', 'Inter', sans-serif; } table { border-collapse: collapse; width: 100%; margin-bottom: 1em; } th, td { border: 1px solid #ccc; padding: 8px; text-align: left; } th { background-color: #f2f2f2; } h1,h2,h3,h4 { color: #333; margin-top: 1em; }</style></head><body>" + ui.resultContent.innerHTML + "</body></html>";
-            const a = document.createElement("a"); a.href = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(src); a.download = 'TonyStudio_Report.doc'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        };
-
-        // 聊天室邏輯
-        const chatUI = {
-            container: document.getElementById('chatbot-container'),
-            header: document.getElementById('chatToggleHeader'),
-            btn: document.getElementById('chatToggleBtn'),
-            messages: document.getElementById('chat-messages'),
-            inputArea: document.getElementById('chatInputArea'),
-            input: document.getElementById('chatInput'),
-            sendBtn: document.getElementById('chatSendBtn'),
-            resizer: document.getElementById('chatResizer')
-        };
-        
-        let isChatOpen = false;
-        let chatLastWidth = 400, chatLastHeight = 550;
-        
-        chatUI.header.addEventListener('click', (e) => { if (!e.target.closest('button') && !e.target.closest('#chatResizer')) toggleChat(); });
-
-        function toggleChat() {
-            isChatOpen = !isChatOpen;
-            if(isChatOpen) { chatUI.container.style.height = chatLastHeight + 'px'; chatUI.container.style.width = chatLastWidth + 'px'; } 
-            else {
-                chatLastHeight = parseInt(getComputedStyle(chatUI.container).height, 10) || 550;
-                chatLastWidth = parseInt(getComputedStyle(chatUI.container).width, 10) || 400;
-                chatUI.container.style.height = '50px';
-            }
-            chatUI.messages.style.display = isChatOpen ? 'flex' : 'none'; 
-            chatUI.inputArea.style.display = isChatOpen ? 'flex' : 'none';
-            chatUI.btn.innerHTML = isChatOpen ? '<i class="fa-solid fa-chevron-down text-sm"></i>' : '<i class="fa-solid fa-chevron-up text-sm"></i>';
-        }
-
-        let isResizingChat = false, rx, ry, rw, rh;
-        chatUI.resizer.addEventListener('mousedown', (e) => {
-            e.preventDefault(); e.stopPropagation(); isResizingChat = true;
-            rx = e.clientX; ry = e.clientY; rw = parseInt(getComputedStyle(chatUI.container).width, 10); rh = parseInt(getComputedStyle(chatUI.container).height, 10);
-            document.body.style.cursor = 'nwse-resize'; chatUI.container.style.transition = 'none';
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (!isResizingChat) return;
-            chatUI.container.style.width = Math.max(300, Math.min(window.innerWidth * 0.9, rw + (rx - e.clientX))) + 'px';
-            if (isChatOpen) chatUI.container.style.height = Math.max(200, Math.min(window.innerHeight * 0.9, rh + (ry - e.clientY))) + 'px';
-        });
-        window.addEventListener('mouseup', () => { if (isResizingChat) { isResizingChat = false; document.body.style.cursor = 'default'; chatUI.container.style.transition = ''; } });
-
-        let chatFontSize = 13;
-        document.getElementById('chatFontIncreaseBtn').onclick = (e) => { e.stopPropagation(); chatFontSize = Math.min(24, chatFontSize + 1); chatUI.container.style.setProperty('--chat-font-size', chatFontSize + 'px'); };
-        document.getElementById('chatFontDecreaseBtn').onclick = (e) => { e.stopPropagation(); chatFontSize = Math.max(10, chatFontSize - 1); chatUI.container.style.setProperty('--chat-font-size', chatFontSize + 'px'); };
-
-        function renderChatHistory() {
-            chatUI.messages.innerHTML = '';
-            for(let i=1; i<chatHistory.length; i++) appendChatMessage(chatHistory[i].role, chatHistory[i].parts[0].text, false);
-            chatUI.messages.scrollTop = chatUI.messages.scrollHeight;
-        }
-
-        function appendChatMessage(role, text, animate = false) {
-            const wrap = document.createElement('div'); wrap.className = `flex items-end gap-2 ${role === 'user' ? 'flex-row-reverse' : ''}`;
-            const avatar = role === 'user' ? `<div class="w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center text-slate-500 text-xs shrink-0"><i class="fa-solid fa-user"></i></div>` : `<img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-7 h-7 rounded-full object-cover shrink-0 border border-slate-200">`;
-            const style = role === 'user' ? `bg-blue-600 text-white px-4 py-2.5 rounded-2xl rounded-br-sm shadow-sm` : `bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm markdown-body`;
-            
-            const content = role === 'user' ? text : (typeof marked !== 'undefined' ? marked.parse(text) : `<p>${text}</p>`);
-            wrap.innerHTML = `${avatar}<div class="chat-message ${style}">${content}</div>`;
-            chatUI.messages.appendChild(wrap);
-            if(animate) chatUI.messages.scrollTop = chatUI.messages.scrollHeight;
-        }
-
-        chatUI.sendBtn.onclick = async () => {
-            if (chatUI.sendBtn.disabled) return;
-            if (!currentApiKey) return showDialog("請先輸入 API Key！", 'error');
-            const text = chatUI.input.value.trim(); if(!text) return;
-            
-            appendChatMessage('user', text, true); chatHistory.push({ role: "user", parts: [{ text }] }); chatUI.input.value = '';
-            chatUI.sendBtn.disabled = true;
-
-            const loaderId = 'chat-load-' + Date.now();
-            chatUI.messages.insertAdjacentHTML('beforeend', `<div id="${loaderId}" class="flex items-end gap-2"><img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" class="w-7 h-7 rounded-full object-cover shrink-0 border border-slate-200"><div class="chat-message bg-white border border-slate-200 text-slate-500 px-4 py-2.5 rounded-2xl rounded-bl-sm shadow-sm">思考中<span class="loading-dots"></span></div></div>`);
-            chatUI.messages.scrollTop = chatUI.messages.scrollHeight;
-
-            try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${currentApiKey}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ system_instruction: { parts: [{ text: TONY_PERSONA }] }, contents: chatHistory, generationConfig: { temperature: 0.7 } })
-                });
-                if (!res.ok) throw new Error("API 異常");
-                const aiText = (await res.json()).candidates[0].content.parts[0].text;
-                document.getElementById(loaderId).remove();
-                appendChatMessage('model', aiText, true); chatHistory.push({ role: "model", parts: [{ text: aiText }] });
-            } catch (err) {
-                document.getElementById(loaderId).remove(); appendChatMessage('model', `**錯誤**: ${err.message}`, true); chatHistory.pop();
-            } finally {
-                chatUI.sendBtn.disabled = false;
-            }
-        };
-
-        chatUI.input.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); chatUI.sendBtn.click(); } });
-        renderChatHistory();
-
-        // Local Storage Bindings
-        document.getElementById('saveLocalBtn').onclick = () => { localStorage.setItem('tony_rfp_backup', getWorkspaceState()); showDialog('已儲存至瀏覽器本機！'); };
-        document.getElementById('loadLocalBtn').onclick = () => { const d = localStorage.getItem('tony_rfp_backup'); if(d) restoreWorkspaceState(d); else showDialog('無本機備份。', 'error'); };
-        document.getElementById('exportBackupBtn').onclick = () => {
-            const b = new Blob([getWorkspaceState()], {type: "application/json"}); const a = document.createElement("a");
-            a.href = URL.createObjectURL(b); a.download = `TonyStudio_Workspace_${new Date().toISOString().slice(0,10)}.json`; a.click();
-        };
-        document.getElementById('importBackupFile').addEventListener('change', async (e) => {
-            const file = e.target.files[0]; if(!file) return;
-            restoreWorkspaceState(await file.text()); document.getElementById('importBackupFile').value = ''; showDialog('已還原狀態！');
-        });
 
     </script>
 </body>
