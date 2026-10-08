@@ -19,6 +19,7 @@
     <!-- Marked.js for Markdown Parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -76,7 +77,7 @@
                         TonyStudio RFP Intelligence Framework™
                     </h1>
                     <div class="text-xs text-slate-400 font-medium flex items-center gap-2 mt-0.5">
-                        企業提案拆解與回應決策系統 (高精度回歸版)
+                        企業提案拆解與回應決策系統 (公式溯源核心版)
                         <span class="bg-slate-800 text-blue-300 text-[10px] px-1.5 py-0.5 rounded border border-slate-700 shadow-sm flex items-center gap-1">
                             <i class="fa-solid fa-bolt text-yellow-400"></i> gemini-3.8-flash
                         </span>
@@ -103,7 +104,6 @@
 
     <main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
         
-        <!-- 左側面板：輸入與控制項 -->
         <div class="lg:col-span-4 flex flex-col gap-4">
             
             <div class="glass-panel rounded-xl p-4 shadow-sm border border-orange-200 bg-gradient-to-br from-orange-50 to-white">
@@ -202,18 +202,18 @@
                 <div class="p-6 overflow-y-auto flex-grow relative bg-white" id="resultContainer">
                     <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
                         <i class="fa-solid fa-shield-halved text-4xl text-slate-200 mb-3"></i>
-                        <h3 class="text-sm font-medium text-slate-600">高精度證據導向分析 (第2輪優化)</h3>
+                        <h3 class="text-sm font-medium text-slate-600">高精度證據導向分析 (底層公式解析版)</h3>
                         <p class="text-xs max-w-sm mt-2 leading-relaxed">
-                            ✔️ 強制保留並追溯 PDF 頁碼與 Excel 儲存格<br>
-                            ✔️ 內建 Excel 實際公式與跨表關聯稽核<br>
-                            ✔️ 全面繼承 RFP 例外條件與單位期間<br>
-                            ✔️ Win Theme 六步深度策略框架
+                            ✔️ 程式級綁定 PDF 頁碼與 Excel 儲存格座標<br>
+                            ✔️ 獨立擷取 Excel 顯示值 (w) 與 實際公式 (f)<br>
+                            ✔️ 嚴防 LLM 自行發明未公佈之總權重<br>
+                            ✔️ 嚴禁單位轉換與語氣竄改 (may be/try to)
                         </p>
                     </div>
                     <div id="loadingState" class="absolute inset-0 flex flex-col items-center justify-center text-blue-500 p-8 text-center hidden bg-white/95 z-10">
                         <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3"></i>
                         <h3 class="text-sm font-medium text-slate-700">正在進行深度交叉比對與公式稽核...</h3>
-                        <p class="text-[10px] text-slate-500 mt-2">正從事實庫中提取頁碼、儲存格定位與例外條件</p>
+                        <p class="text-[10px] text-slate-500 mt-2">正從事實庫中提取頁碼、儲存格定位與底層公式</p>
                     </div>
                     <div id="resultContent" class="hidden transition-opacity duration-300"></div>
                 </div>
@@ -355,17 +355,31 @@
     </div>
 
     <script>
-        const SYSTEM_PROMPT = `你是 TonyStudio 首席標案分析師，負責極度嚴謹的 RFP 分析。
+        // 【第四輪核心更新】：完全封殺LLM擅自發明定位的底層提示詞
+        const SYSTEM_PROMPT = `你是 TonyStudio 首席標案分析師，負責極度嚴謹的 RFP 與 Excel 報價公式分析。
 
 【絕對禁忌與強制規則】(違反將導致系統崩潰，請嚴格遵守)：
-1. 來源定位必填 (Source Location)：每一項主張、證據，必須提取文本中的 [頁碼: X] 或 [工作表: Y, 儲存格: Z]。嚴禁 LLM 自行發明頁碼。若文本中無標示，請填寫「來源定位未完成」。
-2. Excel 實際公式稽核：注意 Excel 中「文字宣稱」與「實際公式 (如 =SUM)」的差異。若合計漏列 (如 G10 漏了 G9)、跨表引用空白、或者未稅/含稅混用，必須標示為 warning。不因公式可執行就判定語意正確。
-3. 繼承條件與例外 (Conditions)：摘要、規則不得丟失「例外條件」、「特定時間」、「適用範圍」、「單位/幣別」。(例如：100cm 有例外時，不可簡化為無例外門檻)。
-4. 評分比例分母：每個百分比必須明列「所屬區塊及計算基準」(例如：Experience 轄下 15%)。保持原表級距 (如 100/50/0)，不擅自改為 100% 滿分。
-5. 澄清問題過濾：問題必須是「真正影響成本/時程/合規的缺漏」，不可將系統解析失敗當成問題，排除可自行計算的假問題。
-6. Win Theme 策略深度：必須符合架構：客戶要求 → 買方價值 → 我方證據 → 交付方法 → 成本代價 → 待驗證條件。
-7. 嚴禁預測與混淆：不可發明總和權重 (未公佈就是未公佈)，不可混淆投標方與競品，無證據時不可捏造競品弱點。不准產出虛構得標勝率。
-8. 語氣嚴謹：保留 try to answer, may be 等非保證語氣，不可擅自轉為「立即具法律約束力」。
+1. 強制來源綁定 (Source Location)：你在文本中看到的每一句話、每一個公式，都已經被系統打上了 [頁碼: X] 或 [工作表: Y, 儲存格: Z] 的標籤。
+   - 你【必須】完全照抄該標籤作為證據定位。
+   - 絕對禁止你自己發明、猜測、或結合頁碼 (例如：不能把 47 頁說成 48 頁)。
+   - 若你使用的資訊沒有伴隨標籤，請在 source_location 填寫「來源定位未完成」。
+2. Excel 實際公式與邏輯稽核：
+   - 系統已為你抓出 Excel 的【實際公式(f)】與【顯示內容(w)/快取值(v)】。
+   - 你必須稽核公式是否漏列 (例如: G10 寫 =SUM(G5:G8)，但 G9 明明有數值，這就是漏列)。
+   - 必須檢查跨表引用是否指向空白儲存格。
+   - 發現上述異常，強制標示 alert_type 為 "finance"。
+3. 嚴禁單位與數值轉換：
+   - 原文寫「兩年 820 件」就是兩年 820 件，絕對不准自行除以 2 改稱「每年」，也不准改成「門市數」。
+   - 預估量不可改稱「保證採購量」。
+   - 參考價格不可改稱「最高限價」。
+4. 繼承條件與例外 (Conditions)：
+   - 摘要與結論中，必須保留原文的「例外條款」、「特定時間」、「適用範圍」。(例如：僅限夜間 21:00-04:00、有例外的 100cm 要求不可寫成無例外門檻)。
+   - 必須寫入 \`conditions\` 獨立欄位。
+5. 嚴格保留法律語氣：
+   - 原文寫 "may be"、"try to answer"，你必須保留「可能」、「盡力回覆」，不准改成「保證」或「具法律約束力」。
+6. 評分權重階層：
+   - 每個百分比必須明列「所屬區塊及計算基準」。
+   - 若上層權重未公布，強制填寫「未公佈」，絕對不准自行發明配重湊滿 100%。
 
 【輸出格式嚴格限制】
 你必須「僅」輸出一個合法的 JSON 字串。絕對不可包含任何 Markdown 代碼塊標記 (\`\`\`json 等)，也不要加上問候語。
@@ -379,9 +393,9 @@
       "heading": "區塊標題",
       "alert_type": "none | warning (合約/時程/公式漏列風險) | strategy (勝選主軸) | success (加分項) | finance (財務/Excel稽核)",
       "content": "詳細內容說明 (支援 Markdown)。",
-      "evidence_quote": "支持此論點的 RFP 原文擷取片段。若為推論填空字串。",
-      "source_location": "[頁碼: X] 或 [工作表: Y, 儲存格 Z]。嚴禁憑空捏造，定位失敗請填寫「來源定位未完成」。多個來源請分別列出。",
-      "conditions": "適用的條件分支、例外、範圍 (例如: 僅限夜間 21:00-04:00、受限時替代)。若無請填空字串。",
+      "evidence_quote": "支持此論點的 RFP 原文擷取片段。",
+      "source_location": "[頁碼: X] 或 [工作表: Y, 儲存格 Z]。嚴禁憑空捏造，定位失敗請填寫「來源定位未完成」。",
+      "conditions": "適用的條件分支、例外、範圍。若無請填空字串。",
       "is_assumption": true/false,
       "table": [ { "欄位A": "值A" } ]
     }
@@ -390,7 +404,7 @@
 
         let currentApiKey = localStorage.getItem('gemini_api_key') || '';
         let rfpParsedFiles = [], proposalParsedFiles = [];
-        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。我已升級為高精度來源追溯版本，隨時可以幫您分析 RFP 檔案與 Excel 公式！" }] }];
+        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。解析器已更新，我現在能精準讀出 Excel 的底層實際公式與 PDF 綁定頁碼了！" }] }];
         let currentProjectId = null;
         let currentProjectName = '未命名專案';
         let isProcessing = false;
@@ -514,7 +528,7 @@
                         if (locText === '來源定位未完成' || locText === '') {
                             html += `<span class="badge-evidence badge-location-fail"><i class="fa-solid fa-location-crosshairs"></i> 定位未完成</span>`;
                         } else {
-                            html += `<span class="badge-evidence badge-location" title="${locText}"><i class="fa-solid fa-location-dot"></i> 定位: ${locText.substring(0, 30)}${locText.length > 30 ? '...' : ''}</span>`;
+                            html += `<span class="badge-evidence badge-location" title="${locText}"><i class="fa-solid fa-location-dot"></i> 定位: ${locText.substring(0, 45)}${locText.length > 45 ? '...' : ''}</span>`;
                         }
                     }
 
@@ -561,7 +575,7 @@
             { id: 4, title: "4. Win Theme 勝選主軸", icon: "fa-flag-checkered", prompt: "運用六步策略框架：客戶要求 → 買方價值 → 我方證據 → 交付方法 → 成本代價 → 待驗證條件。嚴禁產出虛構的勝率或無證據的競品弱點。" },
             { id: 5, title: "5. 提案大綱與 WBS", icon: "fa-list-ol", prompt: "擬定提案簡報大綱與工作包分配。標記為內部建議。遵守官方人力要求與定位，不可擅自推定常駐或改變原文配置。" },
             { id: 6, title: "6. 合規矩陣 (Compliance)", icon: "fa-table-list", prompt: "建立合規矩陣。條件式要求必須保留全部分支與例外，嚴禁簡化。確保每一項皆有精確的 [頁碼] 或 [儲存格] 定位。" },
-            { id: 7, title: "7. 報價、商業模型與公式稽核", icon: "fa-file-invoice-dollar", prompt: "盤點報價與計費邏輯。進行【Excel 實際公式稽核】：比對文字與儲存格實際公式，找出合計漏列、跨表引用錯誤、未稅/含稅混用。標示警告。" },
+            { id: 7, title: "7. 報價、商業模型與公式稽核", icon: "fa-file-invoice-dollar", prompt: "盤點報價與計費邏輯。進行【Excel 實際公式稽核】：系統已為你抓出 實際公式(f) 與 顯示內容(w)。請比對它們，找出合計漏列 (例如有G9卻只SUM到G8)、跨表引用空白、未稅/含稅混用。必須標示 finance 警告。" },
             { id: 8, title: "8. 澄清問題過濾 (Q&A)", icon: "fa-clipboard-question", prompt: "草擬澄清問題。先過濾：是否能由現有公式/文件回答？是否為解析失敗？僅保留真正影響成本、時程或合規的問題，並附上精確原文定位。" },
             { id: 9, title: "9. 封裝與遞交 Check-list", icon: "fa-box-open", prompt: "整理遞交清單。嚴格區分官方要求與內部建議。確保交期、格式的原文來源精確無誤，不可憑空產生。" },
             { id: 10, title: "10. 紅軍審查 (Red Team Review)", icon: "fa-mask", prompt: "擔任嚴苛的紅軍審查員。指出我方提案中與 RFP 官方條件（需附來源定位）衝突之處。找出過度承諾與缺乏證據的漏洞。" },
@@ -641,6 +655,7 @@
         window.removeRfpFile = (i) => { rfpParsedFiles.splice(i, 1); renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile'); };
         window.removePropFile = (i) => { proposalParsedFiles.splice(i, 1); renderTags(proposalParsedFiles, document.getElementById('proposalFileTagsContainer'), 'removePropFile'); };
         
+        // 【核心修正】分開擷取公式與文字，並強制綁定座標
         async function extractTextFromFile(file) {
             const name = file.name.toLowerCase();
             try {
@@ -653,23 +668,39 @@
                     let text = `文件總頁數: ${pdf.numPages}\n`;
                     for (let i = 1; i <= pdf.numPages; i++) {
                         const pageText = (await (await pdf.getPage(i)).getTextContent()).items.map(it => it.str).join(' ');
-                        text += `\n[頁碼: ${i}] ` + pageText + '\n';
+                        // 強制插入明顯的頁碼分隔符
+                        text += `\n\n--- [頁碼: ${i}] ---\n` + pageText;
                     }
                     return text;
                 } else if (name.match(/\.(xlsx|xls)$/)) {
                     const wb = XLSX.read(await file.arrayBuffer(), {type: 'array', cellFormula: true});
                     let result = `總工作表數量: ${wb.SheetNames.length}\n`;
+                    
                     wb.SheetNames.forEach(sn => {
                         result += `\n\n=== [工作表: ${sn}] ===\n`;
                         const sheet = wb.Sheets[sn];
-                        result += XLSX.utils.sheet_to_csv(sheet) + '\n';
                         
-                        // 擷取 Excel 實際公式供 LLM 稽核
-                        result += `\n--- [${sn} 公式與參照清單] ---\n`;
-                        for (const z in sheet) {
-                            if(z[0] === '!') continue;
-                            if(sheet[z].f) {
-                                result += `[工作表: ${sn}, 儲存格: ${z}] 值=${sheet[z].v !== undefined ? sheet[z].v : '空'}, 實際公式=${sheet[z].f}\n`;
+                        // 棄用 sheet_to_csv，改採逐格深度掃描，將 f, v, w 綁在一起
+                        const rangeStr = sheet['!ref'];
+                        if (!rangeStr) return; // 空白工作表
+                        
+                        const range = XLSX.utils.decode_range(rangeStr);
+                        for(let R = range.s.r; R <= range.e.r; ++R) {
+                            for(let C = range.s.c; C <= range.e.c; ++C) {
+                                const cellAddress = XLSX.utils.encode_cell({c: C, r: R});
+                                const cell = sheet[cellAddress];
+                                
+                                if (!cell) continue;
+                                if (cell.v === undefined && cell.f === undefined && cell.w === undefined) continue;
+                                
+                                let cellInfo = `[工作表: ${sn}, 儲存格: ${cellAddress}]`;
+                                let hasData = false;
+                                
+                                if (cell.w !== undefined) { cellInfo += ` 顯示文字(w)="${cell.w}"`; hasData = true; }
+                                if (cell.v !== undefined && cell.v !== cell.w) { cellInfo += ` 快取值(v)="${cell.v}"`; hasData = true; }
+                                if (cell.f !== undefined) { cellInfo += ` 實際公式(f)="=${cell.f}"`; hasData = true; }
+                                
+                                if(hasData) result += cellInfo + '\n';
                             }
                         }
                     });
@@ -1051,7 +1082,6 @@
                     .conditions-box { background: #f1f5f9; padding: 10px; border-left: 3px solid #94a3b8; font-size: 12px; margin: 10px 0; }
                 </style></head><body>`;
             
-            // 替換前端特殊的 div class 為 Word 相容樣式
             let wordContent = content.replace(/<div class="mt-2 mb-3 text-\[11px\].*?">.*?<b>/g, '<div class="conditions-box"><b>');
 
             const postHtml = "</body></html>";
