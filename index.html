@@ -77,7 +77,7 @@
                         TonyStudio RFP Intelligence Framework™
                     </h1>
                     <div class="text-xs text-slate-400 font-medium flex items-center gap-2 mt-0.5">
-                        企業提案拆解與回應決策系統 (公式溯源核心版)
+                        企業提案拆解與回應決策系統 (公式精確溯源版)
                         <span class="bg-slate-800 text-blue-300 text-[10px] px-1.5 py-0.5 rounded border border-slate-700 shadow-sm flex items-center gap-1">
                             <i class="fa-solid fa-bolt text-yellow-400"></i> gemini-3.8-flash
                         </span>
@@ -202,12 +202,12 @@
                 <div class="p-6 overflow-y-auto flex-grow relative bg-white" id="resultContainer">
                     <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
                         <i class="fa-solid fa-shield-halved text-4xl text-slate-200 mb-3"></i>
-                        <h3 class="text-sm font-medium text-slate-600">高精度證據導向分析 (底層公式解析版)</h3>
+                        <h3 class="text-sm font-medium text-slate-600">高精度證據導向分析 (第3輪回歸優化)</h3>
                         <p class="text-xs max-w-sm mt-2 leading-relaxed">
-                            ✔️ 程式級綁定 PDF 頁碼與 Excel 儲存格座標<br>
-                            ✔️ 獨立擷取 Excel 顯示值 (w) 與 實際公式 (f)<br>
-                            ✔️ 嚴防 LLM 自行發明未公佈之總權重<br>
-                            ✔️ 嚴禁單位轉換與語氣竄改 (may be/try to)
+                            ✔️ 獨創 Excel `(w, v, f)` 三維度解構解析<br>
+                            ✔️ 嚴防數量假警報 (如 820=700+120 自動驗證)<br>
+                            ✔️ 嚴禁將保險日期與施工期限混淆<br>
+                            ✔️ 全面繼承 RFP 例外條件與單位期間
                         </p>
                     </div>
                     <div id="loadingState" class="absolute inset-0 flex flex-col items-center justify-center text-blue-500 p-8 text-center hidden bg-white/95 z-10">
@@ -355,31 +355,22 @@
     </div>
 
     <script>
-        // 【第四輪核心更新】：完全封殺LLM擅自發明定位的底層提示詞
-        const SYSTEM_PROMPT = `你是 TonyStudio 首席標案分析師，負責極度嚴謹的 RFP 與 Excel 報價公式分析。
+        // 【第三輪核心優化】：極致防呆與數學驗證，禁止 LLM 自行發明與過度推斷
+        const SYSTEM_PROMPT = `你是 TonyStudio 首席標案分析師，負責極度嚴謹的 RFP 分析與 Excel 稽核。
 
 【絕對禁忌與強制規則】(違反將導致系統崩潰，請嚴格遵守)：
-1. 強制來源綁定 (Source Location)：你在文本中看到的每一句話、每一個公式，都已經被系統打上了 [頁碼: X] 或 [工作表: Y, 儲存格: Z] 的標籤。
-   - 你【必須】完全照抄該標籤作為證據定位。
-   - 絕對禁止你自己發明、猜測、或結合頁碼 (例如：不能把 47 頁說成 48 頁)。
-   - 若你使用的資訊沒有伴隨標籤，請在 source_location 填寫「來源定位未完成」。
-2. Excel 實際公式與邏輯稽核：
-   - 系統已為你抓出 Excel 的【實際公式(f)】與【顯示內容(w)/快取值(v)】。
-   - 你必須稽核公式是否漏列 (例如: G10 寫 =SUM(G5:G8)，但 G9 明明有數值，這就是漏列)。
-   - 必須檢查跨表引用是否指向空白儲存格。
-   - 發現上述異常，強制標示 alert_type 為 "finance"。
-3. 嚴禁單位與數值轉換：
-   - 原文寫「兩年 820 件」就是兩年 820 件，絕對不准自行除以 2 改稱「每年」，也不准改成「門市數」。
-   - 預估量不可改稱「保證採購量」。
-   - 參考價格不可改稱「最高限價」。
-4. 繼承條件與例外 (Conditions)：
-   - 摘要與結論中，必須保留原文的「例外條款」、「特定時間」、「適用範圍」。(例如：僅限夜間 21:00-04:00、有例外的 100cm 要求不可寫成無例外門檻)。
-   - 必須寫入 \`conditions\` 獨立欄位。
-5. 嚴格保留法律語氣：
-   - 原文寫 "may be"、"try to answer"，你必須保留「可能」、「盡力回覆」，不准改成「保證」或「具法律約束力」。
-6. 評分權重階層：
-   - 每個百分比必須明列「所屬區塊及計算基準」。
-   - 若上層權重未公布，強制填寫「未公佈」，絕對不准自行發明配重湊滿 100%。
+1. 來源定位必填 (Source Location)：每一項主張，必須提取文本中的 [頁碼: X] 或 [工作表: Y, 儲存格: Z]。系統已在文本中為你標示。嚴禁 LLM 自行發明。若無則強制填寫「來源定位未完成」。
+2. Excel 實際公式稽核：
+   - 系統已為你拆解 Excel 的 顯示文字(w)、快取值(v) 與 實際公式(f)。
+   - 你必須稽核公式是否漏列 (例如有 G9 卻只 SUM 到 G8)、跨表引用是否指向無 (w) 值的空白格子。
+3. 嚴禁假數量矛盾與單位轉換：
+   - 發現總數與細項時，必須先進行數學驗證。例如看到「SES招牌234+燈箱234+地板232」，驗算等於700，若工作表寫「2 Years Estimate (SES) 700件」，這就是完全吻合，絕對不准說數量矛盾。
+   - 保險日期 (如 7/19~7/24) 絕對不可當成施工期限。
+   - 撤場費用排除引用時，不可牽拖無關的保險欄位。
+4. 繼承條件與例外 (Conditions)：摘要、規則不得丟失「例外條件」、「適用範圍」。
+5. 評分權重與機率：每個百分比必須明列「所屬區塊及計算基準」。若上層權重未公布，強制填寫「未公布」，嚴禁自行假設湊滿 100%。不准產出虛構勝率。
+6. 分類矩陣不等於衝突：左側專案總額與右側 6 大 Area 報價為不同維度的矩陣填報，若無公式相連，指出「未防呆連動」即可，不可判定為「架構衝突」。
+7. 語氣嚴謹：保留 try to answer 等非保證語氣，不可擅自轉為「立即具約束力」。
 
 【輸出格式嚴格限制】
 你必須「僅」輸出一個合法的 JSON 字串。絕對不可包含任何 Markdown 代碼塊標記 (\`\`\`json 等)，也不要加上問候語。
@@ -391,10 +382,10 @@
   "sections": [
     {
       "heading": "區塊標題",
-      "alert_type": "none | warning (合約/時程/公式漏列風險) | strategy (勝選主軸) | success (加分項) | finance (財務/Excel稽核)",
+      "alert_type": "none | warning (合約/時程/公式風險) | strategy (勝選主軸) | success (加分項) | finance (財務/Excel稽核)",
       "content": "詳細內容說明 (支援 Markdown)。",
-      "evidence_quote": "支持此論點的 RFP 原文擷取片段。",
-      "source_location": "[頁碼: X] 或 [工作表: Y, 儲存格 Z]。嚴禁憑空捏造，定位失敗請填寫「來源定位未完成」。",
+      "evidence_quote": "支持此論點的 RFP 原文擷取片段。若為推論填空字串。",
+      "source_location": "[頁碼: X] 或 [工作表: Y, 儲存格: Z]。嚴禁憑空捏造，定位失敗請填寫「來源定位未完成」。多個來源請分別列出。",
       "conditions": "適用的條件分支、例外、範圍。若無請填空字串。",
       "is_assumption": true/false,
       "table": [ { "欄位A": "值A" } ]
@@ -404,7 +395,7 @@
 
         let currentApiKey = localStorage.getItem('gemini_api_key') || '';
         let rfpParsedFiles = [], proposalParsedFiles = [];
-        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。解析器已更新，我現在能精準讀出 Excel 的底層實際公式與 PDF 綁定頁碼了！" }] }];
+        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。解析器已更新，我現在能精準讀出 Excel 的底層實際公式與 PDF 綁定頁碼了！請隨時點選右側的 Preview 預覽畫面喔！" }] }];
         let currentProjectId = null;
         let currentProjectName = '未命名專案';
         let isProcessing = false;
@@ -1082,6 +1073,7 @@
                     .conditions-box { background: #f1f5f9; padding: 10px; border-left: 3px solid #94a3b8; font-size: 12px; margin: 10px 0; }
                 </style></head><body>`;
             
+            // 替換前端特殊的 div class 為 Word 相容樣式
             let wordContent = content.replace(/<div class="mt-2 mb-3 text-\[11px\].*?">.*?<b>/g, '<div class="conditions-box"><b>');
 
             const postHtml = "</body></html>";
