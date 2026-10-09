@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TonyStudio RFP Intelligence Framework™ V2.5</title>
+    <title>TonyStudio RFP Intelligence Framework™ V2.6</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -205,11 +205,11 @@ const api={validate,extractFormulas};if(typeof module!=='undefined'&&module.expo
 })(typeof window!=='undefined'?window:globalThis);
 </script>
 <script>
-window.RFPReportState={history:[],fingerprint:'',latest:null,visibleReport:null,app_version:'2.5'};
+window.RFPReportState={history:[],fingerprint:'',latest:null,visibleReport:null,app_version:'2.6'};
 window.getRFPRecords=function(){return RFPAuditUI.results;};
 window.downloadReportValidation=function(){
  const snapshot=RFPReportState.visibleReport||RFPReportState.latest;
- const data={app_version:'2.5',downloaded_at:new Date().toISOString(),... (snapshot||{status:'NOT_RUN',issues:['尚未完成本頁報告生成／檢查']}),current_sources:(typeof getSourceReadiness==='function'?getSourceReadiness().records:[]).map(r=>({filename:r.evidence.filename,sha256:r.evidence.sha256})),displayed_report_available:!!RFPReportState.visibleReport};
+ const data={app_version:'2.6',downloaded_at:new Date().toISOString(),... (snapshot||{status:'NOT_RUN',issues:['尚未完成本頁報告生成／檢查']}),current_sources:(typeof getSourceReadiness==='function'?getSourceReadiness().records:[]).map(r=>({filename:r.evidence.filename,sha256:r.evidence.sha256})),displayed_report_available:!!RFPReportState.visibleReport};
  const u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=u;a.download='report_validation.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
 };
@@ -261,7 +261,7 @@ const api={plan,apply};if(typeof module!=='undefined'&&module.exports)module.exp
                 <img src="https://firebasestorage.googleapis.com/v0/b/k16-tony-ai-wisdom-platform.firebasestorage.app/o/assets%2F6av64EOvvqQNAIoXqcPfHC5BBeF3%2F1785039560457_1.png?alt=media&token=19b27497-4101-4436-bc80-b299741b7984" alt="TonyStudio Logo" class="h-10 w-10 rounded-lg shadow-lg border border-slate-700 object-cover bg-white">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                        TonyStudio RFP Intelligence Framework™ V2.5
+                        TonyStudio RFP Intelligence Framework™ V2.6
                     </h1>
                     <div class="text-xs text-slate-400 font-medium flex items-center gap-2 mt-0.5">
                         企業提案拆解與回應決策系統 (高精度回歸版)
@@ -696,7 +696,8 @@ const api={plan,apply};if(typeof module!=='undefined'&&module.exports)module.exp
                 // 觸發容錯顯示，將壞掉的 JSON 原樣呈現
                 return {
                     is_fallback: true,
-                    raw_text: cleanText
+                    raw_text: cleanText,
+                    parse_error: err.message
                 };
             }
         }
@@ -706,9 +707,9 @@ const api={plan,apply};if(typeof module!=='undefined'&&module.exports)module.exp
                 return `
                 <div class="mb-5 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
                     <h2 class="text-sm font-bold text-red-800 mb-2"><i class="fa-solid fa-triangle-exclamation"></i> 報告格式解析異常 (已啟動容錯顯示)</h2>
-                    <p class="text-xs text-red-700 mb-4">AI 產生的內容夾帶了非預期的控制字元或引號，導致無法轉譯為完美表格。系統已自動攔截崩潰，並將原始分析結果完整擷取如下，確保您的資料絕不遺失：</p>
+                    <p class="text-xs text-red-700 mb-4">AI回覆未能解析為完整報告。可能是JSON格式錯誤、回覆截斷或結構不符；以下保留實際收到的內容，不代表內容完整或已驗證。</p>
                     <div class="bg-white border border-red-200 p-3 rounded text-[11px] text-slate-800 font-mono whitespace-pre-wrap overflow-x-auto max-h-[500px] overflow-y-auto">
-                        ${data.raw_text}
+                        ${String(data.raw_text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
                     </div>
                 </div>`;
             }
@@ -1183,9 +1184,33 @@ const api={plan,apply};if(typeof module!=='undefined'&&module.exports)module.exp
                 });
 
                 if (!response.ok) throw new Error(`API 請求失敗: ${response.statusText}`);
-                const rawText = (await response.json()).candidates[0].content.parts[0].text;
-                
-                let parsedJSON = parseAIResponse(rawText);
+                let responseData=await response.json();
+                const extractReply=data=>(data.candidates?.[0]?.content?.parts||[]).filter(p=>!p.thought&&typeof p.text==='string').map(p=>p.text).join('');
+                let rawText=extractReply(responseData);
+                let parsedJSON=parseAIResponse(rawText);
+                const formatAttempts=[{finish_reason:responseData.candidates?.[0]?.finishReason||null,parse_error:parsedJSON.parse_error||null}];
+                const validFormat=data=>!data.is_fallback&&Array.isArray(data.sections)&&data.sections.length>0;
+                if(!validFormat(parsedJSON)||responseData.candidates?.[0]?.finishReason==='MAX_TOKENS'){
+                  document.getElementById('statusBadge').textContent='回覆格式異常：正在重新生成精簡報告（最多一次）';
+                  try{
+                    const retryResponse=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${currentApiKey}`,{
+                      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+                        system_instruction:{parts:[{text:SYSTEM_PROMPT}]},
+                        contents:[{parts:[{text:promptStr+'\n【格式重試】重新依上述原始證據生成完整合法JSON。最多5個sections，每區塊精簡，避免長表及重複背景；保留證據ID與重要條件。不要續寫上次不完整JSON，不要虛構資料。'}]}],
+                        generationConfig:{temperature:0.1,responseMimeType:'application/json',maxOutputTokens:8192}
+                      })});
+                    if(!retryResponse.ok)throw new Error('重試API失敗：'+retryResponse.status);
+                    responseData=await retryResponse.json();rawText=extractReply(responseData);parsedJSON=parseAIResponse(rawText);
+                    formatAttempts.push({finish_reason:responseData.candidates?.[0]?.finishReason||null,parse_error:parsedJSON.parse_error||null});
+                  }catch(retryError){formatAttempts.push({error:retryError.message});}
+                }
+                if(!validFormat(parsedJSON)||responseData.candidates?.[0]?.finishReason==='MAX_TOKENS'){
+                  const failure={status:'FORMAT_ERROR',app_version:'2.6',workflow_id:workflow.id,run_id:crypto.randomUUID(),generated_at:new Date().toISOString(),source_hashes:sourceState.records.map(r=>r.evidence.sha256),issues:['AI回覆格式／完整性檢查失敗；未進入內容驗證'],format_attempts:formatAttempts,report:{is_fallback:true,raw_text:rawText}};
+                  RFPReportState.latest=failure;RFPReportState.visibleReport=failure;
+                  ui.resultContent.innerHTML=renderReportFromJSON(failure.report);ui.loadingState.classList.add('hidden');ui.resultContent.classList.remove('hidden');
+                  document.getElementById('statusBadge').textContent='格式失敗：可下載診斷JSON或原始草稿';document.getElementById('exportWordBtn').classList.remove('hidden');
+                  return;
+                }
                 const records=rfpParsedFiles.map(f=>f.evidenceRecord).filter(Boolean);
                 const samsung=records.some(r=>r.evidence.sha256===RFPEvidenceAudit.BASELINE);
                 if(workflow.id===7){
@@ -1213,13 +1238,13 @@ const api={plan,apply};if(typeof module!=='undefined'&&module.exports)module.exp
                   }catch(repairError){citationRepair.error=repairError.message;}
                 }
                 citationRepair.after_issues=validation.issues.slice();
-                validation.citation_repair=citationRepair;
+                validation.citation_repair=citationRepair;validation.format_attempts=formatAttempts;
                 if(records.some(r=>r.tests.validation_status==='TESTS_FAILED'))validation.issues.push('原始擷取驗收失敗');
                 if(workflow.id===8&&!(parsedJSON.sections||[]).some(x=>Array.isArray(x.evidence_ids)&&x.evidence_ids.length))validation.issues.push('澄清問題缺少可核對前提');
                 validation.status=validation.issues.length?'NEEDS_REVIEW':'CHECKS_PASSED';
                 validation.workflow_id=workflow.id;
                 validation.source_hashes=records.map(r=>r.evidence.sha256);
-                validation.app_version='2.5';validation.run_id=crypto.randomUUID();validation.generated_at=new Date().toISOString();
+                validation.app_version='2.6';validation.run_id=crypto.randomUUID();validation.generated_at=new Date().toISOString();
                 RFPReportState.latest=validation;RFPReportState.visibleReport=validation;
                 if(!validation.issues.length)RFPReportState.history.push(...validation.claims.map(c=>({...c,workflow_id:workflow.id})));
                 const banner=document.createElement('div');
@@ -1404,7 +1429,7 @@ const api={plan,apply};if(typeof module!=='undefined'&&module.exports)module.exp
             let wordContent = content.replace(/<div class="mt-2 mb-3 text-[11px].*?">.*?<b>/g, '<div class="conditions-box"><b>');
 
             const postHtml = "</body></html>";
-            const snapshotHtml='<script type="application/json" id="rfp-validation-snapshot">'+JSON.stringify(inspection||{status:'NOT_RUN',app_version:'2.5'}).replace(/</g,'\\u003c')+'<'+ '/script>';
+            const snapshotHtml='<script type="application/json" id="rfp-validation-snapshot">'+JSON.stringify(inspection||{status:'NOT_RUN',app_version:'2.6'}).replace(/</g,'\\u003c')+'<'+ '/script>';
             const html = preHtml + draftNotice + wordContent + snapshotHtml + postHtml;
 
             const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
