@@ -1,10 +1,8 @@
-V2 使用說明
-開啟HTML，使用Excel驗收區或官方RFP上傳入口。
-HTML與xlsx.full.min.js放在同一資料夾。
-Github Pages：把HTML改名index.html，與xlsx.full.min.js一起上傳；不要上傳RFP或證據JSON。
-
-已實測：官方Excel18筆公式與快取驗收；版本不同、空白填0、公式變更、缺表負向測試；Edge實際上傳；模擬API報告流程、07三項疑點附錄、錯誤ID／日期／單位／結構化主張衝突。
-
-檢查範圍限制：不是完整全文語意驗證。跨報告比較依AI提供的結構化claims key；不同key的語意相同主張未必能辨識。沒有claims的敘述不代表已完成一致性驗證。PDF抽文字不替代圖面／掃描OCR。實際Gemini及Firebase連線未驗證。
-
-有檢查問題時報告可在頁面閱覽，但Word匯出被阻擋。使用下載報告檢查JSON按鈕查看原因。API分析會依既有流程傳送資料，獨立驗收不需API。
+V2.1 來源接入修正
+兩個Excel上傳入口均會將證據加入正式RFP來源。主入口同名檔案重新上傳會替換舊紀錄。
+來源狀態顯示已接入份數。舊專案缺少evidenceRecord時，在AI呼叫前阻擋並提示重新上傳原始檔；不從舊文字猜造證據。
+重新上傳兩份PDF與原始Excel後，確認來源接入3份及Excel18/18。先生成07，再下載report_validation.json。
+AI若仍未提供證據ID，報告仍列待覆核，不自動配上猜測來源。
+本機Edge測試通過：兩個上傳入口、舊專案阻擋、新專案保存／還原、非空source_hashes及模擬API報告檢查。
+實際Gemini/Firebase線上連線未測試；mock API測試不代表模型每次都遵守引用要求。
+GitHub Pages上傳index.html與xlsx.full.min.js，不上傳RFP或測試資料。

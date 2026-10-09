@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TonyStudio RFP Intelligence Framework™</title>
+    <title>TonyStudio RFP Intelligence Framework™ V2.1</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  document.getElementById('auditUpload').addEventListener('change',async e=>{
   const file=e.target.files[0];if(!file)return;
   document.getElementById('auditStatus').textContent='正在讀取實際檔案與驗收…';
-  try{window.RFPAuditUI.record(await parse(file));}catch(err){document.getElementById('auditStatus').textContent='擷取失敗：'+err.message;results=[];window.RFPAuditUI.results=results;document.getElementById('downloadEvidence').disabled=true;document.getElementById('downloadTests').disabled=true;}
+  try{const record=await parse(file);window.RFPAuditUI.record(record);document.dispatchEvent(new CustomEvent('rfp-evidence-uploaded',{detail:{file,record}}));}catch(err){document.getElementById('auditStatus').textContent='擷取失敗：'+err.message;results=[];window.RFPAuditUI.results=results;document.getElementById('downloadEvidence').disabled=true;document.getElementById('downloadTests').disabled=true;}
  });
  document.getElementById('downloadEvidence').onclick=()=>download('extracted_evidence.json',results.length===1?results[0].evidence:results.map(r=>r.evidence));
  document.getElementById('downloadTests').onclick=()=>download('test_results.json',results.length===1?results[0].tests:results.map(r=>r.tests));
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                 <img src="https://firebasestorage.googleapis.com/v0/b/k16-tony-ai-wisdom-platform.firebasestorage.app/o/assets%2F6av64EOvvqQNAIoXqcPfHC5BBeF3%2F1785039560457_1.png?alt=media&token=19b27497-4101-4436-bc80-b299741b7984" alt="TonyStudio Logo" class="h-10 w-10 rounded-lg shadow-lg border border-slate-700 object-cover bg-white">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                        TonyStudio RFP Intelligence Framework™
+                        TonyStudio RFP Intelligence Framework™ V2.1
                     </h1>
                     <div class="text-xs text-slate-400 font-medium flex items-center gap-2 mt-0.5">
                         企業提案拆解與回應決策系統 (高精度回歸版)
@@ -541,6 +541,8 @@ document.addEventListener('DOMContentLoaded',()=>{
 
         let currentApiKey = localStorage.getItem('gemini_api_key') || '';
         let rfpParsedFiles = [], proposalParsedFiles = [];
+        const uploadEvidence = new WeakMap();
+        let sourceUploadBusy = false;
         let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。我已升級為來源擷取版本（AI報告尚待覆核），隨時可以幫您分析 RFP 檔案與 Excel 公式！" }] }];
         let currentProjectId = null;
         let currentProjectName = '未命名專案';
@@ -835,10 +837,12 @@ document.addEventListener('DOMContentLoaded',()=>{
                       cells.push({evidence_id:hash+':page:'+i,filename:file.name,page_number:i,raw_value:text});
                     }
                     const record={evidence:{filename:file.name,sha256:hash,source_id:hash,file_size_bytes:bytes.byteLength,cells,audit_findings:[],page_count:pdf.numPages},tests:{validation_status:'SOURCE_ONLY',validation_passed:false,tests_completed:0,scope:'PDF實際頁次與原文擷取，未完成全文語意驗證'}};
+                    uploadEvidence.set(file,record);
                     RFPAuditUI.record(record);
                     return JSON.stringify(record.evidence);
                 } else if (name.match(/\.(xlsx|xls)$/)) {
                     const record = await RFPAuditUI.parse(file);
+                    uploadEvidence.set(file,record);
                     RFPAuditUI.record(record);
                     if(record.tests.validation_status === 'TESTS_FAILED') throw new Error('Samsung版本擷取驗收失敗，請先下載測試JSON查核');
                     return RFPAuditUI.text(record);
@@ -849,6 +853,19 @@ document.addEventListener('DOMContentLoaded',()=>{
             return null;
         }
 
+        document.addEventListener('rfp-evidence-uploaded',e=>{
+            const {file,record}=e.detail;
+            uploadEvidence.set(file,record);
+            rfpParsedFiles=rfpParsedFiles.filter(x=>x.name!==file.name&&x.evidenceRecord?.evidence.sha256!==record.evidence.sha256);
+            rfpParsedFiles.push({name:file.name,text:JSON.stringify(record.evidence),evidenceRecord:record});
+            renderTags(rfpParsedFiles,ui.rfpTags,'removeRfpFile');
+            updateSharedEvidence();
+        });
+        function getSourceReadiness(){
+            const missing=rfpParsedFiles.filter(f=>!f.evidenceRecord?.evidence?.cells?.length).map(f=>f.name);
+            const records=rfpParsedFiles.map(f=>f.evidenceRecord).filter(r=>r?.evidence?.cells?.length);
+            return {ready:records.length>0&&missing.length===0,records,missing};
+        }
         function updateSharedEvidence() {
             RFPAuditUI.clear();
             for(const f of [...rfpParsedFiles,...proposalParsedFiles])if(f.evidenceRecord)RFPAuditUI.record(f.evidenceRecord);
@@ -866,24 +883,31 @@ document.addEventListener('DOMContentLoaded',()=>{
                 propText += '\n\n' + proposalParsedFiles.map(f => `--- [我方提案檔案: ${f.name}] ---\n${f.text}`).join('\n');
             }
             sharedEvidenceState.propText = propText;
+            const readiness=getSourceReadiness();
+            let el=document.getElementById('sourceReadiness');
+            if(!el){el=document.createElement('p');el.id='sourceReadiness';el.style.cssText='font-size:12px;white-space:pre-wrap';ui.rfpTags.after(el);}
+            el.textContent='來源接入：'+readiness.records.length+'份結構化來源；'+
+              (readiness.missing.length?'舊資料缺少證據，請重新上傳：'+readiness.missing.join('、'):readiness.ready?'可生成（內容仍待覆核）':'尚無結構化來源，請上傳原始PDF或Excel');
         }
 
         ui.fileUpload.addEventListener('change', async (e) => {
             const files = e.target.files; if(!files.length) return;
+            sourceUploadBusy=true;
             for(let f of files) {
                 const text = await extractTextFromFile(f);
-                if(text) rfpParsedFiles.push({ name: f.name, text, evidenceRecord: RFPAuditUI.results.find(x=>x.evidence.filename===f.name)||null });
+                if(text){const entry={name:f.name,text,evidenceRecord:uploadEvidence.get(f)||null};rfpParsedFiles=rfpParsedFiles.filter(x=>x.name!==f.name);rfpParsedFiles.push(entry);}
             }
             renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile'); 
             updateSharedEvidence();
             ui.fileUpload.value = '';
+            sourceUploadBusy=false;
         });
 
         ui.propUpload.addEventListener('change', async (e) => {
             const files = e.target.files; if(!files.length) return;
             for(let f of files) {
                 const text = await extractTextFromFile(f);
-                if(text) proposalParsedFiles.push({ name: f.name, text, evidenceRecord: RFPAuditUI.results.find(x=>x.evidence.filename===f.name)||null });
+                if(text) proposalParsedFiles.push({ name: f.name, text, evidenceRecord: uploadEvidence.get(f)||null });
             }
             renderTags(proposalParsedFiles, document.getElementById('proposalFileTagsContainer'), 'removePropFile'); 
             updateSharedEvidence();
@@ -1036,6 +1060,13 @@ document.addEventListener('DOMContentLoaded',()=>{
         ui.proposalContext.addEventListener('input', updateSharedEvidence);
 
         async function runAnalysis(workflow) {
+            if(sourceUploadBusy)return showDialog('檔案仍在解析，請稍候。','error');
+            updateSharedEvidence();
+            const sourceState=getSourceReadiness();
+            if(!sourceState.ready){
+              RFPReportState.latest={status:'SOURCE_NOT_READY',issues:sourceState.missing.length?sourceState.missing.map(n=>'舊專案檔案缺少結構化證據：'+n):['尚未接入原始PDF／Excel證據'],source_hashes:sourceState.records.map(r=>r.evidence.sha256),workflow_id:workflow.id};
+              return showDialog('來源證據未接入，尚未呼叫AI。'+(sourceState.missing.length?'請重新上傳：'+sourceState.missing.join('、'):'請上傳原始PDF或Excel。'),'error');
+            }
             if(RFPAuditUI.results.some(r => r.tests.validation_status === 'TESTS_FAILED')) return showDialog('擷取驗收失敗；請先檢查測試JSON。', 'error');
             if (isProcessing) return; 
             if (!currentApiKey) return showDialog('請先在左側步驟 2 輸入並儲存 API Key', 'error');
@@ -1061,6 +1092,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                 promptStr += `\n\n【我方提案與能力證明 (證據庫)】:\n(使用者尚未提供，若分析涉及合規或我方能力，請一律判定為「缺乏證據」或「待驗證」)`;
             }
 
+            promptStr += '\n【可選證據ID，必須填入evidence_ids，禁止空陣列】'+JSON.stringify(sourceState.records.flatMap(r=>r.evidence.cells.filter(c=>c.original_formula||c.page_number).map(c=>({id:c.evidence_id,sheet:c.sheet_name,cell:c.cell_address,page:c.page_number}))));
             promptStr += '\n【程式稽核發現，必須保留】'+JSON.stringify(rfpParsedFiles.flatMap(f=>f.evidenceRecord?.evidence.audit_findings||[]));
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${currentApiKey}`, {
