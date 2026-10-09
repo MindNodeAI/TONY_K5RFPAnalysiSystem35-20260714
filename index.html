@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TonyStudio RFP Intelligence Framework™ V2.3</title>
+    <title>TonyStudio RFP Intelligence Framework™ V2.4</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -162,6 +162,13 @@ function validate(report,records,history,samsung){
   s.source_location=refs.map(c=>c.page_number?'[檔案: '+c.filename+', 頁碼: '+c.page_number+']':'[工作表: '+c.sheet_name+', 儲存格: '+c.cell_address+']').join('；')||'內部建議或來源未完成';
   s.evidence_quote=refs.map(c=>c.original_formula||String(c.raw_value??c.cached_value??'空白')).join('\n');
   const text=[s.content,s.conditions,JSON.stringify(s.table||[])].join('\n');
+  if(samsung){
+    for(const row of s.table||[]){
+      const label=String(row['策略維度']||row['策略構面']||row['面向']||'');
+      if(/客戶要求/.test(label)&&/常駐|全職/.test(Object.values(row).join(' ')))issues.push(label+'：策略表格不能將常駐／全職當成官方要求');
+    }
+    if(/(?:需具備|必須配置|官方要求).{0,15}(?:4|四).{0,8}常駐/.test(text))issues.push(label+'：常駐程度未經官方確認');
+  }
   const formulaText=[s.content,s.conditions,...(s.table||[]).flatMap(row=>Object.values(row).filter(v=>typeof v==='string'))].join('\n');
   const formulas=formulaText.match(/=(?:'[^'\r\n]+'!\$?[A-Z]+\$?\d+|[A-Z]+\([^\)\r\n]*\)(?:\/\d+)?(?:\*\d+)?|[A-Z]+\d+(?:\*\d+)?)/g)||[];
   for(const f of formulas)if(!refs.some(c=>c.original_formula===f)&&!s.is_assumption)issues.push(label+'正文公式未由引用證據支持：'+f);
@@ -189,11 +196,11 @@ const api={validate};if(typeof module!=='undefined'&&module.exports)module.expor
 })(typeof window!=='undefined'?window:globalThis);
 </script>
 <script>
-window.RFPReportState={history:[],fingerprint:'',latest:null,visibleReport:null,app_version:'2.3'};
+window.RFPReportState={history:[],fingerprint:'',latest:null,visibleReport:null,app_version:'2.4'};
 window.getRFPRecords=function(){return RFPAuditUI.results;};
 window.downloadReportValidation=function(){
  const snapshot=RFPReportState.visibleReport||RFPReportState.latest;
- const data={app_version:'2.3',downloaded_at:new Date().toISOString(),... (snapshot||{status:'NOT_RUN',issues:['尚未完成本頁報告生成／檢查']}),current_sources:(typeof getSourceReadiness==='function'?getSourceReadiness().records:[]).map(r=>({filename:r.evidence.filename,sha256:r.evidence.sha256})),displayed_report_available:!!RFPReportState.visibleReport};
+ const data={app_version:'2.4',downloaded_at:new Date().toISOString(),... (snapshot||{status:'NOT_RUN',issues:['尚未完成本頁報告生成／檢查']}),current_sources:(typeof getSourceReadiness==='function'?getSourceReadiness().records:[]).map(r=>({filename:r.evidence.filename,sha256:r.evidence.sha256})),displayed_report_available:!!RFPReportState.visibleReport};
  const u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=u;a.download='report_validation.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
 };
@@ -201,6 +208,39 @@ document.addEventListener('DOMContentLoaded',()=>{
  const b=document.createElement('button');b.textContent='下載報告檢查 JSON';b.onclick=downloadReportValidation;
  document.getElementById('auditStatus').parentNode.appendChild(b);
 });
+</script>
+<script>(function(root){
+function plan(report,records){
+ const cells=records.flatMap(r=>r.evidence.cells||[]),byId=new Map(cells.map(c=>[c.evidence_id,c]));
+ return (report.sections||[]).map((s,i)=>{
+  const text=[s.content,s.conditions,...(s.table||[]).flatMap(row=>Object.values(row).filter(v=>typeof v==='string'))].join('\n');
+  const formulas=text.match(/=(?:'[^'\r\n]+'!\$?[A-Z]+\$?\d+|[A-Z]+\([^\)\r\n]*\)(?:\/\d+)?(?:\*\d+)?|[A-Z]+\d+(?:\*\d+)?)/g)||[];
+  const cited=(s.evidence_ids||[]).map(id=>byId.get(id)).filter(Boolean);
+  const candidates=[];
+  if(!s.is_assumption)for(const f of new Set(formulas)){
+   if(cited.some(c=>c.original_formula===f))continue;
+   let matches=cells.filter(c=>c.original_formula===f);
+   if(matches.length>1)matches=matches.filter(c=>text.includes(c.sheet_name+'!'+c.cell_address));
+   if(matches.length===1)candidates.push({evidence_id:matches[0].evidence_id,original_formula:f,sheet_name:matches[0].sheet_name,cell_address:matches[0].cell_address});
+  }
+  return {section_index:i,heading:s.heading,existing_ids:s.evidence_ids||[],candidates};
+ }).filter(p=>p.candidates.length);
+}
+function apply(report,proposal,repairPlan){
+ const copy=JSON.parse(JSON.stringify(report));const log=[];
+ for(const patch of proposal.patches||[]){
+  const p=repairPlan.find(x=>x.section_index===patch.section_index);
+  if(!p||!Array.isArray(patch.evidence_ids))continue;
+  const allowed=new Set([...p.existing_ids,...p.candidates.map(c=>c.evidence_id)]);
+  if(patch.evidence_ids.some(id=>!allowed.has(id))){log.push({section_index:p.section_index,status:'REJECTED_UNKNOWN_ID'});continue;}
+  const added=patch.evidence_ids.filter(id=>!p.existing_ids.includes(id));
+  copy.sections[p.section_index].evidence_ids=[...new Set([...p.existing_ids,...added])];
+  log.push({section_index:p.section_index,status:'APPLIED',added_ids:added});
+ }
+ return {report:copy,log};
+}
+const api={plan,apply};if(typeof module!=='undefined'&&module.exports)module.exports=api;root.RFPCitationRepair=api;
+})(typeof window!=='undefined'?window:globalThis);
 </script>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
@@ -211,7 +251,7 @@ document.addEventListener('DOMContentLoaded',()=>{
                 <img src="https://firebasestorage.googleapis.com/v0/b/k16-tony-ai-wisdom-platform.firebasestorage.app/o/assets%2F6av64EOvvqQNAIoXqcPfHC5BBeF3%2F1785039560457_1.png?alt=media&token=19b27497-4101-4436-bc80-b299741b7984" alt="TonyStudio Logo" class="h-10 w-10 rounded-lg shadow-lg border border-slate-700 object-cover bg-white">
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
-                        TonyStudio RFP Intelligence Framework™ V2.3
+                        TonyStudio RFP Intelligence Framework™ V2.4
                     </h1>
                     <div class="text-xs text-slate-400 font-medium flex items-center gap-2 mt-0.5">
                         企業提案拆解與回應決策系統 (高精度回歸版)
@@ -1135,20 +1175,41 @@ document.addEventListener('DOMContentLoaded',()=>{
                 if (!response.ok) throw new Error(`API 請求失敗: ${response.statusText}`);
                 const rawText = (await response.json()).candidates[0].content.parts[0].text;
                 
-                const parsedJSON = parseAIResponse(rawText);
+                let parsedJSON = parseAIResponse(rawText);
                 const records=rfpParsedFiles.map(f=>f.evidenceRecord).filter(Boolean);
                 const samsung=records.some(r=>r.evidence.sha256===RFPEvidenceAudit.BASELINE);
                 if(workflow.id===7){
                   const findings=records.flatMap(r=>r.evidence.audit_findings||[]);
                   if(findings.length)parsedJSON.sections.push({heading:'程式確認的公式疑點',content:findings.map(f=>f.reason).join('\n\n'),evidence_ids:findings.map(f=>f.evidence_id),is_assumption:false,claims:[]});
                 }
-                const validation=RFPReportValidator.validate(parsedJSON,records,RFPReportState.history,samsung);
+                let validation=RFPReportValidator.validate(parsedJSON,records,RFPReportState.history,samsung);
+                const repairPlan=RFPCitationRepair.plan(parsedJSON,records);
+                const citationRepair={attempted:false,attempts:0,before_issues:validation.issues.slice(),log:[],error:null};
+                if(repairPlan.length){
+                  citationRepair.attempted=true;citationRepair.attempts=1;
+                  document.getElementById('statusBadge').textContent='正在補齊引用並重新檢查（最多一次）';
+                  try{
+                    const repairResponse=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${currentApiKey}`,{
+                      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+                        system_instruction:{parts:[{text:'你只負責引用補齊。候選來源由程式根據原始公式逐字一致且定位唯一建立。只輸出JSON {"patches":[{"section_index":0,"evidence_ids":["候選ID"]}]}。只能選每區塊existing_ids及candidates內的ID。不要改写正文、公式、結論或新增ID。不能確認就不要選。'}]},
+                        contents:[{parts:[{text:JSON.stringify(repairPlan)}]}],generationConfig:{temperature:0,responseMimeType:'application/json',maxOutputTokens:4096}
+                      })});
+                    if(!repairResponse.ok)throw new Error('引用補齊API失敗：'+repairResponse.status);
+                    const repairData=await repairResponse.json();
+                    const proposed=parseAIResponse(repairData.candidates[0].content.parts[0].text);
+                    const fixed=RFPCitationRepair.apply(parsedJSON,proposed,repairPlan);
+                    parsedJSON=fixed.report;citationRepair.log=fixed.log;
+                    validation=RFPReportValidator.validate(parsedJSON,records,RFPReportState.history,samsung);
+                  }catch(repairError){citationRepair.error=repairError.message;}
+                }
+                citationRepair.after_issues=validation.issues.slice();
+                validation.citation_repair=citationRepair;
                 if(records.some(r=>r.tests.validation_status==='TESTS_FAILED'))validation.issues.push('原始擷取驗收失敗');
                 if(workflow.id===8&&!(parsedJSON.sections||[]).some(x=>Array.isArray(x.evidence_ids)&&x.evidence_ids.length))validation.issues.push('澄清問題缺少可核對前提');
                 validation.status=validation.issues.length?'NEEDS_REVIEW':'CHECKS_PASSED';
                 validation.workflow_id=workflow.id;
                 validation.source_hashes=records.map(r=>r.evidence.sha256);
-                validation.app_version='2.3';validation.run_id=crypto.randomUUID();validation.generated_at=new Date().toISOString();
+                validation.app_version='2.4';validation.run_id=crypto.randomUUID();validation.generated_at=new Date().toISOString();
                 RFPReportState.latest=validation;RFPReportState.visibleReport=validation;
                 if(!validation.issues.length)RFPReportState.history.push(...validation.claims.map(c=>({...c,workflow_id:workflow.id})));
                 const banner=document.createElement('div');
@@ -1333,7 +1394,7 @@ document.addEventListener('DOMContentLoaded',()=>{
             let wordContent = content.replace(/<div class="mt-2 mb-3 text-[11px].*?">.*?<b>/g, '<div class="conditions-box"><b>');
 
             const postHtml = "</body></html>";
-            const snapshotHtml='<script type="application/json" id="rfp-validation-snapshot">'+JSON.stringify(inspection||{status:'NOT_RUN',app_version:'2.3'}).replace(/</g,'\\u003c')+'<'+ '/script>';
+            const snapshotHtml='<script type="application/json" id="rfp-validation-snapshot">'+JSON.stringify(inspection||{status:'NOT_RUN',app_version:'2.4'}).replace(/</g,'\\u003c')+'<'+ '/script>';
             const html = preHtml + draftNotice + wordContent + snapshotHtml + postHtml;
 
             const blob = new Blob(['\ufeff', html], { type: 'application/msword' });

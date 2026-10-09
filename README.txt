@@ -1,1 +1,6 @@
-V2.2修正：保留畫面報告之檢查快照與run_id；來源變更標示STALE_SOURCE；JSON包含版本、實際來源及問題。未通過可匯出待覆核草稿，檔名及首頁均標記，不代表驗證通過。Edge實測上傳、還原、模擬API生成、來源變更、診斷下載及Word草稿匯出通過。真實AI與Firebase連線未實測。部署index.html與xlsx.full.min.js，不上傳RFP。
+V2.4更新
+漏引公式若與原始證據逐字相同且定位唯一，建立候選ID並向AI要求補齊；最多增加一次API請求。只接受候選中的ID，只改evidence_ids，不改正文或原始公式。補齊後重跑驗證。失敗或不確定仍為待覆核草稿。
+檢查JSON增加citation_repair，記錄補齊前後問題、嘗試次數、接受／拒絕ID及錯誤。
+策略表格中的「客戶要求常駐／全職」也會被標記，不能靠is_assumption略過。
+已通過本機單元測試與Edge模擬API整合測試。實際Gemini連線與回覆尚未實測；每次報告仍需內容覆核。
+部署index.html及xlsx.full.min.js，重新整理確認頁首V2.4。先跑07及下載檢查JSON。不要上傳RFP至GitHub。
