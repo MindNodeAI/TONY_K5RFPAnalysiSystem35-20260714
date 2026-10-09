@@ -365,18 +365,17 @@
 【絕對禁忌與強制規則】(違反將導致系統崩潰，請嚴格遵守)：
 1. 來源定位必填 (Source Location)：每一項主張、證據，必須提取文本中的 [頁碼: X] 或 [工作表: Y, 儲存格: Z]。嚴禁 LLM 自行發明頁碼。若文本中無標示，請填寫「來源定位未完成」。
 2. Excel 實際公式稽核：注意 Excel 中「文字宣稱」與「實際公式 (如 =SUM)」的差異。若合計漏列 (如 G10 漏了 G9)、跨表引用空白、或者未稅/含稅混用，必須標示為 warning。不因公式可執行就判定語意正確。
-   - 特例：若讀到 AVERAGE(D52,F52,H52)*700，代表官方已有加權，只能建議「待確認的替代基準」，不可說公式不存在。
-   - 特例：若讀到 SUM(I172:I172)，不可擅自修正，需標示「語意疑點(可能僅含稅)」。
-3. 嚴防數量假警報：必須先進行數學驗證。例如看到「SES招牌234+燈箱234+地板232」，驗算等於700，若工作表寫「2 Years Estimate (SES) 700件」，這就是完全吻合，絕對不准說數量矛盾。
-4. 繼承條件與例外 (Conditions)：摘要、規則不得丟失「例外條件」、「特定時間」、「適用範圍」、「單位/幣別」。(例如：保險日期 7/19~7/24 絕對不可擴大解釋為施工期限)。
-5. 評分比例分母：每個百分比必須明列「所屬區塊及計算基準」(例如：Experience 轄下 15%)。保持原表級距 (如 100/50/0)，未公佈總和權重就是未公佈，不可擅自湊 100%。
-6. 澄清問題過濾：問題必須是「真正影響成本/時程/合規的缺漏」，不可將系統解析失敗當成問題，排除可由現有公式自行計算的假問題。
-7. Win Theme 策略深度：必須符合架構：客戶要求 → 買方價值 → 我方證據 → 交付方法 → 成本代價 → 待驗證條件。
-8. 嚴禁預測與混淆：不可混淆投標方與競品，無證據時不可捏造競品弱點。不准產出虛構得標勝率。
-9. 語氣嚴謹：保留 try to answer, may be 等非保證語氣，不可擅自轉為「立即具法律約束力」。
+3. 繼承條件與例外 (Conditions)：摘要、規則不得丟失「例外條件」、「特定時間」、「適用範圍」、「單位/幣別」。(例如：100cm 有例外時，不可簡化為無例外門檻)。
+4. 評分比例分母：每個百分比必須明列「所屬區塊及計算基準」(例如：Experience 轄下 15%)。保持原表級距 (如 100/50/0)，不擅自改為 100% 滿分。
+5. 澄清問題過濾：問題必須是「真正影響成本/時程/合規的缺漏」，不可將系統解析失敗當成問題，排除可自行計算的假問題。
+6. Win Theme 策略深度：必須符合架構：客戶要求 → 買方價值 → 我方證據 → 交付方法 → 成本代價 → 待驗證條件。
+7. 嚴禁預測與混淆：不可發明總和權重 (未公佈就是未公佈)，不可混淆投標方與競品，無證據時不可捏造競品弱點。不准產出虛構得標勝率。
+8. 語氣嚴謹：保留 try to answer, may be 等非保證語氣，不可擅自轉為「立即具法律約束力」。
 
-【輸出格式嚴格限制】
-你必須「僅」輸出一個合法的 JSON 字串。絕對不可包含任何 Markdown 代碼塊標記 (\`\`\`json 等)，也不要加上問候語。
+【輸出格式嚴格限制與 JSON 防崩潰警告】
+你必須「僅」輸出一個合法的 JSON 字串。
+⚠️ 致命警告：所有的字串內容 (content, summary 等) 絕對不可以包含「真實的換行符號 (Raw Newline)」。若需要換行排版，必須且只能使用轉義字元「\\n」。若夾帶真實換行將導致系統崩潰！
+嚴禁包含任何 Markdown 代碼塊標記 (\`\`\`json 等)，也不要加上問候語。
 
 【JSON 結構】
 {
@@ -475,12 +474,11 @@
             document.getElementById('aboutModal').classList.remove('flex');
         };
 
-        // 終極 JSON 防崩潰攔截網
         function parseAIResponse(text) {
             try {
                 return JSON.parse(text); 
             } catch (err) {
-                console.warn("初次 JSON 解析失敗，啟動容錯機制...", err);
+                console.warn("初次 JSON 解析失敗，啟動字串級別自癒修復機制...", err);
                 try {
                     let cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
                     const startIdx = cleanText.indexOf('{');
@@ -488,30 +486,51 @@
                     
                     if (startIdx !== -1 && endIdx !== -1 && startIdx <= endIdx) {
                         cleanText = cleanText.substring(startIdx, endIdx + 1);
-                        // 暴力修復 LLM 未跳脫的換行符號
-                        cleanText = cleanText.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t");
-                        return JSON.parse(cleanText);
-                    }
-                } catch (fatalErr) {
-                    console.error("JSON 深度修復失敗:", fatalErr);
-                }
-                
-                // 終極 Fallback：絕對不報錯崩潰，將破裂的純文字塞入合法物件回傳
-                console.warn("啟動終極 Fallback 渲染模式");
-                return {
-                    report_title: "⚠️ 報告格式解析異常 (已啟動容錯顯示)",
-                    summary: "AI 產生的內容夾帶了非預期的控制字元或換行，導致無法轉譯為完美表格。系統已自動攔截崩潰，並將原始分析結果完整擷取如下，確保您的資料絕不遺失：",
-                    sections: [
-                        {
-                            heading: "AI 原始分析結果",
-                            alert_type: "warning",
-                            content: "```text\n" + text + "\n```",
-                            source_location: "系統層級攔截",
-                            conditions: "強制純文字容錯顯示模式",
-                            is_assumption: false
+                        
+                        // 狀態機：專門修復被 LLM 夾帶在字串值內部的真實換行符號
+                        let isInsideString = false;
+                        let isEscaped = false;
+                        let repaired = "";
+                        for (let i = 0; i < cleanText.length; i++) {
+                            const char = cleanText[i];
+                            if (char === '"' && !isEscaped) {
+                                isInsideString = !isInsideString;
+                                repaired += char;
+                            } else if (char === '\\') {
+                                isEscaped = !isEscaped;
+                                repaired += char;
+                            } else {
+                                isEscaped = false;
+                                if (isInsideString) {
+                                    if (char === '\n') repaired += "\\n";
+                                    else if (char === '\r') repaired += "\\r";
+                                    else if (char === '\t') repaired += "\\t";
+                                    else repaired += char;
+                                } else {
+                                    repaired += char;
+                                }
+                            }
                         }
-                    ]
-                };
+                        return JSON.parse(repaired);
+                    }
+                    throw new Error("無法定位 JSON 定界符");
+                } catch (fatalErr) {
+                    console.error("JSON 深度修復失敗:", fatalErr, text);
+                    return {
+                        report_title: "⚠️ 報告格式解析異常 (已啟動容錯顯示)",
+                        summary: "AI 產生的內容夾帶了非預期的控制字元或換行，導致無法轉譯為完美表格。系統已自動攔截崩潰，並將原始分析結果完整擷取如下，確保您的資料絕不遺失：",
+                        sections: [
+                            {
+                                heading: "AI 原始分析結果",
+                                alert_type: "warning",
+                                content: "\`\`\`text\n" + text + "\n\`\`\`",
+                                source_location: "系統層級攔截",
+                                conditions: "強制純文字容錯顯示模式",
+                                is_assumption: false
+                            }
+                        ]
+                    };
+                }
             }
         }
 
@@ -1100,9 +1119,15 @@
             const html = preHtml + wordContent + postHtml;
 
             const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
-            let projectName = document.getElementById('currentProjectDisplayMain').textContent.trim();
-            if(projectName === '未命名專案') projectName = 'TonyStudio';
-            const filename = projectName + '_RFP戰略分析報告.doc';
+            
+            // 抓取報告標題作為檔名，若無則使用預設名稱
+            const titleElement = document.querySelector('#resultContent h1');
+            let reportTitle = 'RFP戰略分析報告';
+            if (titleElement && titleElement.textContent.trim() !== '') {
+                // 移除檔名不合法字元
+                reportTitle = titleElement.textContent.trim().replace(/[\\/:*?"<>|]/g, '_');
+            }
+            const filename = reportTitle + '.doc';
             
             const downloadLink = document.createElement("a");
             document.body.appendChild(downloadLink);
