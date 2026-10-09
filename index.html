@@ -15,7 +15,90 @@
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     </script>
     <!-- SheetJS for Excel Parsing (cellFormula support) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="xlsx.full.min.js"></script>
+<script>(function(root){
+'use strict';
+const BASELINE='47bfb455aa268df8894062b722f3131fa3687ff51c315b47e3231b2c82c31add';
+const cases=[
+ ['總表','G5',"='1.SES新莊宏匯'!I88"],
+ ['總表','G8',"='4.日常維護'!I52+'4.日常維護'!I53+'4.日常維護'!I54"],
+ ['總表','G10','=SUM(G5:G8)'],['總表','G17',"='6.Special Project_SES高雄夢時代'!I56"],['總表','E10','=SUM(E5:E9)'],
+ ['1.SES新莊宏匯','I85','=SUM(H10:H84)'],['1.SES新莊宏匯','I88','=I85*20'],
+ ['5.SESL微風南山體驗區','I171','=SUM(I169)'],['5.SESL微風南山體驗區','I173','=SUM(I172:I172)'],['5.SESL微風南山體驗區','I174','=I171*4'],['5.SESL微風南山體驗區','A76',null],
+ ['4.日常維護','I52','=(I10+I17+I24)/3*700'],['4.日常維護','D52',null],['4.日常維護','F52',null],['4.日常維護','H52',null],
+ ['6.Special Project_SES高雄夢時代','I56',null],['6.Special Project_SES高雄夢時代','I72','=SUM(H11:H71)'],['6.Special Project_SES高雄夢時代','I74','=SUM(I72:I73)']
+];
+function readCell(wb,sheet,address){
+ const ws=wb.Sheets[sheet],c=ws&&ws[address];
+ const f=c&&typeof c.f==='string'?'='+c.f:null;
+ const v=c&&c.v!==undefined?c.v:null;
+ const state=!ws?'MISSING_SHEET':!c?'ABSENT':f!==null?(v===null?'FORMULA_CACHE_MISSING':v===0?'FORMULA_CACHE_ZERO':'FORMULA_CACHE_VALUE'):v===null?'BLANK':v===''?'EMPTY_STRING':v===0?'VALUE_ZERO':'VALUE';
+ return {sheet_name:sheet,cell_address:address,cell_type:c?c.t||null:null,original_formula:f,cached_value:v,display_text:c&&c.w!==undefined?c.w:null,data_status:state};
+}
+function extract(wb,meta){
+ const cells=[];const seen=new Set();
+ function add(s,a){const id=s+'!'+a;if(seen.has(id))return;seen.add(id);cells.push({evidence_id:meta.sha256+':'+id,...readCell(wb,s,a)});}
+ for(const s of wb.SheetNames)for(const a of Object.keys(wb.Sheets[s]||{}))if(!a.startsWith('!'))add(s,a);
+ for(const [s,a] of cases)add(s,a);
+ const version=meta.sha256===BASELINE;
+ const tests=version?cases.map(([s,a,f])=>{
+  const actual=readCell(wb,s,a),expected=f===null?null:0;
+  const fp=actual.data_status!=='MISSING_SHEET'&&actual.original_formula===f;
+  const vp=actual.cached_value===expected;
+  return {sheet:s,cell:a,expected_formula:f,actual_formula:actual.original_formula,expected_cached_value:expected,actual_cached_value:actual.cached_value,formula_passed:fp,cached_value_passed:vp,result:fp&&vp?'PASS':'FAIL'};
+ }):[];
+ const pass=version&&tests.length===18&&tests.every(t=>t.result==='PASS');
+ const findings=[];
+ if(version){
+  for(const [s,a,f,reason] of [
+   ['總表','G10','=SUM(G5:G8)','範圍未包含G9；若旨在彙總五類工程費，是否應納入需官方確認。'],
+   ['總表','G17',"='6.Special Project_SES高雄夢時代'!I56",'引用I56；其值與公式均空白，目標位置需官方確認。'],
+   ['5.SESL微風南山體驗區','I173','=SUM(I172:I172)','Total Amount只引用稅額I172；I174引用I171，不能宣稱此疑點傳入兩年估算。']
+  ])if(readCell(wb,s,a).original_formula===f)findings.push({evidence_id:meta.sha256+':'+s+'!'+a,original_formula:f,reason,status:'NEEDS_OFFICIAL_REVIEW'});
+ }
+ return {evidence:{schema_version:1,...meta,worksheet_names:wb.SheetNames,worksheet_count:wb.SheetNames.length,cells,audit_findings:findings,recalculated:false},tests:{...meta,baseline_sha256:BASELINE,validation_scope:'Samsung指定版本18筆公式及快取／空白值；不是整份報告正確性驗證',version_match:version,validation_passed:pass,validation_status:version?(pass?'SUCCESS':'TESTS_FAILED'):'NOT_APPLICABLE',tests_completed:tests.length,tests}};
+}
+const api={extract,readCell,BASELINE};
+if(typeof module!=='undefined'&&module.exports)module.exports=api;
+root.RFPEvidenceAudit=api;
+})(typeof window!=='undefined'?window:globalThis);
+</script>
+<script>(function(){
+let results=[];
+async function parse(file){
+ if(typeof XLSX==='undefined')throw new Error('SheetJS未載入，請將xlsx.full.min.js放在HTML同一資料夾。');
+ if(!crypto.subtle)throw new Error('此瀏覽器環境不能計算SHA256；請改用localhost或支援的瀏覽器。');
+ const bytes=await file.arrayBuffer();
+ const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).map(x=>x.toString(16).padStart(2,'0')).join('');
+ const wb=XLSX.read(bytes,{type:'array',cellFormula:true});
+ return RFPEvidenceAudit.extract(wb,{filename:file.name,source_id:hash,sha256:hash,file_size_bytes:bytes.byteLength,parser_version:XLSX.version,extracted_at:new Date().toISOString()});
+}
+function download(name,data){
+ const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function show(){
+ const text=results.map(r=>r.evidence.filename+'：'+r.tests.validation_status+'；完成 '+r.tests.tests_completed+'/18；SHA256 '+r.evidence.sha256).join('\n');
+ document.getElementById('auditStatus').textContent=text||'尚未執行。驗收只涵蓋Samsung指定版本18筆資料，不代表報告已驗證。';
+ document.getElementById('downloadEvidence').disabled=!results.length;
+ document.getElementById('downloadTests').disabled=!results.length;
+}
+window.RFPAuditUI={parse,results,record(r){results=results.filter(x=>x.evidence.sha256!==r.evidence.sha256);results.push(r);window.RFPAuditUI.results=results;show();},clear(){results=[];window.RFPAuditUI.results=results;show();},text(r){return JSON.stringify(r.evidence);}};
+document.addEventListener('DOMContentLoaded',()=>{
+ const box=document.createElement('section');box.className='glass-panel rounded-xl p-4 shadow-sm border border-blue-200';
+ box.innerHTML='<h2 class="text-sm font-bold mb-2">Excel 原始證據擷取與版本驗收</h2><p class="text-xs mb-2">獨立本機擷取，不需要API金鑰。其他版本可擷取，但不套用Samsung驗收。</p><input id="auditUpload" type="file" accept=".xlsx,.xls"><pre id="auditStatus" style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;margin:12px 0"></pre><button id="downloadEvidence" disabled>下載證據 JSON</button>　<button id="downloadTests" disabled>下載測試 JSON</button>';
+ document.querySelector('main > div').prepend(box);
+ document.getElementById('auditUpload').addEventListener('change',async e=>{
+  const file=e.target.files[0];if(!file)return;
+  document.getElementById('auditStatus').textContent='正在讀取實際檔案與驗收…';
+  try{window.RFPAuditUI.record(await parse(file));}catch(err){document.getElementById('auditStatus').textContent='擷取失敗：'+err.message;results=[];window.RFPAuditUI.results=results;document.getElementById('downloadEvidence').disabled=true;document.getElementById('downloadTests').disabled=true;}
+ });
+ document.getElementById('downloadEvidence').onclick=()=>download('extracted_evidence.json',results.length===1?results[0].evidence:results.map(r=>r.evidence));
+ document.getElementById('downloadTests').onclick=()=>download('test_results.json',results.length===1?results[0].tests:results.map(r=>r.tests));
+ show();
+});
+})();
+</script>
     <!-- Marked.js for Markdown Parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -395,7 +478,7 @@
 
         let currentApiKey = localStorage.getItem('gemini_api_key') || '';
         let rfpParsedFiles = [], proposalParsedFiles = [];
-        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。我已升級為高精度來源追溯版本，隨時可以幫您分析 RFP 檔案與 Excel 公式！" }] }];
+        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。我已升級為來源擷取版本（AI報告尚待覆核），隨時可以幫您分析 RFP 檔案與 Excel 公式！" }] }];
         let currentProjectId = null;
         let currentProjectName = '未命名專案';
         let isProcessing = false;
@@ -688,42 +771,10 @@
                     }
                     return text;
                 } else if (name.match(/\.(xlsx|xls)$/)) {
-                    const wb = XLSX.read(await file.arrayBuffer(), {type: 'array', cellFormula: true});
-                    let result = `總工作表數量: ${wb.SheetNames.length}\n`;
-                    wb.SheetNames.forEach(sn => {
-                        result += `\n\n=== [工作表: ${sn}] ===\n`;
-                        const sheet = wb.Sheets[sn];
-                        // 逐格掃描
-                        for (const z in sheet) {
-                            if(z[0] === '!') continue;
-                            const cell = sheet[z];
-                            if(cell) {
-                                let cellInfo = `[工作表: ${sn}, 儲存格: ${z}] `;
-                                let hasData = false;
-                                
-                                if (cell.w !== undefined && cell.w !== "") { 
-                                    cellInfo += `顯示文字(w)="${cell.w}" `; 
-                                    hasData = true; 
-                                }
-                                if (cell.v !== undefined && cell.v !== "") { 
-                                    cellInfo += `快取值(v)="${cell.v}" `; 
-                                    hasData = true; 
-                                }
-                                if (cell.f !== undefined && cell.f !== "") { 
-                                    cellInfo += `實際公式(f)="=${cell.f}" `; 
-                                    hasData = true; 
-                                }
-                                
-                                if (hasData) {
-                                    result += cellInfo + '\n';
-                                } else {
-                                    // 儲存格存在但空白
-                                    result += cellInfo + `狀態="輸入尚未填寫(空白)"\n`;
-                                }
-                            }
-                        }
-                    });
-                    return result;
+                    const record = await RFPAuditUI.parse(file);
+                    RFPAuditUI.record(record);
+                    if(record.tests.validation_status === 'TESTS_FAILED') throw new Error('Samsung版本擷取驗收失敗，請先下載測試JSON查核');
+                    return RFPAuditUI.text(record);
                 }
             } catch (err) { 
                 showDialog(`解析檔案失敗: ${err.message}`, 'error'); 
@@ -795,6 +846,7 @@
         }
 
         function resetWorkspace() {
+            RFPAuditUI.clear();
             currentProjectId = null; 
             currentProjectName = '未命名專案'; 
             document.getElementById('currentProjectDisplayMain').textContent = currentProjectName;
@@ -912,6 +964,7 @@
         ui.proposalContext.addEventListener('input', updateSharedEvidence);
 
         async function runAnalysis(workflow) {
+            if(RFPAuditUI.results.some(r => r.tests.validation_status === 'TESTS_FAILED')) return showDialog('擷取驗收失敗；請先檢查測試JSON。', 'error');
             if (isProcessing) return; 
             if (!currentApiKey) return showDialog('請先在左側步驟 2 輸入並儲存 API Key', 'error');
             
@@ -961,7 +1014,7 @@
                 ui.resultContent.classList.remove('hidden');
                 setTimeout(() => ui.resultContent.classList.remove('opacity-0'), 50);
                 
-                document.getElementById('statusBadge').textContent = '分析完成'; 
+                document.getElementById('statusBadge').textContent = 'AI草稿完成（內容尚待覆核）'; 
                 document.getElementById('statusBadge').className = 'px-2 py-1 bg-green-100 text-green-700 text-[10px] rounded font-medium border border-green-200';
                 
                 document.getElementById('exportWordBtn').classList.remove('hidden');
