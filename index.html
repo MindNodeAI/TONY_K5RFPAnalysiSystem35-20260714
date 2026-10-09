@@ -67,7 +67,6 @@
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
 
-    <!-- 導覽列 -->
     <header class="bg-slate-900 text-white shadow-md border-b border-slate-800 relative z-50 w-full">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-4">
@@ -77,7 +76,7 @@
                         TonyStudio RFP Intelligence Framework™
                     </h1>
                     <div class="text-xs text-slate-400 font-medium flex items-center gap-2 mt-0.5">
-                        企業提案拆解與回應決策系統 (高精度回歸防禦版)
+                        企業提案拆解與回應決策系統 (高精度回歸版)
                         <span class="bg-slate-800 text-blue-300 text-[10px] px-1.5 py-0.5 rounded border border-slate-700 shadow-sm flex items-center gap-1">
                             <i class="fa-solid fa-bolt text-yellow-400"></i> gemini-3.8-flash
                         </span>
@@ -102,7 +101,6 @@
         </div>
     </header>
 
-    <!-- 內容主體 -->
     <main class="container mx-auto px-4 py-6 flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
         
         <!-- 左側面板：輸入與控制項 -->
@@ -186,7 +184,6 @@
             </div>
         </div>
 
-        <!-- 右側面板：結果顯示區 -->
         <div class="lg:col-span-8 flex flex-col min-h-[600px] lg:h-[calc(100vh-90px)] lg:sticky lg:top-20">
             <div class="glass-panel rounded-xl shadow-sm flex flex-col h-full overflow-hidden border border-slate-200 bg-white">
                 
@@ -205,12 +202,12 @@
                 <div class="p-6 overflow-y-auto flex-grow relative bg-white" id="resultContainer">
                     <div id="emptyState" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center">
                         <i class="fa-solid fa-shield-halved text-4xl text-slate-200 mb-3"></i>
-                        <h3 class="text-sm font-medium text-slate-600">高精度證據導向分析 (底層防禦版)</h3>
+                        <h3 class="text-sm font-medium text-slate-600">高精度證據導向分析 (第3輪優化)</h3>
                         <p class="text-xs max-w-sm mt-2 leading-relaxed">
-                            ✔️ 內建防破裂自癒 JSON 系統 (終極 Fallback)<br>
-                            ✔️ 強制保留 PDF 頁碼與 Excel 儲存格座標<br>
-                            ✔️ 內建 Excel 實際公式(f) 與快取值(v) 隔離稽核<br>
-                            ✔️ 嚴防數量假警報與日期誤判
+                            ✔️ 嚴格底層 Excel 公式擷取與快取值分離 (f,v,w)<br>
+                            ✔️ 內建防 JSON 崩潰與引號自癒保護網<br>
+                            ✔️ 全面繼承 RFP 例外條件與禁止亂加總<br>
+                            ✔️ 匯出 Word 檔名自動同步報告主題
                         </p>
                     </div>
                     <div id="loadingState" class="absolute inset-0 flex flex-col items-center justify-center text-blue-500 p-8 text-center hidden bg-white/95 z-10">
@@ -228,7 +225,6 @@
         <p>&copy; 2020 TonyStudio. 本學習平台由 TONY 楊文澤資深AI科技顧問設計. All Rights Reserved.</p>
     </footer>
 
-    <!-- 關於顧問 Modal -->
     <div id="aboutModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex-col items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
             <div class="bg-slate-900 px-5 py-4 border-b border-slate-800 flex justify-between items-center">
@@ -331,7 +327,6 @@
         </div>
     </div>
 
-    <!-- 浮動聊天室 -->
     <div id="chatbot-container" class="fixed bottom-6 right-6 bg-white rounded-xl shadow-2xl border border-slate-200 flex flex-col transition-shadow z-[9990]" style="display: flex; height: 50px; width: 380px;">
         <div id="chatResizer" class="absolute top-0 left-0 w-6 h-6 cursor-nwse-resize z-50 flex items-start justify-start opacity-50 hover:opacity-100 bg-slate-800 rounded-br-lg rounded-tl-xl transition-opacity">
             <i class="fa-solid fa-up-right-and-down-left-from-center text-[10px] text-white m-1"></i>
@@ -360,22 +355,25 @@
     </div>
 
     <script>
-        const SYSTEM_PROMPT = `你是 TonyStudio 首席標案分析師，負責極度嚴謹的 RFP 分析。
+        const SYSTEM_PROMPT = `你是 TonyStudio 首席標案分析師，負責極度嚴謹的 RFP 拆解與分析。
 
 【絕對禁忌與強制規則】(違反將導致系統崩潰，請嚴格遵守)：
-1. 來源定位必填 (Source Location)：每一項主張、證據，必須提取文本中的 [頁碼: X] 或 [工作表: Y, 儲存格: Z]。嚴禁 LLM 自行發明頁碼。若文本中無標示，請填寫「來源定位未完成」。
-2. Excel 實際公式稽核：注意 Excel 中「文字宣稱」與「實際公式 (如 =SUM)」的差異。若合計漏列 (如 G10 漏了 G9)、跨表引用空白、或者未稅/含稅混用，必須標示為 warning。不因公式可執行就判定語意正確。
-3. 繼承條件與例外 (Conditions)：摘要、規則不得丟失「例外條件」、「特定時間」、「適用範圍」、「單位/幣別」。(例如：100cm 有例外時，不可簡化為無例外門檻)。
-4. 評分比例分母：每個百分比必須明列「所屬區塊及計算基準」(例如：Experience 轄下 15%)。保持原表級距 (如 100/50/0)，不擅自改為 100% 滿分。
-5. 澄清問題過濾：問題必須是「真正影響成本/時程/合規的缺漏」，不可將系統解析失敗當成問題，排除可自行計算的假問題。
-6. Win Theme 策略深度：必須符合架構：客戶要求 → 買方價值 → 我方證據 → 交付方法 → 成本代價 → 待驗證條件。
-7. 嚴禁預測與混淆：不可發明總和權重 (未公佈就是未公佈)，不可混淆投標方與競品，無證據時不可捏造競品弱點。不准產出虛構得標勝率。
-8. 語氣嚴謹：保留 try to answer, may be 等非保證語氣，不可擅自轉為「立即具法律約束力」。
+1. 來源定位必填：每一項主張、證據，必須提取文本中的 [頁碼: X] 或 [工作表: Y, 儲存格: Z]。嚴禁 LLM 自行發明頁碼與座標。
+2. 數學與公式稽核 (Excel防呆)：
+   - 若遇到加總運算 (如 234+234+232=700，若加上 STS 的 120 即為 820)，必須先驗算。若官方總和正確，嚴禁判定為數量矛盾。
+   - 若發現公式未包含相鄰列 (例如總表 G10 公式僅 =SUM(G5:G8)，漏列 G9)，請標示「範圍未包含 G9，是否應納入需官方確認」，絕不准擅自修改官方公式或宣稱官方公式出錯。
+   - 單純的跨表或跨格引用 (如 =I169 或 =I171*4) 不是重複累加，請如實呈現並視為正常參照。
+3. 繼承條件與例外：摘要、規則不得丟失「例外條件」、「特定時間」。保險日期 (如 7/19~7/24) 絕對不可當成施工期限！
+4. 評分比例分母：每個百分比必須明列「所屬區塊及計算基準」。若未給定總和權重，標示為未公佈，不可自行計算湊滿 100%。
+5. Win Theme 策略深度：必須符合架構：客戶要求 → 買方價值 → 我方證據 → 交付方法 → 成本代價 → 待驗證條件。
+6. 嚴禁發明與預測：不可混淆投標方與競品，無證據時不可捏造競品弱點。不准產出虛構得標勝率。
+7. 分類矩陣客觀化：左側專案總額、右側 6 大 Area 是不同維度的矩陣填報，請指出它們「未防呆連動」，不要直接宣稱架構衝突。
 
-【輸出格式嚴格限制與 JSON 防崩潰警告】
-你必須「僅」輸出一個合法的 JSON 字串。
-⚠️ 致命警告：所有的字串內容 (content, summary 等) 絕對不可以包含「真實的換行符號 (Raw Newline)」。若需要換行排版，必須且只能使用轉義字元「\\n」。若夾帶真實換行將導致系統崩潰！
-嚴禁包含任何 Markdown 代碼塊標記 (\`\`\`json 等)，也不要加上問候語。
+【JSON 語法嚴格防線 (崩潰警告)】
+這是最重要的一點！你輸出的 JSON 絕對不能讓系統崩潰：
+1. 字串內嚴禁使用「真實換行符號(Enter)」，所有換行請務必寫成 \\n！
+2. 字串內容中若需使用引號，請全面改用單引號 ' 或全形雙引號 「」，絕對禁止在 JSON 值裡面使用未跳脫的雙引號 "！
+3. 陣列或物件的最後一個元素後方，絕對不可加上逗號 (Trailing comma)。
 
 【JSON 結構】
 {
@@ -384,11 +382,11 @@
   "sections": [
     {
       "heading": "區塊標題",
-      "alert_type": "none | warning (合約/時程/公式漏列風險) | strategy (勝選主軸) | success (加分項) | finance (財務/Excel稽核)",
-      "content": "詳細內容說明 (支援 Markdown)。",
-      "evidence_quote": "支持此論點的 RFP 原文擷取片段。若為推論填空字串。",
-      "source_location": "[頁碼: X] 或 [工作表: Y, 儲存格 Z]。嚴禁憑空捏造，定位失敗請填寫「來源定位未完成」。多個來源請分別列出。",
-      "conditions": "適用的條件分支、例外、範圍 (例如: 僅限夜間 21:00-04:00、受限時替代)。若無請填空字串。",
+      "alert_type": "none | warning | strategy | success | finance",
+      "content": "詳細內容說明 (支援 Markdown)。嚴禁真實換行，請用 \\n。",
+      "evidence_quote": "支持此論點的 RFP 原文擷取片段。",
+      "source_location": "[頁碼: X] 或 [工作表: Y, 儲存格 Z]。定位失敗請填寫「來源定位未完成」。",
+      "conditions": "適用的條件分支、例外、範圍。",
       "is_assumption": true/false,
       "table": [ { "欄位A": "值A" } ]
     }
@@ -397,10 +395,16 @@
 
         let currentApiKey = localStorage.getItem('gemini_api_key') || '';
         let rfpParsedFiles = [], proposalParsedFiles = [];
-        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。我已升級為高精度來源追溯版本，內建 Node.js 級別的防崩潰 JSON 處理與 Excel (f,v,w) 三維度解析器，隨時可以幫您分析 RFP 檔案與公式！" }] }];
+        let chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問。我已升級為高精度來源追溯版本，隨時可以幫您分析 RFP 檔案與 Excel 公式！" }] }];
         let currentProjectId = null;
         let currentProjectName = '未命名專案';
         let isProcessing = false;
+        
+        // 跨報告共用證據池
+        let sharedEvidenceState = {
+            rfpText: "",
+            propText: ""
+        };
 
         const ui = {
             apiKeyInput: document.getElementById('apiKeyInput'),
@@ -474,67 +478,41 @@
             document.getElementById('aboutModal').classList.remove('flex');
         };
 
+        // 終極防崩潰 JSON 解析器
         function parseAIResponse(text) {
+            let cleanText = text;
             try {
-                return JSON.parse(text); 
-            } catch (err) {
-                console.warn("初次 JSON 解析失敗，啟動字串級別自癒修復機制...", err);
-                try {
-                    let cleanText = text.replace(/```json/gi, '').replace(/```/g, '').trim();
-                    const startIdx = cleanText.indexOf('{');
-                    const endIdx = cleanText.lastIndexOf('}');
-                    
-                    if (startIdx !== -1 && endIdx !== -1 && startIdx <= endIdx) {
-                        cleanText = cleanText.substring(startIdx, endIdx + 1);
-                        
-                        // 狀態機：專門修復被 LLM 夾帶在字串值內部的真實換行符號
-                        let isInsideString = false;
-                        let isEscaped = false;
-                        let repaired = "";
-                        for (let i = 0; i < cleanText.length; i++) {
-                            const char = cleanText[i];
-                            if (char === '"' && !isEscaped) {
-                                isInsideString = !isInsideString;
-                                repaired += char;
-                            } else if (char === '\\') {
-                                isEscaped = !isEscaped;
-                                repaired += char;
-                            } else {
-                                isEscaped = false;
-                                if (isInsideString) {
-                                    if (char === '\n') repaired += "\\n";
-                                    else if (char === '\r') repaired += "\\r";
-                                    else if (char === '\t') repaired += "\\t";
-                                    else repaired += char;
-                                } else {
-                                    repaired += char;
-                                }
-                            }
-                        }
-                        return JSON.parse(repaired);
-                    }
-                    throw new Error("無法定位 JSON 定界符");
-                } catch (fatalErr) {
-                    console.error("JSON 深度修復失敗:", fatalErr, text);
-                    return {
-                        report_title: "⚠️ 報告格式解析異常 (已啟動容錯顯示)",
-                        summary: "AI 產生的內容夾帶了非預期的控制字元或換行，導致無法轉譯為完美表格。系統已自動攔截崩潰，並將原始分析結果完整擷取如下，確保您的資料絕不遺失：",
-                        sections: [
-                            {
-                                heading: "AI 原始分析結果",
-                                alert_type: "warning",
-                                content: "\`\`\`text\n" + text + "\n\`\`\`",
-                                source_location: "系統層級攔截",
-                                conditions: "強制純文字容錯顯示模式",
-                                is_assumption: false
-                            }
-                        ]
-                    };
+                // 基本清理 markdown
+                cleanText = cleanText.replace(/```json/gi, '').replace(/```/g, '').trim();
+                const startIdx = cleanText.indexOf('{');
+                const endIdx = cleanText.lastIndexOf('}');
+                if (startIdx !== -1 && endIdx !== -1 && startIdx <= endIdx) {
+                    cleanText = cleanText.substring(startIdx, endIdx + 1);
                 }
+                // 嘗試直接解析
+                return JSON.parse(cleanText); 
+            } catch (err) {
+                console.warn("JSON 解析失敗，啟用容錯顯示模式", err);
+                // 觸發容錯顯示，將壞掉的 JSON 原樣呈現
+                return {
+                    is_fallback: true,
+                    raw_text: cleanText
+                };
             }
         }
 
         function renderReportFromJSON(data) {
+            if (data.is_fallback) {
+                return `
+                <div class="mb-5 bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm">
+                    <h2 class="text-sm font-bold text-red-800 mb-2"><i class="fa-solid fa-triangle-exclamation"></i> 報告格式解析異常 (已啟動容錯顯示)</h2>
+                    <p class="text-xs text-red-700 mb-4">AI 產生的內容夾帶了非預期的控制字元或引號，導致無法轉譯為完美表格。系統已自動攔截崩潰，並將原始分析結果完整擷取如下，確保您的資料絕不遺失：</p>
+                    <div class="bg-white border border-red-200 p-3 rounded text-[11px] text-slate-800 font-mono whitespace-pre-wrap overflow-x-auto max-h-[500px] overflow-y-auto">
+                        ${data.raw_text}
+                    </div>
+                </div>`;
+            }
+
             let html = `<div class="mb-5"><h1 class="text-xl font-bold text-slate-800 mb-1">${data.report_title || '戰略分析報告'}</h1>`;
             if (data.summary) html += `<p class="text-slate-600 text-xs leading-relaxed">${data.summary}</p>`;
             html += `</div>`;
@@ -605,7 +583,7 @@
             { id: 4, title: "4. Win Theme 勝選主軸", icon: "fa-flag-checkered", prompt: "運用六步策略框架：客戶要求 → 買方價值 → 我方證據 → 交付方法 → 成本代價 → 待驗證條件。嚴禁產出虛構的勝率或無證據的競品弱點。" },
             { id: 5, title: "5. 提案大綱與 WBS", icon: "fa-list-ol", prompt: "擬定提案簡報大綱與工作包分配。標記為內部建議。遵守官方人力要求與定位，不可擅自推定常駐或改變原文配置。" },
             { id: 6, title: "6. 合規矩陣 (Compliance)", icon: "fa-table-list", prompt: "建立合規矩陣。條件式要求必須保留全部分支與例外，嚴禁簡化。確保每一項皆有精確的 [頁碼] 或 [儲存格] 定位。" },
-            { id: 7, title: "7. 報價、商業模型與公式稽核", icon: "fa-file-invoice-dollar", prompt: "盤點報價與計費邏輯。進行【Excel 實際公式稽核】：比對文字與儲存格實際公式，找出合計漏列、跨表引用錯誤、未稅/含稅混用。標示警告。" },
+            { id: 7, title: "7. 報價、商業模型與公式稽核", icon: "fa-file-invoice-dollar", prompt: "盤點報價與計費邏輯。進行【Excel 實際公式稽核】：比對文字與儲存格實際公式，找出合計漏列、跨表引用錯誤。公式快取為0不是錯誤證據。空白與0不能互相轉換。單純引用(如 =I169)非漏列。" },
             { id: 8, title: "8. 澄清問題過濾 (Q&A)", icon: "fa-clipboard-question", prompt: "草擬澄清問題。先過濾：是否能由現有公式/文件回答？是否為解析失敗？僅保留真正影響成本、時程或合規的問題，並附上精確原文定位。" },
             { id: 9, title: "9. 封裝與遞交 Check-list", icon: "fa-box-open", prompt: "整理遞交清單。嚴格區分官方要求與內部建議。確保交期、格式的原文來源精確無誤，不可憑空產生。" },
             { id: 10, title: "10. 紅軍審查 (Red Team Review)", icon: "fa-mask", prompt: "擔任嚴苛的紅軍審查員。指出我方提案中與 RFP 官方條件（需附來源定位）衝突之處。找出過度承諾與缺乏證據的漏洞。" },
@@ -682,9 +660,18 @@
                 container.appendChild(el);
             });
         }
-        window.removeRfpFile = (i) => { rfpParsedFiles.splice(i, 1); renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile'); };
-        window.removePropFile = (i) => { proposalParsedFiles.splice(i, 1); renderTags(proposalParsedFiles, document.getElementById('proposalFileTagsContainer'), 'removePropFile'); };
+        window.removeRfpFile = (i) => { 
+            rfpParsedFiles.splice(i, 1); 
+            renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile'); 
+            updateSharedEvidence();
+        };
+        window.removePropFile = (i) => { 
+            proposalParsedFiles.splice(i, 1); 
+            renderTags(proposalParsedFiles, document.getElementById('proposalFileTagsContainer'), 'removePropFile'); 
+            updateSharedEvidence();
+        };
         
+        // 核心解析器：嚴格拆分 f, v, w，空白保留 null 不填0
         async function extractTextFromFile(file) {
             const name = file.name.toLowerCase();
             try {
@@ -697,38 +684,42 @@
                     let text = `文件總頁數: ${pdf.numPages}\n`;
                     for (let i = 1; i <= pdf.numPages; i++) {
                         const pageText = (await (await pdf.getPage(i)).getTextContent()).items.map(it => it.str).join(' ');
-                        // 強制綁定頁碼標籤，防堵發明證據
-                        text += `\n[頁碼: ${i}] ` + pageText + '\n';
+                        text += `\n--- [頁碼: ${i}] ---\n` + pageText + '\n';
                     }
                     return text;
                 } else if (name.match(/\.(xlsx|xls)$/)) {
-                    // Excel 底層細胞級解析器 (cellFormula: true 啟動)
                     const wb = XLSX.read(await file.arrayBuffer(), {type: 'array', cellFormula: true});
                     let result = `總工作表數量: ${wb.SheetNames.length}\n`;
                     wb.SheetNames.forEach(sn => {
                         result += `\n\n=== [工作表: ${sn}] ===\n`;
                         const sheet = wb.Sheets[sn];
-                        const rangeStr = sheet['!ref'];
-                        if (!rangeStr) return; // 略過空白工作表
-                        
-                        const range = XLSX.utils.decode_range(rangeStr);
-                        for(let R = range.s.r; R <= range.e.r; ++R) {
-                            for(let C = range.s.c; C <= range.e.c; ++C) {
-                                const cellAddress = XLSX.utils.encode_cell({c: C, r: R});
-                                const cell = sheet[cellAddress];
-                                
-                                if (!cell) continue; 
-                                if (cell.v === undefined && cell.f === undefined && cell.w === undefined) continue;
-                                
-                                let cellInfo = `[工作表: ${sn}, 儲存格: ${cellAddress}]`;
+                        // 逐格掃描
+                        for (const z in sheet) {
+                            if(z[0] === '!') continue;
+                            const cell = sheet[z];
+                            if(cell) {
+                                let cellInfo = `[工作表: ${sn}, 儲存格: ${z}] `;
                                 let hasData = false;
                                 
-                                // 將 f, v, w 分開綁定，防止 LLM 混淆
-                                if (cell.w !== undefined) { cellInfo += ` 顯示文字(w)="${cell.w}"`; hasData = true; }
-                                if (cell.v !== undefined && cell.v !== cell.w) { cellInfo += ` 快取值(v)="${cell.v}"`; hasData = true; }
-                                if (cell.f !== undefined) { cellInfo += ` 實際公式(f)="=${cell.f}"`; hasData = true; }
+                                if (cell.w !== undefined && cell.w !== "") { 
+                                    cellInfo += `顯示文字(w)="${cell.w}" `; 
+                                    hasData = true; 
+                                }
+                                if (cell.v !== undefined && cell.v !== "") { 
+                                    cellInfo += `快取值(v)="${cell.v}" `; 
+                                    hasData = true; 
+                                }
+                                if (cell.f !== undefined && cell.f !== "") { 
+                                    cellInfo += `實際公式(f)="=${cell.f}" `; 
+                                    hasData = true; 
+                                }
                                 
-                                if(hasData) result += cellInfo + '\n';
+                                if (hasData) {
+                                    result += cellInfo + '\n';
+                                } else {
+                                    // 儲存格存在但空白
+                                    result += cellInfo + `狀態="輸入尚未填寫(空白)"\n`;
+                                }
                             }
                         }
                     });
@@ -740,6 +731,20 @@
             return null;
         }
 
+        function updateSharedEvidence() {
+            let reqText = ui.rfpContext.value.trim();
+            if (rfpParsedFiles.length) {
+                reqText += '\n\n' + rfpParsedFiles.map(f => `--- [檔案來源: ${f.name}] ---\n${f.text}`).join('\n');
+            }
+            sharedEvidenceState.rfpText = reqText;
+
+            let propText = ui.proposalContext.value.trim();
+            if (proposalParsedFiles.length) {
+                propText += '\n\n' + proposalParsedFiles.map(f => `--- [我方提案檔案: ${f.name}] ---\n${f.text}`).join('\n');
+            }
+            sharedEvidenceState.propText = propText;
+        }
+
         ui.fileUpload.addEventListener('change', async (e) => {
             const files = e.target.files; if(!files.length) return;
             for(let f of files) {
@@ -747,6 +752,7 @@
                 if(text) rfpParsedFiles.push({ name: f.name, text });
             }
             renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile'); 
+            updateSharedEvidence();
             ui.fileUpload.value = '';
         });
 
@@ -757,6 +763,7 @@
                 if(text) proposalParsedFiles.push({ name: f.name, text });
             }
             renderTags(proposalParsedFiles, document.getElementById('proposalFileTagsContainer'), 'removePropFile'); 
+            updateSharedEvidence();
             ui.propUpload.value = '';
         });
 
@@ -781,6 +788,7 @@
                 renderTags(rfpParsedFiles, ui.rfpTags, 'removeRfpFile');
                 proposalParsedFiles = d.propFiles || [];
                 renderTags(proposalParsedFiles, document.getElementById('proposalFileTagsContainer'), 'removePropFile');
+                updateSharedEvidence();
             } catch(e) { 
                 showDialog('載入失敗，檔案毀損。', 'error'); 
             }
@@ -799,6 +807,7 @@
             ui.emptyState.classList.remove('hidden');
             document.getElementById('exportWordBtn').classList.add('hidden');
             document.getElementById('exportWordBtn').classList.remove('flex');
+            updateSharedEvidence();
             
             chatHistory = [{ role: "model", parts: [{ text: "你好！我是 TONY 顧問，專案已重置，準備好開始新的 RFP 分析。" }] }];
             renderChatMessages();
@@ -899,19 +908,15 @@
             }
         }
 
+        ui.rfpContext.addEventListener('input', updateSharedEvidence);
+        ui.proposalContext.addEventListener('input', updateSharedEvidence);
+
         async function runAnalysis(workflow) {
             if (isProcessing) return; 
             if (!currentApiKey) return showDialog('請先在左側步驟 2 輸入並儲存 API Key', 'error');
             
-            let reqText = ui.rfpContext.value.trim();
-            if (rfpParsedFiles.length) {
-                reqText += '\n\n' + rfpParsedFiles.map(f => `--- [檔案來源: ${f.name}] ---\n${f.text}`).join('\n');
-            }
-            
-            let propText = ui.proposalContext.value.trim();
-            if (proposalParsedFiles.length) {
-                propText += '\n\n' + proposalParsedFiles.map(f => `--- [我方提案檔案: ${f.name}] ---\n${f.text}`).join('\n');
-            }
+            const reqText = sharedEvidenceState.rfpText;
+            const propText = sharedEvidenceState.propText;
 
             if (!reqText && !propText) return showDialog('請先提供 RFP 內容或我方提案資料', 'error');
 
@@ -932,14 +937,17 @@
             }
 
             try {
-                // 加入 maxOutputTokens: 8192 擴展輸出上限，避免長 JSON 被截斷
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${currentApiKey}`, {
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         system_instruction: { parts: [{ text: SYSTEM_PROMPT }] }, 
                         contents: [{ parts: [{ text: promptStr }] }], 
-                        generationConfig: { temperature: 0.1, responseMimeType: "application/json", maxOutputTokens: 8192 }
+                        generationConfig: { 
+                            temperature: 0.1, 
+                            responseMimeType: "application/json",
+                            maxOutputTokens: 8192
+                        }
                     })
                 });
 
@@ -961,8 +969,7 @@
             } catch (error) {
                 ui.loadingState.classList.add('hidden'); 
                 ui.resultContent.classList.remove('hidden');
-                // 即使出現完全的網路或系統錯誤，也能優雅地顯示在這裡
-                ui.resultContent.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded border border-red-200 text-xs shadow-sm"><b>系統層級異常：</b><br>${error.message}</div>`;
+                ui.resultContent.innerHTML = `<div class="p-4 bg-red-50 text-red-600 rounded border border-red-200 text-xs shadow-sm"><b>分析異常：</b><br>${error.message}</div>`;
             } finally { 
                 isProcessing = false; 
             }
@@ -1095,8 +1102,15 @@
                 return;
             }
 
+            // 動態抓取 H1 作為匯出檔名
+            let reportTitle = "戰略分析報告";
+            const h1El = document.querySelector('#resultContent h1');
+            if (h1El) {
+                reportTitle = h1El.textContent.trim().replace(/[\\/:*?"<>|]/g, '-');
+            }
+
             const preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><meta charset='utf-8'><title>RFP Analysis Report</title>
+                <head><meta charset='utf-8'><title>${reportTitle}</title>
                 <style>
                     body { font-family: '微軟正黑體', 'Inter', sans-serif; line-height: 1.6; color: #333; } 
                     table { border-collapse: collapse; width: 100%; margin-bottom: 20px; border: 1px solid #cbd5e1; } 
@@ -1113,20 +1127,14 @@
                 </style></head><body>`;
             
             // 替換前端特殊的 div class 為 Word 相容樣式
-            let wordContent = content.replace(/<div class="mt-2 mb-3 text-\[11px\].*?">.*?<b>/g, '<div class="conditions-box"><b>');
+            let wordContent = content.replace(/<div class="mt-2 mb-3 text-[11px].*?">.*?<b>/g, '<div class="conditions-box"><b>');
 
             const postHtml = "</body></html>";
             const html = preHtml + wordContent + postHtml;
 
             const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
             
-            // 抓取報告標題作為檔名，若無則使用預設名稱
-            const titleElement = document.querySelector('#resultContent h1');
-            let reportTitle = 'RFP戰略分析報告';
-            if (titleElement && titleElement.textContent.trim() !== '') {
-                // 移除檔名不合法字元
-                reportTitle = titleElement.textContent.trim().replace(/[\\/:*?"<>|]/g, '_');
-            }
+            // 檔案名稱直接套用大標題
             const filename = reportTitle + '.doc';
             
             const downloadLink = document.createElement("a");
